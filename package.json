@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
+    "postinstall": "prisma generate",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "lint": "eslint"
