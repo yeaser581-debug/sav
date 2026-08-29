@@ -27,11 +27,14 @@ export async function proxy(request: NextRequest) {
   }
 
   // Allow Next.js internals & static files
+  // (public/ is served at the root, not under /public — that entry below did nothing)
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
-    pathname.startsWith('/public') ||
-    pathname.startsWith('/uploads')
+    pathname.startsWith('/uploads') ||
+    pathname === '/manifest.json' ||
+    pathname === '/sw.js' ||
+    pathname.startsWith('/icons')
   ) {
     return NextResponse.next();
   }

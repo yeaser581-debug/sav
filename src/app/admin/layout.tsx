@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminSidebarSkeleton from '@/components/admin/AdminSidebarSkeleton';
+import { InstallPrompt } from '@/components/InstallPrompt';
 
 // Isolated in its own component (and Suspense boundary) because it reads
 // headers() — a runtime API. If this lived directly in AdminLayout, the whole
@@ -30,6 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <main className="min-w-0 md:ml-64 p-4 md:p-6 text-foreground">
         {children}
       </main>
+      <InstallPrompt />
     </div>
   );
 }

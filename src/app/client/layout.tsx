@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import ClientSidebar from '@/components/client/ClientSidebar';
+import { InstallPrompt } from '@/components/InstallPrompt';
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
@@ -17,6 +18,7 @@ export default async function ClientLayout({ children }: { children: React.React
       <main className="min-w-0 md:ml-64 p-4 pb-24 md:p-6 md:pb-6 text-foreground">
         {children}
       </main>
+      <InstallPrompt />
     </div>
   );
 }
