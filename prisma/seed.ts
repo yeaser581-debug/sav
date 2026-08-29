@@ -14,6 +14,9 @@ const adapter = new PrismaMariaDb({
   password: process.env.DATABASE_PASSWORD || "",
   database: process.env.DATABASE_NAME || "aftersales_db",
   connectionLimit: 5,
+  // Real MySQL 8 servers (Railway's included) default to caching_sha2_password,
+  // which needs this to exchange the RSA key without a TLS connection.
+  allowPublicKeyRetrieval: true,
 });
 const prisma = new PrismaClient({ adapter });
 
