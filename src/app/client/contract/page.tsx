@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { FileText, ShieldCheck, Calendar } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ClientContractPage() {
   const contract = await prisma.contract.findFirst({
     where: { isActive: true },

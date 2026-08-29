@@ -1,6 +1,8 @@
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AgentBuildingsPage() {
   const headersList = await headers();
   const agentId = Number(headersList.get('x-user-id'));

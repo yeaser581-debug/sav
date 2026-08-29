@@ -6,6 +6,12 @@ import { ArrowRight } from 'lucide-react';
 import { DashboardStats, StatusBreakdownCard } from '@/components/admin/DashboardStats';
 import { IssueTable } from '@/components/issues/IssueTable';
 
+// This page always queries live data per-request and can never be prerendered at
+// build time anyway (the DB isn't reachable from the build environment on most
+// hosts, Railway included) — force-dynamic makes that explicit instead of relying
+// on Next.js to infer it, which crashed the build rather than gracefully bailing.
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
   const [totalIssues, pendingIssuesCount, agentCount, clientCount] = await Promise.all([
     prisma.issue.count(),

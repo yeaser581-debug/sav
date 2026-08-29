@@ -6,6 +6,8 @@ import { buttonVariants } from '@/components/ui/button';
 import { Clock, Wrench, Calendar, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { IssueTable } from '@/components/issues/IssueTable';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AgentDashboard() {
   const headersList = await headers();
   const userId = Number(headersList.get('x-user-id'));

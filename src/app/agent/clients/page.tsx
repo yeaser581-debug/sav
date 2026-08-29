@@ -10,6 +10,8 @@ const STATUS_COLORS: Record<string, string> = {
   REJECTED:      'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function AgentClientsPage() {
   const headersList = await headers();
   const agentId = Number(headersList.get('x-user-id'));

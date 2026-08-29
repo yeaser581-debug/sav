@@ -8,6 +8,8 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
 import { Separator } from '@/components/ui/separator';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ClientDashboard() {
   const headersList = await headers();
   const userId = Number(headersList.get('x-user-id'));
