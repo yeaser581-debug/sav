@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-wash: var(--destructive-wash);
+  --color-success: var(--success);
+  --color-success-wash: var(--success-wash);
+  --color-warning: var(--warning);
+  --color-warning-wash: var(--warning-wash);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+ * "Institut" — the After-Sales design system.
+ * Cool white / near-ink neutrals, one confident cobalt accent (no gradient), and
+ * semantic status colors (success/warning/destructive) kept separate from that accent.
+ * Dark mode is a considered companion, not an inversion: a deep charcoal-navy ground
+ * (not pure black) and a brightened cobalt so the accent stays legible.
+ */
+:root {
+  --background: #fafaf9;
+  --foreground: #12141a;
+  --card: #ffffff;
+  --card-foreground: #12141a;
+  --popover: #ffffff;
+  --popover-foreground: #12141a;
+  --primary: #2952a3;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #12141a;
+  --muted: #f3f4f6;
+  --muted-foreground: #5b5e68;
+  --accent: #eaf0fb;
+  --accent-foreground: #1d3b78;
+  --destructive: #b23a34;
+  --destructive-wash: #fceae9;
+  --success: #1e7a46;
+  --success-wash: #e7f5ec;
+  --warning: #92620a;
+  --warning-wash: #fbf1df;
+  --border: #e7e8ec;
+  --input: #e7e8ec;
+  --ring: #2952a3;
+  --radius: 0.5rem;
+  --chart-1: #2952a3;
+  --chart-2: #1e7a46;
+  --chart-3: #92620a;
+  --chart-4: #6c93e0;
+  --chart-5: #b23a34;
+}
+
+.dark {
+  --background: #0f1115;
+  --foreground: #f1f2f4;
+  --card: #17191f;
+  --card-foreground: #f1f2f4;
+  --popover: #17191f;
+  --popover-foreground: #f1f2f4;
+  --primary: #6c93e0;
+  --primary-foreground: #0b1220;
+  --secondary: #1d2027;
+  --secondary-foreground: #f1f2f4;
+  --muted: #1d2027;
+  --muted-foreground: #9a9da8;
+  --accent: #1b2740;
+  --accent-foreground: #90aeea;
+  --destructive: #e2726b;
+  --destructive-wash: #2e1a19;
+  --success: #4fbe82;
+  --success-wash: #16291f;
+  --warning: #e0ac49;
+  --warning-wash: #2b2313;
+  --border: #262932;
+  --input: #262932;
+  --ring: #6c93e0;
+  --chart-1: #6c93e0;
+  --chart-2: #4fbe82;
+  --chart-3: #e0ac49;
+  --chart-4: #90aeea;
+  --chart-5: #e2726b;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

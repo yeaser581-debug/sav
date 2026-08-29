@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  isSuperAdmin Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Agent {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+  areas        Area[]
+  issues       Issue[]
+}
+
+model Area {
+  id        Int        @id @default(autoincrement())
+  name      String
+  agentId   Int?
+  agent     Agent?     @relation(fields: [agentId], references: [id])
+  buildings Building[]
+  deletedAt DateTime?
+}
+
+model Building {
+  id        Int       @id @default(autoincrement())
+  name      String
+  address   String?
+  areaId    Int?
+  area      Area?     @relation(fields: [areaId], references: [id])
+  clients   Client[]
+  deletedAt DateTime?
+}
+
+model Client {
+  id              Int       @id @default(autoincrement())
+  name            String
+  email           String?
+  phone           String?
+  unitNumber      String?
+  login           String    @unique
+  passwordHash    String
+  qrToken         String    @unique
+  qrUsedAt        DateTime?
+  mustSetPassword Boolean   @default(true)
+  buildingId      Int
+  building        Building  @relation(fields: [buildingId], references: [id])
+  createdAt       DateTime  @default(now())
+  deletedAt       DateTime?
+  issues          Issue[]
+}
+
+model AuditLog {
+  id              Int      @id @default(autoincrement())
+  entityType      String
+  entityId        Int
+  entityLabel     String
+  action          String // 'UPDATE' | 'DELETE' | 'RESTORE'
+  changes         Json?
+  performedById   Int
+  performedByName String
+  createdAt       DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+}
+
+model Contract {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.LongText
+  version   Int      @default(1)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  issues    Issue[]
+}
+
+model Issue {
+  id                  Int               @id @default(autoincrement())
+  clientId            Int
+  client              Client            @relation(fields: [clientId], references: [id])
+  agentId             Int?
+  agent               Agent?            @relation(fields: [agentId], references: [id])
+  contractId          Int?
+  contract            Contract?         @relation(fields: [contractId], references: [id])
+  originalDescription String?           @db.Text
+  aiDescription       String?           @db.Text
+  severity            Severity?
+  status              IssueStatus       @default(PENDING_AGENT)
+  rejectionReason     String?           @db.Text
+  disputeReason       String?           @db.Text
+  deadlineAt          DateTime?
+  resolvedAt          DateTime?
+  closedAt            DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  media               IssueMedia[]
+  messages            IssueMessage[]
+  proof               ResolutionProof[]
+  visits              Visit[]
+}
+
+enum Severity {
+  CRITICAL
+  MEDIUM
+  LOW
+}
+
+enum IssueStatus {
+  REJECTED
+  PENDING_AGENT
+  IN_PROGRESS
+  RESOLVED
+  CONFIRMED
+  DISPUTED
+}
+
+model IssueMedia {
+  id        Int       @id @default(autoincrement())
+  issueId   Int
+  issue     Issue     @relation(fields: [issueId], references: [id])
+  type      MediaType
+  url       String
+  createdAt DateTime  @default(now())
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+  AUDIO
+  TEXT
+}
+
+model IssueMessage {
+  id         Int        @id @default(autoincrement())
+  issueId    Int
+  issue      Issue      @relation(fields: [issueId], references: [id])
+  senderId   Int
+  senderType SenderType
+  message    String     @db.Text
+  mediaUrl   String?
+  mediaType  MediaType?
+  createdAt  DateTime   @default(now())
+}
+
+enum SenderType {
+  CLIENT
+  AGENT
+  ADMIN
+}
+
+model ResolutionProof {
+  id             Int        @id @default(autoincrement())
+  issueId        Int
+  issue          Issue      @relation(fields: [issueId], references: [id])
+  uploadedById   Int
+  uploadedByType SenderType
+  url            String
+  type           MediaType
+  note           String?    @db.Text
+  createdAt      DateTime   @default(now())
+}
+
+model Visit {
+  id          Int         @id @default(autoincrement())
+  issueId     Int
+  issue       Issue       @relation(fields: [issueId], references: [id])
+  scheduledAt DateTime
+  status      VisitStatus @default(PROPOSED)
+  createdAt   DateTime    @default(now())
+}
+
+enum VisitStatus {
+  PROPOSED
+  CONFIRMED
+  DECLINED
+  CANCELLED
+  DONE
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  userRole  String // 'client', 'agent', 'admin'
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, userRole])
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
