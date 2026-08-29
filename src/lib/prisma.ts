@@ -13,6 +13,9 @@ function createPrismaClient() {
     password: process.env.DATABASE_PASSWORD || '',
     database: process.env.DATABASE_NAME || 'aftersales_db',
     connectionLimit: 10,
+    // Real MySQL 8 servers (Railway's included) default to caching_sha2_password,
+    // which needs this to exchange the RSA key without a TLS connection.
+    allowPublicKeyRetrieval: true,
   });
   return new PrismaClient({ adapter });
 }
