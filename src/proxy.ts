@@ -78,10 +78,12 @@ export async function proxy(request: NextRequest) {
   // A client's first login (via QR or an admin-issued temporary password) must be
   // followed by setting their own password before anything else is accessible —
   // otherwise whatever was printed on the door remains a permanent credential.
+  let mustSetPassword = false;
   if (payload.role === 'client') {
     const client = await prisma.client.findUnique({ where: { id: payload.id }, select: { mustSetPassword: true } });
+    mustSetPassword = client?.mustSetPassword === true;
     const ACTIVATION_ALLOWED = ['/client/activate', '/api/auth/set-password'];
-    if (client?.mustSetPassword && !ACTIVATION_ALLOWED.some(p => pathname.startsWith(p))) {
+    if (mustSetPassword && !ACTIVATION_ALLOWED.some(p => pathname.startsWith(p))) {
       return pathname.startsWith('/api')
         ? NextResponse.json({ error: 'MUST_SET_PASSWORD', message: 'Veuillez définir votre mot de passe avant de continuer.' }, { status: 403 })
         : NextResponse.redirect(new URL('/client/activate', request.url));
@@ -106,6 +108,7 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set('x-user-email', payload.email);
   requestHeaders.set('x-user-role', payload.role);
   requestHeaders.set('x-user-super-admin', String(payload.isSuperAdmin === true));
+  requestHeaders.set('x-must-set-password', String(mustSetPassword));
 
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
