@@ -65,7 +65,7 @@ export default function AdminClientsPage() {
   const deleteTimersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
-    setBaseUrl(window.location.origin);
+    setBaseUrl(process.env.NEXT_PUBLIC_APP_URL || window.location.origin);
     fetchClients();
     fetch('/api/buildings')
       .then(res => res.ok ? res.json() : [])
