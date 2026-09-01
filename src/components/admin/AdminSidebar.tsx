@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { InstallMenuItem } from '@/components/InstallMenuItem';
 
 const nav = [
   { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
@@ -137,6 +138,7 @@ export default function AdminSidebar({ userName, userId, isSuperAdmin }: { userN
           <p className="text-muted-foreground text-xs truncate">{userName}</p>
         </div>
       </div>
+      <InstallMenuItem />
       <Button
         variant="ghost"
         onClick={() => logout()}

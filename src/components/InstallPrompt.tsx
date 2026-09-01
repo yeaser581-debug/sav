@@ -4,86 +4,27 @@ import { useEffect, useState } from 'react';
 import { Download, X, Share, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useInstallPrompt, isMobile } from '@/hooks/useInstallPrompt';
 
 const DISMISS_KEY = 'as-install-prompt-dismissed';
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-};
-
-function isIos() {
-  if (typeof navigator === 'undefined') return false;
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
-function isMobile() {
-  if (typeof navigator === 'undefined') return false;
-  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
-function isStandalone() {
-  if (typeof window === 'undefined') return false;
-  const nav = window.navigator as Navigator & { standalone?: boolean };
-  return window.matchMedia('(display-mode: standalone)').matches || nav.standalone === true;
-}
-
 export function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [visible, setVisible] = useState(false);
-  const [ios, setIos] = useState(false);
-  const [justInstalled, setJustInstalled] = useState(false);
+  const { canInstall, ios, standalone, install, justInstalled, clearJustInstalled } = useInstallPrompt();
+  const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    }
-
-    // Fires on a real, confirmed install — regardless of whether it was triggered
-    // through this component's button or the browser's own UI — so this is the
-    // one signal actually worth telling the user about.
-    const onInstalled = () => {
-      setVisible(false);
-      setJustInstalled(true);
-    };
-    window.addEventListener('appinstalled', onInstalled);
-
-    if (isStandalone()) return () => window.removeEventListener('appinstalled', onInstalled);
-    let dismissed = false;
-    try { dismissed = localStorage.getItem(DISMISS_KEY) === '1'; } catch {}
-    if (dismissed) return () => window.removeEventListener('appinstalled', onInstalled);
-
-    if (isIos()) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIos(true);
-      setVisible(true);
-      return () => window.removeEventListener('appinstalled', onInstalled);
-    }
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setVisible(true);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-      window.removeEventListener('appinstalled', onInstalled);
-    };
+    let wasDismissed = false;
+    try { wasDismissed = localStorage.getItem(DISMISS_KEY) === '1'; } catch {}
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDismissed(wasDismissed);
   }, []);
 
   const dismiss = () => {
-    setVisible(false);
+    setDismissed(true);
     try { localStorage.setItem(DISMISS_KEY, '1'); } catch {}
   };
 
-  const install = async () => {
-    if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    setDeferredPrompt(null);
-    setVisible(false);
-  };
+  const visible = !standalone && !dismissed && (ios || canInstall);
 
   return (
     <>
@@ -113,7 +54,7 @@ export function InstallPrompt() {
         </div>
       )}
 
-      <Dialog open={justInstalled} onOpenChange={setJustInstalled}>
+      <Dialog open={justInstalled} onOpenChange={(open) => !open && clearJustInstalled()}>
         <DialogContent className="sm:max-w-sm text-center">
           <DialogHeader className="items-center">
             <div className="h-12 w-12 rounded-full bg-success/15 text-success flex items-center justify-center mb-2">
@@ -126,7 +67,7 @@ export function InstallPrompt() {
                 : "Retrouvez « After-Sales » dans votre menu Démarrer, ou une nouvelle fenêtre de l'application vient de s'ouvrir."}
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={() => setJustInstalled(false)} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button onClick={clearJustInstalled} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
             Compris
           </Button>
         </DialogContent>

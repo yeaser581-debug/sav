@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { InstallMenuItem } from '@/components/InstallMenuItem';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -50,6 +51,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
         </div>
         <div className="flex items-center gap-1">
           <ThemeToggle className="h-8 w-8 text-muted-foreground hover:text-foreground" />
+          <InstallMenuItem variant="icon" />
           <NotificationBell userId={userId} />
           <Button
             variant="ghost"
@@ -151,6 +153,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
               <p className="text-muted-foreground text-xs truncate">{userName}</p>
             </div>
           </div>
+          <InstallMenuItem />
           <Button
             variant="ghost"
             onClick={logout}
