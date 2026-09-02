@@ -446,6 +446,11 @@ export default function AdminIssueDetailPage({ params }: { params: Promise<{ id:
               onRefresh={fetchIssue}
               subtitle="Fil de discussion avec le résident"
               className="h-full lg:h-auto lg:max-h-130"
+              leadMessage={{
+                content: issue.originalDescription,
+                senderLabel: issue.client?.name || issue.client?.login || 'Résident',
+                createdAt: issue.createdAt,
+              }}
             />
           </div>
         </div>

@@ -70,6 +70,7 @@ export function ChatPanel({
   title = 'Discussion',
   subtitle,
   className = 'h-[70vh] lg:h-[600px]',
+  leadMessage,
 }: {
   issueId: number;
   myRole: 'CLIENT' | 'ADMIN';
@@ -80,6 +81,7 @@ export function ChatPanel({
   title?: string;
   subtitle?: string;
   className?: string;
+  leadMessage?: { content: string; senderLabel: string; createdAt: string };
 }) {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -279,13 +281,32 @@ export function ChatPanel({
       </CardHeader>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-        {messages.filter(m => !hiddenIds.has(m.id)).length === 0 && pendingMessages.length === 0 ? (
+        {!leadMessage && messages.filter(m => !hiddenIds.has(m.id)).length === 0 && pendingMessages.length === 0 ? (
           <div className="text-center py-12">
             <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
             <p className="text-xs text-muted-foreground font-medium">Aucun message pour l&apos;instant.</p>
           </div>
         ) : (
-          messages.filter(m => !hiddenIds.has(m.id)).map(msg => {
+          <>
+          {leadMessage && (
+            <div className="flex gap-2.5 flex-row">
+              <Avatar className="h-7 w-7 shrink-0 mt-1">
+                <AvatarFallback className="bg-accent text-foreground text-[10px] font-bold">RE</AvatarFallback>
+              </Avatar>
+              <div className="space-y-1 max-w-[80%]">
+                <div className="p-3 text-xs leading-relaxed font-medium bg-muted border border-border text-foreground rounded-2xl rounded-tl-sm">
+                  <p className="text-[9px] font-bold mb-1.5 uppercase tracking-wider text-muted-foreground">
+                    Réclamation initiale — {leadMessage.senderLabel}
+                  </p>
+                  <p className="whitespace-pre-wrap">{leadMessage.content}</p>
+                </div>
+                <p className="text-[9px] text-muted-foreground px-1">
+                  {new Date(leadMessage.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            </div>
+          )}
+          {messages.filter(m => !hiddenIds.has(m.id)).map(msg => {
             const isMe = msg.senderType === myRole;
             const initials = msg.senderType === 'ADMIN' ? 'AD' : 'RE';
 
@@ -328,7 +349,8 @@ export function ChatPanel({
                 </div>
               </div>
             );
-          })
+          })}
+          </>
         )}
 
         {pendingMessages.map(msg => (

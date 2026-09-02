@@ -21,6 +21,10 @@ const SEVERITY: Record<string, { label: string; filled: number; text: string; ba
   LOW: { label: 'Faible', filled: 1, text: 'text-muted-foreground', bar: 'bg-muted-foreground' },
 };
 
+export function severityAccentColor(severity: string | null): string {
+  return SEVERITY[severity ?? '']?.bar ?? 'bg-muted-foreground';
+}
+
 export function SeverityBadge({ severity }: { severity: string | null }) {
   if (!severity) {
     return (

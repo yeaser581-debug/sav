@@ -20,10 +20,14 @@ export default async function AdminDashboard() {
     prisma.client.count(),
   ]);
 
-  const recentIssues = await prisma.issue.findMany({
+  const activeConversations = await prisma.issue.findMany({
+    where: { status: { in: ['PENDING_AGENT', 'IN_PROGRESS', 'DISPUTED'] } },
+    orderBy: [{ severity: { sort: 'asc', nulls: 'last' } }, { createdAt: 'desc' }],
     take: 5,
-    orderBy: { createdAt: 'desc' },
-    include: { client: { select: { unitNumber: true } } },
+    include: {
+      client: { select: { unitNumber: true } },
+      messages: { orderBy: { createdAt: 'desc' }, take: 1, select: { message: true, mediaType: true, senderType: true, createdAt: true } },
+    },
   });
 
   const statusCounts = await prisma.issue.groupBy({
@@ -139,10 +143,10 @@ export default async function AdminDashboard() {
           <CardHeader className="flex flex-row items-center justify-between px-6 py-5 border-b border-border">
             <div>
               <CardTitle className="text-base font-semibold text-foreground">
-                Réclamations récentes
+                Conversations à traiter
               </CardTitle>
               <CardDescription className="text-muted-foreground text-xs mt-0.5">
-                Les 5 dernières soumissions
+                Réclamations actives, par priorité
               </CardDescription>
             </div>
             <Link href="/admin/issues" className={buttonVariants({ variant: "ghost", size: "sm", className: "text-foreground hover:bg-accent gap-1.5" })}>
@@ -152,15 +156,17 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent className="p-0">
             <IssueTable
-              issues={recentIssues.map(i => ({
+              issues={activeConversations.map(i => ({
                 id: i.id,
                 originalDescription: i.originalDescription,
                 status: i.status,
                 severity: i.severity,
                 client: i.client,
+                latestMessage: i.messages[0] ? { ...i.messages[0], createdAt: i.messages[0].createdAt.toISOString() } : null,
               }))}
               basePath="/admin/issues"
-              emptyMessage="Aucune réclamation pour le moment."
+              variant="conversation"
+              emptyMessage="Aucune conversation active pour le moment."
             />
           </CardContent>
         </Card>

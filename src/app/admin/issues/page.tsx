@@ -24,6 +24,7 @@ type Issue = {
   severity: string;
   createdAt: string;
   client: { unitNumber: string; name?: string };
+  latestMessage?: { message: string; mediaType?: string | null; senderType?: string; createdAt: string } | null;
 };
 
 type Counts = { total: number; urgent: number; inProgress: number; resolved: number };
@@ -233,7 +234,7 @@ function AdminIssuesPageInner() {
             <IssueTable
               issues={issues}
               basePath="/admin/issues"
-              showDate
+              variant="conversation"
               emptyMessage="Aucune réclamation trouvée."
             />
             <PaginationControls page={page} total={total} limit={LIMIT} onPageChange={setPage} />

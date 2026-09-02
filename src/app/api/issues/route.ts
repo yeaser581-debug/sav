@@ -79,7 +79,13 @@ export async function GET(req: NextRequest) {
   const [issues, total, statusGroups, urgentCount] = await Promise.all([
     prisma.issue.findMany({
       where: fullWhere,
-      include: { media: true, client: { select: { unitNumber: true } } },
+      include: {
+        media: true,
+        client: { select: { unitNumber: true } },
+        ...(payload.role === 'admin'
+          ? { messages: { orderBy: { createdAt: 'desc' as const }, take: 1, select: { message: true, mediaType: true, senderType: true, createdAt: true } } }
+          : {}),
+      },
       orderBy,
       skip: (page - 1) * limit,
       take: limit,
@@ -102,7 +108,14 @@ export async function GET(req: NextRequest) {
     ? { ALL: roleTotal, UNASSIGNED: statusCount('PENDING_AGENT'), IN_PROGRESS: statusCount('IN_PROGRESS'), RESOLVED: resolvedCount }
     : { ALL: roleTotal, PENDING: statusCount('PENDING_AGENT'), IN_PROGRESS: statusCount('IN_PROGRESS'), RESOLVED: resolvedCount };
 
-  return NextResponse.json({ issues, total, page, limit, counts });
+  const mappedIssues = payload.role === 'admin'
+    ? issues.map((issue) => {
+        const { messages, ...rest } = issue as typeof issue & { messages?: { message: string; mediaType: string | null; senderType: string; createdAt: Date }[] };
+        return { ...rest, latestMessage: messages?.[0] ?? null };
+      })
+    : issues;
+
+  return NextResponse.json({ issues: mappedIssues, total, page, limit, counts });
 }
 
 export async function POST(req: NextRequest) {

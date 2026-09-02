@@ -3,7 +3,10 @@ import { ArrowRight, ClipboardList } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { buttonVariants } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { SeverityBadge } from '@/components/ui/severity-badge';
+import { SeverityBadge, severityAccentColor } from '@/components/ui/severity-badge';
+import { timeAgo } from '@/lib/utils';
+
+const MEDIA_PREVIEW: Record<string, string> = { PHOTO: '📷 Photo', VIDEO: '🎥 Vidéo', AUDIO: '🎤 Message vocal' };
 
 export type IssueTableItem = {
   id: number;
@@ -12,7 +15,16 @@ export type IssueTableItem = {
   severity: string | null;
   createdAt?: string | Date;
   client?: { unitNumber?: string | null; name?: string | null } | null;
+  latestMessage?: { message: string; mediaType?: string | null; senderType?: string; createdAt: string | Date } | null;
 };
+
+function conversationSnippet(issue: IssueTableItem): string {
+  const latest = issue.latestMessage;
+  if (!latest) return issue.originalDescription || 'Sans description';
+  const prefix = latest.senderType === 'ADMIN' ? 'Vous : ' : '';
+  const body = latest.message?.trim() || (latest.mediaType ? MEDIA_PREVIEW[latest.mediaType] ?? '' : '');
+  return `${prefix}${body || issue.originalDescription || 'Sans description'}`;
+}
 
 /**
  * The one shared issue list — used by both admin and agent, on both the dashboard
@@ -25,18 +37,59 @@ export function IssueTable({
   showDate = false,
   actionLabel,
   emptyMessage = 'Aucune réclamation trouvée.',
+  variant = 'table',
 }: {
   issues: IssueTableItem[];
   basePath: string;
   showDate?: boolean;
   actionLabel?: (issue: IssueTableItem) => string;
   emptyMessage?: string;
+  variant?: 'table' | 'conversation';
 }) {
   if (issues.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-14 text-center">
         <ClipboardList className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-40" />
         <p className="text-sm text-muted-foreground font-medium">{emptyMessage}</p>
+      </div>
+    );
+  }
+
+  if (variant === 'conversation') {
+    return (
+      <div className="divide-y divide-border">
+        {issues.map(issue => {
+          const initials = (issue.client?.unitNumber || '?').slice(0, 2).toUpperCase();
+          return (
+            <Link
+              key={issue.id}
+              href={`${basePath}/${issue.id}`}
+              className="flex items-stretch gap-3 hover:bg-accent/40 active:bg-accent/40 transition-colors"
+            >
+              <span className={`w-1 shrink-0 ${severityAccentColor(issue.severity)}`} aria-hidden="true" />
+              <div className="flex items-center gap-3 flex-1 min-w-0 py-3.5 pr-4">
+                <div className="w-10 h-10 rounded-full bg-accent border border-border flex items-center justify-center shrink-0">
+                  <span className="text-xs font-bold text-foreground">{initials}</span>
+                </div>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-bold text-foreground truncate">
+                      Unité {issue.client?.unitNumber || '—'}
+                      {issue.client?.name && <span className="font-normal text-muted-foreground"> — {issue.client.name}</span>}
+                    </p>
+                    <span className="text-[10px] text-muted-foreground shrink-0">
+                      {timeAgo(issue.latestMessage?.createdAt ?? issue.createdAt ?? new Date())}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-muted-foreground truncate">{conversationSnippet(issue)}</p>
+                    <span className="shrink-0"><StatusBadge status={issue.status} /></span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     );
   }
