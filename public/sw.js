@@ -1,8 +1,9 @@
-const CACHE_NAME = 'after-sales-shell-v1';
+const CACHE_NAME = 'after-sales-shell-v2';
 const SHELL_ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/offline.html',
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,7 +32,7 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request).catch(() => caches.match(request).then((cached) => cached || caches.match('/')))
+      fetch(request).catch(() => caches.match(request).then((cached) => cached || caches.match('/offline.html')))
     );
     return;
   }

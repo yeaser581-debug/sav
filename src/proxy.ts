@@ -34,6 +34,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/uploads') ||
     pathname === '/manifest.json' ||
     pathname === '/sw.js' ||
+    pathname === '/offline.html' ||
     pathname.startsWith('/icons')
   ) {
     return NextResponse.next();
