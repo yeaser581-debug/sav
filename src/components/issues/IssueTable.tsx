@@ -38,6 +38,7 @@ export function IssueTable({
   actionLabel,
   emptyMessage = 'Aucune réclamation trouvée.',
   variant = 'table',
+  activeId,
 }: {
   issues: IssueTableItem[];
   basePath: string;
@@ -45,6 +46,7 @@ export function IssueTable({
   actionLabel?: (issue: IssueTableItem) => string;
   emptyMessage?: string;
   variant?: 'table' | 'conversation';
+  activeId?: number;
 }) {
   if (issues.length === 0) {
     return (
@@ -64,7 +66,7 @@ export function IssueTable({
             <Link
               key={issue.id}
               href={`${basePath}/${issue.id}`}
-              className="flex items-stretch gap-3 hover:bg-accent/40 active:bg-accent/40 transition-colors"
+              className={`flex items-stretch gap-3 hover:bg-accent/40 active:bg-accent/40 transition-colors ${issue.id === activeId ? 'bg-accent/60' : ''}`}
             >
               <span className={`w-1 shrink-0 ${severityAccentColor(issue.severity)}`} aria-hidden="true" />
               <div className="flex items-center gap-3 flex-1 min-w-0 py-3.5 pr-4">

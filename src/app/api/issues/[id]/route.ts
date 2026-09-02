@@ -39,6 +39,16 @@ export async function GET(
     return NextResponse.json({ ...issue, messages: [] });
   }
 
+  if (payload.role === 'admin') {
+    const otherIssues = await prisma.issue.findMany({
+      where: { clientId: issue.clientId, id: { not: issue.id } },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: { id: true, status: true, severity: true, originalDescription: true, createdAt: true },
+    });
+    return NextResponse.json({ ...issue, otherIssues });
+  }
+
   return NextResponse.json(issue);
 }
 
