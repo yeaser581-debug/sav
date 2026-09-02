@@ -13,6 +13,8 @@ import { MediaGallery } from '@/components/ui/media-gallery';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { pushNotifications } from '@/lib/notify';
+import { outboxFetch } from '@/lib/outbox';
+import { toast } from 'sonner';
 import {
   ArrowLeft,
   Calendar,
@@ -83,16 +85,23 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
   };
 
   const updateStatus = async (status: string) => {
-    try {
-      const res = await fetch(`/api/issues/${resolvedParams.id}`, {
+    const result = await outboxFetch(
+      `/api/issues/${resolvedParams.id}`,
+      {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
-      });
-      if (res.ok) fetchIssue();
-    } catch (err) {
-      console.error(err);
+      },
+      crypto.randomUUID(),
+      { kind: 'status', issueId: resolvedParams.id ? Number(resolvedParams.id) : undefined }
+    );
+
+    if (result.status === 'queued') {
+      toast('Hors ligne — votre action sera envoyée automatiquement dès que vous serez en ligne.');
+      return;
     }
+
+    if (result.res.ok) fetchIssue();
   };
 
   const closeDisputeModal = () => {
@@ -117,20 +126,31 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
     if (!disputeReason.trim() || disputing) return;
     setDisputing(true);
     try {
-      const res = await fetch(`/api/issues/${resolvedParams.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'DISPUTED', disputeReason: disputeReason.trim() }),
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const result = await outboxFetch(
+        `/api/issues/${resolvedParams.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'DISPUTED', disputeReason: disputeReason.trim() }),
+        },
+        crypto.randomUUID(),
+        { kind: 'status', issueId: resolvedParams.id ? Number(resolvedParams.id) : undefined }
+      );
+
+      if (result.status === 'queued') {
+        toast('Hors ligne — votre contestation sera envoyée automatiquement dès que vous serez en ligne.');
+        setShowDisputeModal(false);
+        setDisputeReason('');
+        return;
+      }
+
+      if (result.res.ok) {
+        const data = await result.res.json();
         setShowDisputeModal(false);
         setDisputeReason('');
         pushNotifications(data.targetUserIds);
         fetchIssue();
       }
-    } catch (err) {
-      console.error(err);
     } finally {
       setDisputing(false);
     }

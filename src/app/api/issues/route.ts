@@ -116,9 +116,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const description = body.description as string;
     const media = Array.isArray(body.media) ? body.media as { id: string; type: string }[] : [];
+    const clientRequestId = typeof body.clientRequestId === 'string' ? body.clientRequestId : undefined;
 
     if (!description?.trim()) {
       return NextResponse.json({ error: 'Description required' }, { status: 400 });
+    }
+
+    if (clientRequestId) {
+      const existing = await prisma.issue.findUnique({ where: { clientRequestId } });
+      if (existing) {
+        return NextResponse.json({ success: true, issueId: existing.id }, { status: 200 });
+      }
     }
 
     // Get active contract
@@ -131,6 +139,7 @@ export async function POST(req: NextRequest) {
         originalDescription: description.trim(),
         status: 'PENDING_AGENT',
         contractId: contract?.id,
+        clientRequestId,
       },
     });
 

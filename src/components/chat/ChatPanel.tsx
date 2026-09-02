@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { showUndoToast } from '@/components/ui/undo-toast';
-import { MessageSquare, Send, Paperclip, Mic, X, Trash2 } from 'lucide-react';
+import { outboxFetch, subscribe } from '@/lib/outbox';
+import { MessageSquare, Send, Paperclip, Mic, X, Trash2, Clock } from 'lucide-react';
 
 export type ChatMessage = {
   id: number;
@@ -87,6 +88,7 @@ export function ChatPanel({
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [micError, setMicError] = useState('');
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
+  const [pendingMessages, setPendingMessages] = useState<{ id: string; content: string; createdAt: string }[]>([]);
 
   const socketRef = useRef<Socket | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -122,8 +124,17 @@ export function ChatPanel({
   }, [issueId]);
 
   useEffect(() => {
+    return subscribe((event) => {
+      if (event.type !== 'sent' || event.meta?.kind !== 'message' || event.meta.issueId !== issueId) return;
+      setPendingMessages(prev => prev.filter(m => m.id !== event.id));
+      onRefresh();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issueId]);
+
+  useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, otherTyping]);
+  }, [messages, otherTyping, pendingMessages]);
 
   const notifyTyping = () => {
     const now = Date.now();
@@ -145,12 +156,24 @@ export function ChatPanel({
     setNewMessage('');
     setSending(true);
     try {
-      const res = await fetch(`/api/issues/${issueId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
-      });
-      if (res.ok) afterSent(await res.json());
+      const clientRequestId = crypto.randomUUID();
+      const result = await outboxFetch(
+        `/api/issues/${issueId}/messages`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content, clientRequestId }),
+        },
+        clientRequestId,
+        { kind: 'message', issueId }
+      );
+
+      if (result.status === 'queued') {
+        setPendingMessages(prev => [...prev, { id: clientRequestId, content, createdAt: new Date().toISOString() }]);
+        return;
+      }
+
+      if (result.res.ok) afterSent(await result.res.json());
     } finally {
       setSending(false);
     }
@@ -256,7 +279,7 @@ export function ChatPanel({
       </CardHeader>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-        {messages.filter(m => !hiddenIds.has(m.id)).length === 0 ? (
+        {messages.filter(m => !hiddenIds.has(m.id)).length === 0 && pendingMessages.length === 0 ? (
           <div className="text-center py-12">
             <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
             <p className="text-xs text-muted-foreground font-medium">Aucun message pour l&apos;instant.</p>
@@ -307,6 +330,20 @@ export function ChatPanel({
             );
           })
         )}
+
+        {pendingMessages.map(msg => (
+          <div key={msg.id} className="flex gap-2.5 flex-row-reverse">
+            <div className="space-y-1 max-w-[80%]">
+              <div className="p-3 text-xs leading-relaxed font-medium bg-primary/60 text-primary-foreground rounded-2xl rounded-tr-sm">
+                <p className="whitespace-pre-wrap">{msg.content}</p>
+              </div>
+              <div className="flex items-center gap-1 px-1 justify-end text-muted-foreground">
+                <Clock className="h-2.5 w-2.5" />
+                <p className="text-[9px]">En attente d&apos;envoi</p>
+              </div>
+            </div>
+          </div>
+        ))}
 
         {otherTyping && (
           <div className="flex gap-2.5 flex-row">

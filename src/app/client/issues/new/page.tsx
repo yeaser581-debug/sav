@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { IssueFileUpload, type UploadedMedia } from '@/components/client/IssueFileUpload';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { outboxFetch } from '@/lib/outbox';
+import { toast } from 'sonner';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function NewIssuePage() {
@@ -53,14 +55,26 @@ export default function NewIssuePage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/issues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description, media }),
-      });
+      const clientRequestId = crypto.randomUUID();
+      const result = await outboxFetch(
+        '/api/issues',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description, media, clientRequestId }),
+        },
+        clientRequestId,
+        { kind: 'issue' }
+      );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur lors de la création.');
+      if (result.status === 'queued') {
+        toast('Hors ligne — réclamation enregistrée, elle sera envoyée automatiquement dès que vous serez en ligne.');
+        router.push('/client/issues');
+        return;
+      }
+
+      const data = await result.res.json();
+      if (!result.res.ok) throw new Error(data.error || 'Erreur lors de la création.');
 
       router.push(`/client/issues/${data.issueId}`);
     } catch (err: any) {

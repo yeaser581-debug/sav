@@ -105,9 +105,16 @@ export async function POST(
       return NextResponse.json({ success: true, message, targetUserIds }, { status: 201 });
     }
 
-    const { content } = await req.json();
+    const { content, clientRequestId } = await req.json();
     if (!content?.trim()) {
       return NextResponse.json({ error: 'Content required' }, { status: 400 });
+    }
+
+    if (typeof clientRequestId === 'string' && clientRequestId) {
+      const existing = await prisma.issueMessage.findUnique({ where: { clientRequestId } });
+      if (existing) {
+        return NextResponse.json({ success: true, message: existing, targetUserIds: [] }, { status: 200 });
+      }
     }
 
     const message = await prisma.issueMessage.create({
@@ -116,6 +123,7 @@ export async function POST(
         senderType: role.toUpperCase() as 'CLIENT' | 'ADMIN',
         senderId: payload.id,
         message: content.trim(),
+        clientRequestId: typeof clientRequestId === 'string' ? clientRequestId : undefined,
       },
     });
 

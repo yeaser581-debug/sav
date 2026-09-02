@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallMenuItem } from '@/components/InstallMenuItem';
+import { OutboxIndicator } from '@/components/client/OutboxIndicator';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -51,6 +52,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
         </div>
         <div className="flex items-center gap-1">
           <ThemeToggle className="h-8 w-8 text-muted-foreground hover:text-foreground" />
+          <OutboxIndicator variant="icon" />
           <InstallMenuItem variant="icon" />
           <NotificationBell userId={userId} />
           <Button
@@ -153,6 +155,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
               <p className="text-muted-foreground text-xs truncate">{userName}</p>
             </div>
           </div>
+          <OutboxIndicator />
           <InstallMenuItem />
           <Button
             variant="ghost"

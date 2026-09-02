@@ -106,6 +106,7 @@ model Issue {
   deadlineAt          DateTime?
   resolvedAt          DateTime?
   closedAt            DateTime?
+  clientRequestId     String?           @unique
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
   media               IssueMedia[]
@@ -146,15 +147,16 @@ enum MediaType {
 }
 
 model IssueMessage {
-  id         Int        @id @default(autoincrement())
-  issueId    Int
-  issue      Issue      @relation(fields: [issueId], references: [id])
-  senderId   Int
-  senderType SenderType
-  message    String     @db.Text
-  mediaUrl   String?
-  mediaType  MediaType?
-  createdAt  DateTime   @default(now())
+  id              Int        @id @default(autoincrement())
+  issueId         Int
+  issue           Issue      @relation(fields: [issueId], references: [id])
+  senderId        Int
+  senderType      SenderType
+  message         String     @db.Text
+  mediaUrl        String?
+  mediaType       MediaType?
+  clientRequestId String?    @unique
+  createdAt       DateTime   @default(now())
 }
 
 enum SenderType {
