@@ -54,7 +54,7 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
   const [refetching, setRefetching] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
-  const [severityFilter, setSeverityFilter] = useState('all');
+  const [severityFilter, setSeverityFilter] = useState(searchParams.get('severity') || 'all');
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebouncedValue(search, 300);

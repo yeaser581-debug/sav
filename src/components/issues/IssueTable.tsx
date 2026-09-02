@@ -18,12 +18,16 @@ export type IssueTableItem = {
   latestMessage?: { message: string; mediaType?: string | null; senderType?: string; createdAt: string | Date } | null;
 };
 
-function conversationSnippet(issue: IssueTableItem): string {
+export function conversationSnippet(issue: IssueTableItem): string {
   const latest = issue.latestMessage;
   if (!latest) return issue.originalDescription || 'Sans description';
   const prefix = latest.senderType === 'ADMIN' ? 'Vous : ' : '';
   const body = latest.message?.trim() || (latest.mediaType ? MEDIA_PREVIEW[latest.mediaType] ?? '' : '');
   return `${prefix}${body || issue.originalDescription || 'Sans description'}`;
+}
+
+export function unitInitials(unitNumber?: string | null): string {
+  return (unitNumber || '?').slice(0, 2).toUpperCase();
 }
 
 /**
@@ -61,7 +65,7 @@ export function IssueTable({
     return (
       <div className="divide-y divide-border">
         {issues.map(issue => {
-          const initials = (issue.client?.unitNumber || '?').slice(0, 2).toUpperCase();
+          const initials = unitInitials(issue.client?.unitNumber);
           return (
             <Link
               key={issue.id}

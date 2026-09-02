@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { buttonVariants } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { DashboardStats, StatusBreakdownCard } from '@/components/admin/DashboardStats';
-import { IssueTable } from '@/components/issues/IssueTable';
+import { TriageWidget } from '@/components/admin/issues/TriageWidget';
 
 // This page always queries live data per-request and can never be prerendered at
 // build time anyway (the DB isn't reachable from the build environment on most
@@ -155,18 +155,16 @@ export default async function AdminDashboard() {
             </Link>
           </CardHeader>
           <CardContent className="p-0">
-            <IssueTable
+            <TriageWidget
               issues={activeConversations.map(i => ({
                 id: i.id,
                 originalDescription: i.originalDescription,
                 status: i.status,
                 severity: i.severity,
+                createdAt: i.createdAt.toISOString(),
                 client: i.client,
                 latestMessage: i.messages[0] ? { ...i.messages[0], createdAt: i.messages[0].createdAt.toISOString() } : null,
               }))}
-              basePath="/admin/issues"
-              variant="conversation"
-              emptyMessage="Aucune conversation active pour le moment."
             />
           </CardContent>
         </Card>
