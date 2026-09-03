@@ -312,16 +312,22 @@ export function ConversationPane({ issueId }: { issueId: number }) {
           <p className="text-xs text-muted-foreground italic">Aucune autre réclamation.</p>
         ) : (
           <div className="space-y-1.5">
-            {issue.otherIssues.map(o => (
+            {issue.otherIssues.map((o, i) => (
               <Link
                 key={o.id}
                 href={`/admin/issues/${o.id}`}
                 onClick={() => setInfoOpen(false)}
-                className="flex items-start justify-between gap-2 rounded-lg border border-border bg-muted/40 hover:bg-accent p-2.5 transition-colors"
+                className={`flex items-start justify-between gap-2 rounded-lg border p-2.5 transition-colors hover:bg-accent ${
+                  i === 0 ? 'border-primary/30 bg-accent/40' : 'border-border bg-muted/40'
+                }`}
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 mb-1">
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                     <span className="font-mono text-[10px] text-muted-foreground">#{o.id}</span>
+                    <span className="text-[10px] text-muted-foreground">{timeAgo(o.createdAt)}</span>
+                    {i === 0 && (
+                      <span className="text-[9px] font-bold text-primary uppercase tracking-wide">Plus récente</span>
+                    )}
                     <SeverityBadge severity={o.severity} />
                   </div>
                   <p className="text-[11px] text-muted-foreground truncate">
