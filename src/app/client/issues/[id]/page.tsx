@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
+import { OverdueTag } from '@/components/ui/overdue-tag';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MediaGallery } from '@/components/ui/media-gallery';
 import { ChatPanel } from '@/components/chat/ChatPanel';
@@ -268,6 +269,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                     {issue.severity && issue.severity !== 'NORMAL' && (
                       <SeverityBadge severity={issue.severity} />
                     )}
+                    <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
                   </div>
                   <CardTitle className="text-xl font-bold text-foreground mt-3">
                     Détail de la demande
@@ -282,6 +284,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                       minute: '2-digit',
                     })}
                   </CardDescription>
+                  <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} variant="full" />
                 </div>
                 {issue.agent && (
                   <div className="bg-muted border border-border p-3 rounded-xl flex items-center gap-3 shrink-0">

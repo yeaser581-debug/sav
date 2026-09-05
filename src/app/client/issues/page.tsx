@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
+import { OverdueTag } from '@/components/ui/overdue-tag';
 import { PaginationControls } from '@/components/ui/pagination';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { Search, Plus, Calendar, ArrowRight, ClipboardList } from 'lucide-react';
@@ -188,6 +189,7 @@ function ClientIssuesPageInner() {
                         {issue.severity && issue.severity !== 'NORMAL' && (
                           <SeverityBadge severity={issue.severity} />
                         )}
+                        <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
                         <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto lg:ml-0">
                           <Calendar className="h-3.5 w-3.5" />
                           {new Date(issue.createdAt).toLocaleDateString('fr-FR', {

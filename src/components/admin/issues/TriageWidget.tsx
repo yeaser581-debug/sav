@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, ClipboardList } from 'lucide-react';
 import { SeverityBadge } from '@/components/ui/severity-badge';
+import { OverdueTag } from '@/components/ui/overdue-tag';
 import { conversationSnippet, unitInitials, type IssueTableItem } from '@/components/issues/IssueTable';
 import { timeAgo } from '@/lib/utils';
 
@@ -92,6 +93,7 @@ export function TriageWidget({ issues }: { issues: IssueTableItem[] }) {
           </p>
           <div className="flex items-center gap-2">
             <SeverityBadge severity={spotlight.severity} />
+            <OverdueTag severity={spotlight.severity} createdAt={spotlight.createdAt} status={spotlight.status} />
             <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-primary-foreground bg-primary rounded-md px-2.5 py-1.5">
               Répondre <ArrowRight className="h-3 w-3" />
             </span>

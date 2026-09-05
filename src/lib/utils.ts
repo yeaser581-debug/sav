@@ -19,3 +19,20 @@ export function timeAgo(date: string | Date): string {
 
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
+
+const SLA_HOURS: Record<string, number> = { CRITICAL: 24, MEDIUM: 72, LOW: 24 * 7 };
+const FINAL_STATUSES = new Set(['RESOLVED', 'CONFIRMED', 'REJECTED']);
+
+export function issueDeadline(
+  severity: string | null | undefined,
+  createdAt: string | Date | null | undefined,
+  status: string
+): { deadlineAt: Date; overdue: boolean } | null {
+  if (!severity || !createdAt || FINAL_STATUSES.has(status)) return null;
+  const hours = SLA_HOURS[severity];
+  if (!hours) return null;
+
+  const created = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+  const deadlineAt = new Date(created.getTime() + hours * 3_600_000);
+  return { deadlineAt, overdue: Date.now() > deadlineAt.getTime() };
+}

@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MediaGallery } from '@/components/ui/media-gallery';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
+import { OverdueTag } from '@/components/ui/overdue-tag';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { pushNotifications } from '@/lib/notify';
 import { timeAgo } from '@/lib/utils';
@@ -176,6 +177,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
               <SelectItem value="LOW">Faible</SelectItem>
             </SelectContent>
           </Select>
+          <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} variant="full" />
         </div>
 
         <div>
@@ -353,6 +355,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         <span className="text-xs font-bold text-foreground shrink-0">#{issue.id}</span>
         <SeverityBadge severity={issue.severity} />
         <StatusBadge status={issue.status} />
+        <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
         <span className="text-[10px] text-muted-foreground ml-auto hidden sm:inline">{timeAgo(issue.createdAt)}</span>
         <Button variant="ghost" size="icon-sm" onClick={() => setInfoOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground shrink-0">
           <Info className="h-4 w-4" />

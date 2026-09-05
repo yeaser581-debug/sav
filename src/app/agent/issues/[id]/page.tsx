@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
+import { OverdueTag } from '@/components/ui/overdue-tag';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { showUndoToast } from '@/components/ui/undo-toast';
@@ -242,6 +243,7 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                     {issue.severity && (
                       <SeverityBadge severity={issue.severity} />
                     )}
+                    <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
                   </div>
                   <CardTitle className="text-xl font-bold text-foreground mt-3">
                     Détail de l'intervention
@@ -256,6 +258,7 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                       minute: '2-digit',
                     })}
                   </CardDescription>
+                  <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} variant="full" />
                 </div>
 
                 {/* Client Info Summary */}

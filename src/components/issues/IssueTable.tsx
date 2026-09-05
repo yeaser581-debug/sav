@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { buttonVariants } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge, severityAccentColor } from '@/components/ui/severity-badge';
+import { OverdueTag } from '@/components/ui/overdue-tag';
 import { timeAgo } from '@/lib/utils';
 
 const MEDIA_PREVIEW: Record<string, string> = { PHOTO: '📷 Photo', VIDEO: '🎥 Vidéo', AUDIO: '🎤 Message vocal' };
@@ -89,7 +90,10 @@ export function IssueTable({
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs text-muted-foreground truncate">{conversationSnippet(issue)}</p>
-                    <span className="shrink-0"><StatusBadge status={issue.status} /></span>
+                    <span className="flex items-center gap-1.5 shrink-0">
+                      <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
+                      <StatusBadge status={issue.status} />
+                    </span>
                   </div>
                 </div>
               </div>
@@ -132,7 +136,12 @@ export function IssueTable({
                   </p>
                 </TableCell>
                 <TableCell><SeverityBadge severity={issue.severity} /></TableCell>
-                <TableCell><StatusBadge status={issue.status} /></TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1.5">
+                    <StatusBadge status={issue.status} />
+                    <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
+                  </div>
+                </TableCell>
                 {showDate && (
                   <TableCell className="text-xs text-muted-foreground font-medium">
                     {issue.createdAt
@@ -172,6 +181,7 @@ export function IssueTable({
                 <span className="font-mono text-[10px] font-bold text-muted-foreground">#{issue.id}</span>
                 <SeverityBadge severity={issue.severity} />
                 <StatusBadge status={issue.status} />
+                <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
               </div>
               <p className="text-xs font-bold text-foreground truncate">
                 Unité {issue.client?.unitNumber || '—'}
