@@ -7,20 +7,22 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get('token');
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.url;
+
     if (!token) {
-      return NextResponse.redirect(new URL('/login?error=missing_token', req.url));
+      return NextResponse.redirect(new URL('/login?error=missing_token', baseUrl));
     }
 
     const client = await prisma.client.findFirst({ where: { qrToken: token, deletedAt: null } });
 
     if (!client) {
-      return NextResponse.redirect(new URL('/login?error=invalid_token', req.url));
+      return NextResponse.redirect(new URL('/login?error=invalid_token', baseUrl));
     }
 
     // The QR code is a one-time activation key, not a permanent login: once scanned,
     // it's marked used and can never be replayed (e.g. from a photo of the door sticker).
     if (client.qrUsedAt) {
-      return NextResponse.redirect(new URL('/login?error=qr_used', req.url));
+      return NextResponse.redirect(new URL('/login?error=qr_used', baseUrl));
     }
     await prisma.client.update({ where: { id: client.id }, data: { qrUsedAt: new Date() } });
 
@@ -30,7 +32,7 @@ export async function GET(req: NextRequest) {
       role: 'client',
     });
 
-    const res = NextResponse.redirect(new URL('/client', req.url));
+    const res = NextResponse.redirect(new URL('/client', baseUrl));
     res.cookies.set('token', jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
