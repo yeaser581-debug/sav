@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { signToken } from '@/lib/auth';
+import { getPublicBaseUrl } from '@/lib/request';
 
 export async function GET(req: NextRequest) {
+  const baseUrl = getPublicBaseUrl(req);
+
   try {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get('token');
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.url;
 
     if (!token) {
       return NextResponse.redirect(new URL('/login?error=missing_token', baseUrl));
@@ -44,6 +45,6 @@ export async function GET(req: NextRequest) {
     return res;
   } catch (err) {
     console.error('[QR LOGIN ERROR]', err);
-    return NextResponse.redirect(new URL('/login?error=server_error', req.url));
+    return NextResponse.redirect(new URL('/login?error=server_error', baseUrl));
   }
 }
