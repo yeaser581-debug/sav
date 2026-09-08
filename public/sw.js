@@ -47,11 +47,13 @@ self.addEventListener('fetch', (event) => {
   const isApi = url.pathname.startsWith('/api/');
   if (isApi && !API_ALLOWLIST.some((re) => re.test(url.pathname))) return;
 
-  if (request.mode === 'navigate') {
+  const isPageRequest = request.mode === 'navigate' || request.headers.get('rsc') === '1';
+
+  if (isPageRequest) {
     const isClientRoute = url.pathname === '/client' || url.pathname.startsWith('/client/');
     if (!isClientRoute) {
       event.respondWith(
-        fetch(request).catch(() => caches.match(request).then((cached) => cached || caches.match('/offline.html')))
+        fetch(request).catch(() => caches.match(request, { ignoreVary: true }).then((cached) => cached || caches.match('/offline.html')))
       );
       return;
     }
@@ -62,7 +64,7 @@ self.addEventListener('fetch', (event) => {
           if (res.ok) putInRuntimeCache(event, request, res);
           return res;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/offline.html')))
+        .catch(() => caches.match(request, { ignoreVary: true }).then((cached) => cached || caches.match('/offline.html')))
     );
     return;
   }
@@ -75,7 +77,7 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(() =>
-          caches.match(request).then(
+          caches.match(request, { ignoreVary: true }).then(
             (cached) =>
               cached ||
               new Response(JSON.stringify({ error: 'offline' }), {
@@ -89,7 +91,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
+    caches.match(request, { ignoreVary: true }).then((cached) => {
       if (cached) return cached;
       return fetch(request).then((res) => {
         if (res.ok) putInRuntimeCache(event, request, res);

@@ -4,6 +4,7 @@ import ClientSidebar from '@/components/client/ClientSidebar';
 import ActivationHeader from '@/components/client/ActivationHeader';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { CacheWarmer } from '@/components/client/CacheWarmer';
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
@@ -36,6 +37,7 @@ export default async function ClientLayout({ children }: { children: React.React
         </div>
       </main>
       <InstallPrompt />
+      <CacheWarmer />
     </div>
   );
 }
