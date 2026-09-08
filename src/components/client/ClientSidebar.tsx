@@ -6,6 +6,7 @@ import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallMenuItem } from '@/components/InstallMenuItem';
 import { OutboxIndicator } from '@/components/client/OutboxIndicator';
+import { logout } from '@/lib/session';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -27,11 +28,6 @@ const nav = [
 
 export default function ClientSidebar({ userName, userId }: { userName: string; userId: number }) {
   const pathname = usePathname();
-
-  const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login';
-  };
 
   const initials = userName
     .split('@')[0]
@@ -58,7 +54,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={logout}
+            onClick={() => logout()}
             className="text-muted-foreground hover:text-destructive"
           >
             <LogOut className="h-4 w-4" />
@@ -159,7 +155,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
           <InstallMenuItem />
           <Button
             variant="ghost"
-            onClick={logout}
+            onClick={() => logout()}
             className="w-full justify-start gap-2 h-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 px-3 text-sm"
           >
             <LogOut className="h-3.5 w-3.5" />

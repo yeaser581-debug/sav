@@ -2,16 +2,12 @@
 
 import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logout } from '@/lib/session';
 
 // Minimal chrome shown only while mustSetPassword is true — no nav links, no
 // bottom tab bar, nothing that just bounces the user back to /client/activate
 // if clicked. Logout stays as the one legitimate escape hatch.
 export default function ActivationHeader() {
-  const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login';
-  };
-
   return (
     <div className="sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-border bg-card">
       <div className="flex items-center gap-2">
@@ -23,7 +19,7 @@ export default function ActivationHeader() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={logout}
+        onClick={() => logout()}
         className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10"
       >
         <LogOut className="h-3.5 w-3.5" />

@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { InstallMenuItem } from '@/components/InstallMenuItem';
+import { logout } from '@/lib/session';
 
 const nav = [
   { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
@@ -49,11 +50,6 @@ export default function AdminSidebar({ userName, userId, isSuperAdmin }: { userN
   const [open, setOpen] = useState(false);
 
   useEffect(() => { setOpen(false); }, [pathname]);
-
-  const logout = async (reason?: string) => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = reason ? `/login?error=${reason}` : '/login';
-  };
 
   // If a super admin disables this account mid-session, kick the user out
   // immediately instead of waiting for their next request or page reload.

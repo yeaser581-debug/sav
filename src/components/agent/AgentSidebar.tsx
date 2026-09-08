@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { InstallMenuItem } from '@/components/InstallMenuItem';
+import { logout } from '@/lib/session';
 
 const nav = [
   { href: '/agent', label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
@@ -34,11 +35,6 @@ export default function AgentSidebar({ userName, userId }: { userName: string; u
   const [open, setOpen] = useState(false);
 
   useEffect(() => { setOpen(false); }, [pathname]);
-
-  const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login';
-  };
 
   const initials = userName
     .split('@')[0]
@@ -83,7 +79,7 @@ export default function AgentSidebar({ userName, userId }: { userName: string; u
       <InstallMenuItem />
       <Button
         variant="ghost"
-        onClick={logout}
+        onClick={() => logout()}
         className="w-full justify-start gap-2 h-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 px-3 text-sm"
       >
         <LogOut className="h-3.5 w-3.5" />

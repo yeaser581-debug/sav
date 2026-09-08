@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import ClientSidebar from '@/components/client/ClientSidebar';
 import ActivationHeader from '@/components/client/ActivationHeader';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
@@ -28,8 +29,11 @@ export default async function ClientLayout({ children }: { children: React.React
   return (
     <div className="min-h-screen bg-background">
       <ClientSidebar userName={userName} userId={userId} />
-      <main className="min-w-0 md:ml-64 p-4 pb-24 md:p-6 md:pb-6 text-foreground">
-        {children}
+      <main className="min-w-0 md:ml-64 text-foreground">
+        <OfflineBanner />
+        <div className="p-4 pb-24 md:p-6 md:pb-6">
+          {children}
+        </div>
       </main>
       <InstallPrompt />
     </div>
