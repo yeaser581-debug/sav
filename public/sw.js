@@ -1,5 +1,5 @@
 const CACHE_NAME = 'after-sales-shell-v3';
-const RUNTIME_CACHE = 'after-sales-runtime-v2';
+const RUNTIME_CACHE = 'after-sales-runtime-v3';
 const SHELL_ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
@@ -37,10 +37,10 @@ function putInRuntimeCache(event, key, response) {
   event.waitUntil(caches.open(RUNTIME_CACHE).then((cache) => cache.put(key, copy)));
 }
 
-function pageCacheKey(request) {
+function pageCacheKey(request, kind) {
   const key = new URL(request.url);
   key.searchParams.delete('_rsc');
-  return key.toString();
+  return `${key.toString()}::${kind}`;
 }
 
 self.addEventListener('fetch', (event) => {
@@ -53,10 +53,11 @@ self.addEventListener('fetch', (event) => {
   const isApi = url.pathname.startsWith('/api/');
   if (isApi && !API_ALLOWLIST.some((re) => re.test(url.pathname))) return;
 
-  const isPageRequest = request.mode === 'navigate' || request.headers.get('rsc') === '1';
+  const isRsc = request.headers.get('rsc') === '1';
+  const isPageRequest = request.mode === 'navigate' || isRsc;
+  const isClientRoute = url.pathname === '/client' || url.pathname.startsWith('/client/');
 
-  if (isPageRequest) {
-    const isClientRoute = url.pathname === '/client' || url.pathname.startsWith('/client/');
+  if (!isApi && (isPageRequest || isClientRoute)) {
     if (!isClientRoute) {
       event.respondWith(
         fetch(request).catch(() => caches.match(request, { ignoreVary: true }).then((cached) => cached || caches.match('/offline.html')))
@@ -64,7 +65,7 @@ self.addEventListener('fetch', (event) => {
       return;
     }
 
-    const key = pageCacheKey(request);
+    const key = pageCacheKey(request, isRsc ? 'rsc' : 'nav');
     event.respondWith(
       fetch(request)
         .then((res) => {
