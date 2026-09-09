@@ -1,5 +1,5 @@
 const CACHE_NAME = 'after-sales-shell-v3';
-const RUNTIME_CACHE = 'after-sales-runtime-v1';
+const RUNTIME_CACHE = 'after-sales-runtime-v2';
 const SHELL_ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
@@ -32,9 +32,15 @@ self.addEventListener('message', (event) => {
   }
 });
 
-function putInRuntimeCache(event, request, response) {
+function putInRuntimeCache(event, key, response) {
   const copy = response.clone();
-  event.waitUntil(caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy)));
+  event.waitUntil(caches.open(RUNTIME_CACHE).then((cache) => cache.put(key, copy)));
+}
+
+function pageCacheKey(request) {
+  const key = new URL(request.url);
+  key.searchParams.delete('_rsc');
+  return key.toString();
 }
 
 self.addEventListener('fetch', (event) => {
@@ -58,13 +64,14 @@ self.addEventListener('fetch', (event) => {
       return;
     }
 
+    const key = pageCacheKey(request);
     event.respondWith(
       fetch(request)
         .then((res) => {
-          if (res.ok) putInRuntimeCache(event, request, res);
+          if (res.ok) putInRuntimeCache(event, key, res);
           return res;
         })
-        .catch(() => caches.match(request, { ignoreVary: true }).then((cached) => cached || caches.match('/offline.html')))
+        .catch(() => caches.match(key, { ignoreVary: true }).then((cached) => cached || caches.match('/offline.html')))
     );
     return;
   }
