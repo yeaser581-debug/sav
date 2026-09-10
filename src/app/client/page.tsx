@@ -7,6 +7,7 @@ import { ArrowRight, Plus, HelpCircle } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
 import { Separator } from '@/components/ui/separator';
+import { InstallCard } from '@/components/client/InstallCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,6 @@ export default async function ClientDashboard() {
   const userId = Number(headersList.get('x-user-id'));
   const userEmail = headersList.get('x-user-email') ?? 'Client';
   const userName = userEmail.split('@')[0];
-  // Format the name nicely (capitalize first letter)
   const formattedName = userName.charAt(0).toUpperCase() + userName.slice(1);
 
   const issues = await prisma.issue.findMany({
@@ -33,7 +33,6 @@ export default async function ClientDashboard() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Bonjour, {formattedName}</h1>
@@ -47,9 +46,9 @@ export default async function ClientDashboard() {
         </Link>
       </div>
 
-      {/* Main Content Sections */}
+      <InstallCard />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Recent Issues */}
         <Card className="lg:col-span-2 bg-card border-border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border">
             <div>
@@ -104,7 +103,6 @@ export default async function ClientDashboard() {
           </CardContent>
         </Card>
 
-        {/* Right Column: Quick info / banner */}
         <div className="space-y-6">
           <Card className="bg-card border-border shadow-sm">
             <CardHeader>
