@@ -142,7 +142,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
   const infoContent = (
     <div className="space-y-5">
-      {/* Client identity */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-accent border border-border flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-foreground">
@@ -159,7 +158,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
       <Separator />
 
-      {/* Priority + agent */}
       <div className="space-y-3">
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
@@ -211,7 +209,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       </div>
 
-      {/* Rejection reason */}
       {issue.rejectionReason && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
           <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider mb-1.5">Motif de rejet</p>
@@ -219,7 +216,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       )}
 
-      {/* Media */}
       {issue.media.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -229,7 +225,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       )}
 
-      {/* Resolution proof */}
       {issue.proof && issue.proof.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -246,7 +241,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       )}
 
-      {/* Dispute / reopen */}
       {issue.status === 'DISPUTED' && (
         <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-3 space-y-3">
           <p className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -282,7 +276,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       )}
 
-      {/* Visits */}
       {issue.visits.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -305,7 +298,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
       <Separator />
 
-      {/* Other reclamations from the same client */}
       <div>
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
           Autres réclamations de ce client
@@ -347,7 +339,6 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Slim header */}
       <div className="flex items-center gap-2 px-3 h-12 border-b border-border shrink-0 bg-card">
         <Link href="/admin/issues" className="md:hidden text-muted-foreground hover:text-foreground shrink-0">
           <ArrowLeft className="h-4 w-4" />

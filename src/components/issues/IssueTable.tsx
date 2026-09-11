@@ -31,11 +31,6 @@ export function unitInitials(unitNumber?: string | null): string {
   return (unitNumber || '?').slice(0, 2).toUpperCase();
 }
 
-/**
- * The one shared issue list — used by both admin and agent, on both the dashboard
- * (short, no pagination) and the full issues page. Desktop gets a table, mobile gets
- * a tappable card list; neither has to be hand-rolled per page again.
- */
 export function IssueTable({
   issues,
   basePath,
@@ -106,7 +101,6 @@ export function IssueTable({
 
   return (
     <>
-      {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto">
         <Table>
           <TableHeader>
@@ -168,7 +162,6 @@ export function IssueTable({
         </Table>
       </div>
 
-      {/* Mobile cards */}
       <div className="md:hidden divide-y divide-border">
         {issues.map(issue => (
           <Link

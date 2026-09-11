@@ -21,13 +21,10 @@ const ROLE_PREFIXES: Record<string, string[]> = {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public routes
   if (PUBLIC_ROUTES.some(r => pathname.startsWith(r))) {
     return NextResponse.next();
   }
 
-  // Allow Next.js internals & static files
-  // (public/ is served at the root, not under /public — that entry below did nothing)
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
@@ -53,8 +50,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // `proxy` always runs on the Node.js runtime (Next.js 16), so we can safely
-  // verify the JWT signature here (not just decode it) and hit the database below.
   const payload = verifyToken(token);
   if (!payload) {
     const res = NextResponse.redirect(new URL('/login', request.url));
@@ -62,9 +57,6 @@ export async function proxy(request: NextRequest) {
     return res;
   }
 
-  // An admin account can be disabled (or a super admin demoted) after the token
-  // was issued. JWTs are stateless, so we re-check live status on every request
-  // instead of only at login — a disabled admin is kicked out immediately.
   if (payload.role === 'admin') {
     const admin = await prisma.admin.findUnique({ where: { id: payload.id }, select: { isActive: true } });
     if (!admin || !admin.isActive) {
@@ -76,9 +68,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // A client's first login (via QR or an admin-issued temporary password) must be
-  // followed by setting their own password before anything else is accessible —
-  // otherwise whatever was printed on the door remains a permanent credential.
   let mustSetPassword = false;
   if (payload.role === 'client') {
     const client = await prisma.client.findUnique({ where: { id: payload.id }, select: { mustSetPassword: true } });
@@ -91,19 +80,13 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Role-based route protection
   const allowedPrefixes = ROLE_PREFIXES[payload.role] ?? [];
   const roleMatch = allowedPrefixes.some(p => pathname.startsWith(p));
 
-  // The API routes handle their own authorization (verifying the token and role),
-  // so we don't need to block /api/* requests here based on URL prefixes.
-
-  // For page routes
   if (!pathname.startsWith('/api') && !roleMatch) {
     return NextResponse.redirect(new URL(`/${payload.role}`, request.url));
   }
 
-  // Inject user info as headers for server components
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-user-id', String(payload.id));
   requestHeaders.set('x-user-email', payload.email);

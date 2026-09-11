@@ -179,7 +179,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
     );
   }
 
-  // Calculate visual stepper index
   const getStepIndex = (status: string) => {
     if (status === 'PENDING_AGENT') return 1;
     if (status === 'IN_PROGRESS' || status === 'DISPUTED') return 2;
@@ -192,13 +191,11 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
-      {/* Back button */}
       <Link href="/client/issues" className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors w-fit">
         <ArrowLeft className="h-4 w-4" />
         Retour aux réclamations
       </Link>
 
-      {/* Status Stepper */}
       <Card className="bg-card border-border p-5 hidden md:block">
         <div className="flex items-center justify-between">
           {[
@@ -231,7 +228,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </Card>
 
-      {/* Mobile section switcher */}
       <div className="lg:hidden flex bg-muted border border-border rounded-lg p-1">
         {([
           { id: 'details', label: 'Détails' },
@@ -255,9 +251,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         ))}
       </div>
 
-      {/* Main Split Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Details & Media */}
         <div className={`lg:col-span-2 space-y-6 ${mobileTab === 'details' ? 'block' : 'hidden'} lg:block`}>
           <Card className="bg-card border-border shadow-md">
             <CardHeader className="border-b border-border pb-5">
@@ -303,7 +297,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
             </CardHeader>
 
             <CardContent className="pt-6 space-y-6">
-              {/* Description */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Description originale</h4>
                 <div className="p-4 bg-muted border border-border rounded-xl">
@@ -313,7 +306,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                 </div>
               </div>
 
-              {/* Media gallery */}
               {issue.media.length > 0 && (
                 <div className="space-y-3">
                   <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -326,7 +318,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
             </CardContent>
           </Card>
 
-          {/* Resolution proof */}
           {issue.proof && issue.proof.length > 0 && (
             <Card className="bg-card border-border shadow-md">
               <CardHeader className="border-b border-border pb-4">
@@ -349,7 +340,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
             </Card>
           )}
 
-          {/* Validation Banner */}
           {issue.status === 'RESOLVED' && (
             <Card className="border-emerald-500/20 bg-emerald-500/5 shadow-md relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
@@ -383,10 +373,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
           )}
         </div>
 
-        {/* Right Column: Chat & Discussion */}
-        {/* On mobile, the "Discussion" tab takes over the screen as a fixed panel (between the
-            top bar and the bottom tab bar) so the composer never scrolls out of view. On lg+
-            it reverts to a normal in-flow column. */}
         <div
           className={`lg:col-span-1 lg:block lg:static lg:inset-auto lg:z-auto lg:p-0 ${
             mobileTab === 'chat' ? 'fixed inset-x-0 top-14 bottom-24 z-30 p-4' : 'hidden'
@@ -405,7 +391,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Dispute Modal */}
       {showDisputeModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">

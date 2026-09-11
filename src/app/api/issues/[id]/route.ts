@@ -27,7 +27,6 @@ export async function GET(
 
   if (!issue) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // Access control: client can only see their own, agent can see assigned, admin sees all
   if (payload.role === 'client' && issue.clientId !== payload.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -35,7 +34,6 @@ export async function GET(
     if (issue.agentId !== payload.id && issue.status !== 'PENDING_AGENT') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    // The resident/administration chat is not visible to agents.
     return NextResponse.json({ ...issue, messages: [] });
   }
 
@@ -67,7 +65,6 @@ export async function PATCH(
   const issue = await prisma.issue.findUnique({ where: { id: issueId } });
   if (!issue) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // Client can only confirm/dispute the resolution of their own issue
   if (payload.role === 'client') {
     if (issue.clientId !== payload.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -77,7 +74,6 @@ export async function PATCH(
     }
   }
 
-  // Agent can only act on issues assigned to them, or claim/reject an unassigned pending one
   if (payload.role === 'agent') {
     const isOwnIssue = issue.agentId === payload.id;
     const isClaimingOrRejecting = issue.status === 'PENDING_AGENT' && !issue.agentId

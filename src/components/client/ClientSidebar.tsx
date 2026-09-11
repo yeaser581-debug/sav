@@ -38,7 +38,6 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
 
   return (
     <>
-      {/* Mobile top bar */}
       <div className="md:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-3 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-foreground flex items-center justify-center shrink-0">
@@ -62,7 +61,6 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
         </div>
       </div>
 
-      {/* Mobile bottom tab bar */}
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card">
         <div className="flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
           {nav.map(item => {
@@ -96,9 +94,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
         </div>
       </div>
 
-      {/* Desktop sidebar */}
       <aside className="hidden md:flex fixed left-0 top-0 h-full w-64 flex-col z-40 bg-card border-r border-border">
-        {/* Brand */}
         <div className="p-5">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-foreground flex items-center justify-center shrink-0">
@@ -117,7 +113,6 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
 
         <Separator />
 
-        {/* Nav */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {nav.map(item => {
             const Icon = item.icon;
@@ -140,7 +135,6 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
 
         <Separator />
 
-        {/* User */}
         <div className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <Avatar className="h-8 w-8">

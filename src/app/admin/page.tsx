@@ -6,10 +6,6 @@ import { ArrowRight } from 'lucide-react';
 import { DashboardStats, StatusBreakdownCard } from '@/components/admin/DashboardStats';
 import { TriageWidget } from '@/components/admin/issues/TriageWidget';
 
-// This page always queries live data per-request and can never be prerendered at
-// build time anyway (the DB isn't reachable from the build environment on most
-// hosts, Railway included) — force-dynamic makes that explicit instead of relying
-// on Next.js to infer it, which crashed the build rather than gracefully bailing.
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
@@ -101,7 +97,6 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-8">
 
-      {/* ── Page Header ─────────────────────────────────────────── */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -119,7 +114,6 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      {/* ── Stats Row ────────────────────────────────────────────── */}
       <DashboardStats
         totalIssues={totalIssues}
         pendingCount={pendingIssuesCount}
@@ -135,10 +129,8 @@ export default async function AdminDashboard() {
         pendingIssues={pendingIssuesList}
       />
 
-      {/* ── Bottom Grid ─────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* LEFT: Recent Issues Table (spans 2 cols) */}
         <Card className="lg:col-span-2 bg-card border-border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between px-6 py-5 border-b border-border">
             <div>
@@ -169,7 +161,6 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* RIGHT: Status Breakdown */}
         <StatusBreakdownCard totalIssues={totalIssues} statusMap={statusMap} />
 
       </div>

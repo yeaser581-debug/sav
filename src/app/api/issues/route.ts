@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
   const filterParam = searchParams.get('filter');
   const severityParam = searchParams.get('severity');
 
-  // Role scope — used both for the paginated query and for the role-scoped counts
   let roleWhere: Prisma.IssueWhereInput = {};
   if (payload.role === 'client') {
     roleWhere = { clientId: payload.id };
@@ -36,9 +35,7 @@ export async function GET(req: NextRequest) {
       ],
     };
   }
-  // admin sees all (empty roleWhere)
 
-  // Extra filters on top of role scope
   const extraWhere: Prisma.IssueWhereInput[] = [];
 
   if (payload.role === 'admin' && statusParam && statusParam !== 'all' && statusParam in IssueStatus) {
@@ -62,7 +59,6 @@ export async function GET(req: NextRequest) {
       OR: [
         { originalDescription: { contains: search } },
         ...(isNumeric ? [{ id: Number(search) }] : []),
-        // Agents also search by resident unit number
         ...(payload.role === 'agent' ? [{ client: { unitNumber: { contains: search } } }] : []),
       ],
     });
@@ -142,10 +138,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Get active contract
     const contract = await prisma.contract.findFirst({ where: { isActive: true } });
 
-    // Create the issue
     const issue = await prisma.issue.create({
       data: {
         clientId: payload.id,
@@ -156,7 +150,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Move pre-uploaded temp media into the issue's permanent folder
     const tempDir = path.join(process.cwd(), 'public', 'uploads', 'temp');
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'issues', String(issue.id));
     const tempEntries = media.length ? await readdir(tempDir).catch(() => [] as string[]) : [];

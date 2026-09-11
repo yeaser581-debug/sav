@@ -20,8 +20,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/login?error=invalid_token', baseUrl));
     }
 
-    // The QR code is a one-time activation key, not a permanent login: once scanned,
-    // it's marked used and can never be replayed (e.g. from a photo of the door sticker).
     if (client.qrUsedAt) {
       return NextResponse.redirect(new URL('/login?error=qr_used', baseUrl));
     }

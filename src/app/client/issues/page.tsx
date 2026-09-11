@@ -92,7 +92,6 @@ function ClientIssuesPageInner() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Mes réclamations</h1>
@@ -106,9 +105,7 @@ function ClientIssuesPageInner() {
         </Link>
       </div>
 
-      {/* Filters Bar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card border border-border rounded-xl p-3">
-        {/* Tabs */}
         <div className="flex bg-muted border border-border rounded-lg p-1 w-full md:w-auto">
           {[
             { id: 'ALL', label: 'Toutes', count: counts.ALL },
@@ -130,7 +127,6 @@ function ClientIssuesPageInner() {
           ))}
         </div>
 
-        {/* Search */}
         <div className="relative w-full md:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -142,7 +138,6 @@ function ClientIssuesPageInner() {
         </div>
       </div>
 
-      {/* Issues Grid / List */}
       {initialLoading ? (
         <div className="flex justify-center py-16">
           <svg className="animate-spin h-8 w-8 text-foreground" fill="none" viewBox="0 0 24 24">
@@ -182,7 +177,6 @@ function ClientIssuesPageInner() {
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div className="flex-1 space-y-4">
-                      {/* Badge / Info top */}
                       <div className="flex flex-wrap items-center gap-2.5">
                         <span className="font-mono text-xs font-bold text-muted-foreground">#{issue.id}</span>
                         <StatusBadge status={issue.status} />
@@ -200,13 +194,11 @@ function ClientIssuesPageInner() {
                         </span>
                       </div>
 
-                      {/* Description */}
                       <h3 className="text-foreground font-semibold leading-relaxed transition-colors line-clamp-1">
                         {issue.originalDescription}
                       </h3>
                     </div>
 
-                    {/* Right side CTA / Agent */}
                     <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-border pt-4 lg:pt-0 lg:pl-6 shrink-0">
                       {issue.agent ? (
                         <div className="text-left lg:text-right">

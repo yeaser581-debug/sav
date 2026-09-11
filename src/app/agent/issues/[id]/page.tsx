@@ -226,7 +226,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
-      {/* Back button */}
       <Link href="/agent/issues" className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors w-fit">
         <ArrowLeft className="h-4 w-4" />
         Retour aux réclamations
@@ -261,7 +260,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                   <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} variant="full" />
                 </div>
 
-                {/* Client Info Summary */}
                 <div className="bg-muted border border-border p-3 rounded-xl flex items-center gap-3 shrink-0">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-accent text-foreground text-xs font-bold">
@@ -279,7 +277,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
 
             <CardContent className="pt-6 space-y-6">
 
-              {/* Primary Actions for Agent */}
               {issue.status === 'PENDING_AGENT' && (
                 <div className="bg-muted/50 border border-border rounded-xl p-4 space-y-3">
                   <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -345,7 +342,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                 </div>
               )}
 
-              {/* Description */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Description client</h4>
                 <div className="p-4 bg-muted/40 border border-border rounded-xl">
@@ -355,7 +351,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              {/* Media gallery */}
               {issue.media && issue.media.length > 0 && (
                 <div className="space-y-3">
                   <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -369,7 +364,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
           </Card>
       </div>
 
-      {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">
@@ -422,7 +416,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
-      {/* Visit scheduling Modal */}
       {showVisitModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">
@@ -477,7 +470,6 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
-      {/* Resolve Modal */}
       {showResolveModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">

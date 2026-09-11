@@ -90,7 +90,6 @@ export default function AgentSidebar({ userName, userId }: { userName: string; u
 
   return (
     <>
-      {/* Mobile top bar */}
       <div className="md:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-3 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <Button
@@ -112,7 +111,6 @@ export default function AgentSidebar({ userName, userId }: { userName: string; u
         </div>
       </div>
 
-      {/* Mobile drawer */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 gap-0 flex flex-col">
           <div className="p-5">
@@ -133,9 +131,7 @@ export default function AgentSidebar({ userName, userId }: { userName: string; u
         </SheetContent>
       </Sheet>
 
-      {/* Desktop sidebar */}
       <aside className="hidden md:flex fixed left-0 top-0 h-full w-64 flex-col z-40 bg-card border-r border-border">
-        {/* Brand */}
         <div className="p-5">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-foreground flex items-center justify-center shrink-0">

@@ -4,9 +4,6 @@ import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logout } from '@/lib/session';
 
-// Minimal chrome shown only while mustSetPassword is true — no nav links, no
-// bottom tab bar, nothing that just bounces the user back to /client/activate
-// if clicked. Logout stays as the one legitimate escape hatch.
 export default function ActivationHeader() {
   return (
     <div className="sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-border bg-card">
