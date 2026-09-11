@@ -130,7 +130,7 @@ export default function AdminAdminsPage() {
       });
       if (res.ok) {
         toast.success(admin.isActive ? `"${admin.name}" désactivé.` : `"${admin.name}" réactivé.`);
-        if (admin.isActive) forceLogout(admin.id); // was active, just got disabled — kick any open session
+        if (admin.isActive) forceLogout(admin.id);
         fetchAdmins();
       } else {
         const d = await res.json();
@@ -158,7 +158,6 @@ export default function AdminAdminsPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -192,7 +191,6 @@ export default function AdminAdminsPage() {
         </div>
       )}
 
-      {/* Create form */}
       {showForm && (
         <Card className="bg-card border-border shadow-sm">
           <CardHeader className="px-6 py-5 border-b border-border">
@@ -272,7 +270,6 @@ export default function AdminAdminsPage() {
         </Card>
       )}
 
-      {/* Admins Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(2)].map((_, i) => (
@@ -357,7 +354,6 @@ export default function AdminAdminsPage() {
         </div>
       )}
 
-      {/* Edit modal */}
       {editingAdmin && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">
@@ -437,7 +433,6 @@ export default function AdminAdminsPage() {
         </div>
       )}
 
-      {/* Confirm edit */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -13,14 +13,12 @@ export default async function ClientContractPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Mon contrat SAV</h1>
         <p className="text-muted-foreground mt-1 text-sm">Consultez les conditions générales de votre garantie constructeur et votre couverture après-vente.</p>
       </div>
 
       <Card className="bg-card border-border shadow-md overflow-hidden relative">
-        {/* Subtle decorative background gradient */}
         <div className="absolute top-0 right-0 w-36 h-36 bg-foreground/5 rounded-full blur-2xl pointer-events-none" />
 
         {!contract ? (
@@ -59,14 +57,12 @@ export default async function ClientContractPage() {
             </CardHeader>
 
             <CardContent className="pt-6">
-              {/* Document Text */}
               <div className="bg-muted border border-border rounded-xl p-6 md:p-8 overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                 <article className="text-foreground text-sm leading-relaxed whitespace-pre-wrap font-medium font-sans">
                   {contract.content}
                 </article>
               </div>
 
-              {/* Notice */}
               <div className="mt-5 p-4 bg-muted border border-border rounded-xl flex items-start gap-3">
                 <span className="text-foreground text-sm mt-0.5">ℹ️</span>
                 <p className="text-[11px] text-muted-foreground leading-normal">

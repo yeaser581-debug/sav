@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import type { Issue } from '@prisma/client';
 
-const MAX_SIZE = 25 * 1024 * 1024; // 25MB
+const MAX_SIZE = 25 * 1024 * 1024;
 const ALLOWED_PREFIXES = ['image/', 'video/', 'audio/'];
 
 async function notifyForMessage(issue: Issue, role: 'client' | 'admin', preview: string) {

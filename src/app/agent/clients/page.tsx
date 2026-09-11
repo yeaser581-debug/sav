@@ -42,7 +42,6 @@ export default async function AgentClientsPage() {
         </div>
       ) : (
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          {/* Desktop table */}
           <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -86,7 +85,6 @@ export default async function AgentClientsPage() {
           </table>
           </div>
 
-          {/* Mobile cards */}
           <div className="md:hidden divide-y divide-border">
             {clients.map(client => {
               const lastIssue = client.issues[0];

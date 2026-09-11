@@ -24,12 +24,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired code' }, { status: 400 });
     }
 
-    // Mark OTP as used
     await prisma.oTP.update({ where: { id: otp.id }, data: { used: true } });
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
-    // Update whichever user type has this email
     const admin = await prisma.admin.findUnique({ where: { email } });
     if (admin) {
       await prisma.admin.update({ where: { email }, data: { passwordHash } });

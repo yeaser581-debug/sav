@@ -23,19 +23,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
 
-    // Check if user exists (admin or agent)
     const admin = await prisma.admin.findUnique({ where: { email } });
     const agent = await prisma.agent.findFirst({ where: { email, deletedAt: null } });
 
     if (!admin && !agent) {
-      // Don't reveal if user exists
       return NextResponse.json({ success: true });
     }
 
     const code = generateOTP();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Invalidate previous OTPs for this email
     await prisma.oTP.updateMany({
       where: { email, used: false },
       data: { used: true },

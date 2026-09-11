@@ -77,7 +77,6 @@ export default function ForgotPasswordPage() {
 
         <div className="bg-[#1a1a2e]/80 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-2xl">
 
-          {/* Step indicator */}
           <div className="flex items-center justify-center gap-2 mb-8">
             {(['email', 'otp', 'done'] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center gap-2">

@@ -25,7 +25,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Message not found' }, { status: 404 });
     }
 
-    // Only the author can delete their own message.
     if (message.senderType !== payload.role.toUpperCase() || message.senderId !== payload.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -34,7 +33,6 @@ export async function DELETE(
       try {
         await unlink(path.join(process.cwd(), 'public', message.mediaUrl));
       } catch {
-        // File already gone — not fatal.
       }
     }
 

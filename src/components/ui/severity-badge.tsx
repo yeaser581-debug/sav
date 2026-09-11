@@ -1,7 +1,5 @@
 const BAR_HEIGHTS = ['h-[5px]', 'h-[8px]', 'h-[11px]'];
 
-// Intensity shown as filled bars, not a color you have to learn — also works for
-// anyone who can't rely on hue alone to tell severities apart.
 function Bars({ filled, colorClass }: { filled: number; colorClass: string }) {
   return (
     <span className="inline-flex items-end gap-0.5" aria-hidden="true">

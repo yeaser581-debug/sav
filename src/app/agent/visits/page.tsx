@@ -55,13 +55,10 @@ function toDateInputValue(d: Date) {
   return new Date(d.getTime() - off * 60000).toISOString().slice(0, 10);
 }
 
-// Default visual duration used only for collision layout (visits have no real end time).
 const SLOT_HOURS = 1;
 
 type LaidOutVisit = { visit: Visit; start: number; col: number; cols: number };
 
-// Lays visits that overlap in time out side-by-side (like Google Calendar's day view)
-// instead of letting them stack fully on top of each other.
 function layoutDayVisits(dayVisits: Visit[]): LaidOutVisit[] {
   const items = dayVisits
     .map(visit => {
@@ -307,7 +304,6 @@ export default function AgentVisitsPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Page Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Planning des visites</h1>
@@ -335,7 +331,6 @@ export default function AgentVisitsPage() {
         </div>
       </div>
 
-      {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -363,7 +358,6 @@ export default function AgentVisitsPage() {
       ) : view === 'week' ? (
         <>
         <div className="hidden md:block bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-          {/* Toolbar */}
           <div className="flex flex-wrap items-center gap-3 px-5 py-4 border-b border-border">
             <Button onClick={goToday} variant="outline" size="sm" className="h-8 text-xs font-semibold border-border">
               Aujourd&apos;hui
@@ -386,7 +380,6 @@ export default function AgentVisitsPage() {
             />
           </div>
 
-          {/* Day headers */}
           <div className="flex border-b border-border">
             <div className="w-14 shrink-0" />
             {weekDays.map(day => {
@@ -402,7 +395,6 @@ export default function AgentVisitsPage() {
             })}
           </div>
 
-          {/* Grid */}
           <div className="flex overflow-x-auto">
             <div className="w-14 shrink-0">
               {hours.map(h => (
@@ -470,7 +462,6 @@ export default function AgentVisitsPage() {
           </div>
         </div>
 
-        {/* Mobile: single-day agenda — a 7-column hour grid doesn't fit a phone screen */}
         <div className="md:hidden bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border">
             <Button onClick={goToday} variant="outline" size="sm" className="h-8 text-xs font-semibold border-border shrink-0">
@@ -489,7 +480,6 @@ export default function AgentVisitsPage() {
             </div>
           </div>
 
-          {/* Day strip */}
           <div className="flex gap-1.5 px-3 py-2.5 overflow-x-auto border-b border-border">
             {weekDays.map(day => {
               const selected = isSameDay(day, selectedDate);
@@ -515,7 +505,6 @@ export default function AgentVisitsPage() {
             })}
           </div>
 
-          {/* Agenda for the selected day */}
           <div className="p-3 space-y-2.5">
             {(() => {
               const dayVisits = filteredVisits

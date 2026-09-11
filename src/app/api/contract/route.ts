@@ -31,13 +31,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Content required' }, { status: 400 });
     }
 
-    // Set all existing contracts to inactive
     await prisma.contract.updateMany({
       where: { isActive: true },
       data: { isActive: false },
     });
 
-    // Create new active contract
     const contract = await prisma.contract.create({
       data: {
         content,

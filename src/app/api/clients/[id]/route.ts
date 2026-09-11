@@ -41,8 +41,6 @@ export async function PATCH(
         ...(body.phone !== undefined && { phone: body.phone || null }),
         ...(body.email !== undefined && { email: body.email || null }),
         ...(body.buildingId && { buildingId: parseInt(body.buildingId) }),
-        // Any password an admin sets is temporary: the resident must replace it
-        // themselves before using the account further (see proxy.ts mustSetPassword gate).
         ...(passwordHash && { passwordHash, mustSetPassword: true }),
         ...(newQrToken && { qrToken: newQrToken, qrUsedAt: null }),
       },

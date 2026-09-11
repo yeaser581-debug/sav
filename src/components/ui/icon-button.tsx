@@ -1,7 +1,5 @@
 import { Button } from '@/components/ui/button';
 
-// The ghost icon-only button (edit/delete on hover) was hand-copied with the exact
-// same classes into every admin CRUD page. One component now, everywhere it's used.
 export function IconButton({
   icon: Icon,
   onClick,

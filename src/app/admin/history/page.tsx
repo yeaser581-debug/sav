@@ -146,7 +146,6 @@ export default function AdminHistoryPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="space-y-1">
         <div className="flex items-center gap-2 mb-1">
           <div className="h-5 w-1 rounded-full bg-amber-500" />
@@ -158,7 +157,6 @@ export default function AdminHistoryPage() {
         <p className="text-muted-foreground text-sm">Éléments supprimés récupérables et journal des modifications.</p>
       </div>
 
-      {/* Tabs */}
       <div className="flex bg-muted border border-border rounded-lg p-1 w-full sm:w-fit">
         <button
           type="button"

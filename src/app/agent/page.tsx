@@ -15,26 +15,22 @@ export default async function AgentDashboard() {
   const userName = userEmail.split('@')[0];
   const formattedName = userName.charAt(0).toUpperCase() + userName.slice(1);
 
-  // Active tickets assigned to this agent
   const activeCount = await prisma.issue.count({
     where: { agentId: userId, status: 'IN_PROGRESS' },
   });
 
-  // Tickets waiting for assignment (open to any agent)
   const unassignedCount = await prisma.issue.count({
     where: { status: 'PENDING_AGENT' },
   });
 
-  // Scheduled visits coming up
   const upcomingVisitsCount = await prisma.visit.count({
     where: {
       issue: { agentId: userId },
       scheduledAt: { gt: new Date() },
-      status: 'PROPOSED', // or CONFIRMED
+      status: 'PROPOSED',
     },
   });
 
-  // Resolved tickets this month
   const resolvedCount = await prisma.issue.count({
     where: {
       agentId: userId,
@@ -42,7 +38,6 @@ export default async function AgentDashboard() {
     },
   });
 
-  // Recent issues related to this agent or unassigned
   const issues = await prisma.issue.findMany({
     where: {
       OR: [
@@ -64,7 +59,6 @@ export default async function AgentDashboard() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Page Header */}
       <div>
         <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Espace Interventions
@@ -73,8 +67,6 @@ export default async function AgentDashboard() {
         <p className="text-muted-foreground mt-1 text-sm md:text-base">Suivez vos plannings de visites et gérez vos tickets d&apos;intervention.</p>
       </div>
 
-      {/* KPI: "Mes tickets en cours" is the one number an agent actually acts on today —
-          it gets the hero treatment; the rest stay secondary. */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-3">
         <Link
           href="/agent/issues?filter=IN_PROGRESS"
@@ -130,7 +122,6 @@ export default async function AgentDashboard() {
         </div>
       </div>
 
-      {/* Issues Table */}
       <div className="grid grid-cols-1 gap-6">
         <Card className="bg-card border-border shadow-sm overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border">

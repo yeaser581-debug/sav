@@ -18,7 +18,6 @@ import {
 
 type Role = 'admin' | 'agent' | 'client';
 
-// ─── Role config ────────────────────────────────────────────────────────────
 const roleConfig = {
   client: { label: 'Client', Icon: Home },
   agent: { label: 'Agent', Icon: HardHat },
@@ -27,14 +26,12 @@ const roleConfig = {
 
 const roles: Role[] = ['client', 'agent', 'admin'];
 
-// ─── Stats for left panel ────────────────────────────────────────────────────
 const stats = [
   { value: '200+', label: 'Résidences gérées' },
   { value: '98%', label: 'Satisfaction client' },
   { value: '5k+', label: 'Tickets traités' },
 ];
 
-// ─── Decorative grid SVG (subtle dot grid) ───────────────────────────────────
 function DotGrid() {
   return (
     <svg
@@ -51,7 +48,6 @@ function DotGrid() {
   );
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
 export default function LoginPage() {
   return (
     <Suspense fallback={null}>
@@ -117,14 +113,10 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex bg-background">
-      {/* ── LEFT PANEL ─────────────────────────────────────────────────────── */}
       <div className="hidden lg:flex lg:w-[40%] relative flex-col justify-between p-12 overflow-hidden bg-foreground text-background">
-        {/* Dot grid */}
         <DotGrid />
 
-        {/* Top: Logo + brand */}
         <div className="relative z-10">
-          {/* AS monogram */}
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-background mb-8">
             <span className="text-foreground text-2xl font-black tracking-tight select-none">AS</span>
           </div>
@@ -136,16 +128,13 @@ function LoginForm() {
             Gestion du service<br />après-vente immobilier
           </p>
 
-          {/* Divider */}
           <div className="mt-8 mb-8 h-px w-16 bg-background/30" />
 
-          {/* Description */}
           <p className="text-sm text-background/50 max-w-xs leading-relaxed">
             Plateforme unifiée pour les résidences, les équipes terrain et l&apos;administration.
           </p>
         </div>
 
-        {/* Bottom: stats */}
         <div className="relative z-10 space-y-4">
           {stats.map((s) => (
             <div
@@ -162,10 +151,8 @@ function LoginForm() {
         </div>
       </div>
 
-      {/* ── RIGHT PANEL ────────────────────────────────────────────────────── */}
       <div className="flex-1 flex items-center justify-center p-6 bg-background">
         <div className="relative w-full max-w-md">
-          {/* Mobile-only logo */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-foreground mb-4">
               <span className="text-background text-xl font-black tracking-tight">AS</span>
@@ -174,15 +161,12 @@ function LoginForm() {
             <p className="text-sm text-muted-foreground mt-1">Service après-vente immobilier</p>
           </div>
 
-          {/* Form card */}
           <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
-            {/* Heading */}
             <div className="mb-7">
               <h2 className="text-xl font-bold text-foreground">Connexion</h2>
               <p className="text-sm text-muted-foreground mt-1">Sélectionnez votre profil pour continuer</p>
             </div>
 
-            {/* Role selector */}
             <div className="grid grid-cols-3 gap-2 mb-7 p-1 bg-muted rounded-xl border border-border">
               {roles.map((r) => {
                 const { label, Icon } = roleConfig[r];
@@ -205,9 +189,7 @@ function LoginForm() {
               })}
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Identifier field */}
               <div className="space-y-1.5">
                 <Label className="text-foreground text-sm">
                   {role === 'client' ? 'Identifiant client' : 'Adresse email'}
@@ -233,7 +215,6 @@ function LoginForm() {
                 )}
               </div>
 
-              {/* Password field */}
               <div className="space-y-1.5">
                 <Label className="text-foreground text-sm">Mot de passe</Label>
                 <Input
@@ -246,7 +227,6 @@ function LoginForm() {
                 />
               </div>
 
-              {/* Error display */}
               {error && (
                 <div className="flex items-start gap-3 bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3 text-destructive text-sm">
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
@@ -254,7 +234,6 @@ function LoginForm() {
                 </div>
               )}
 
-              {/* Submit */}
               <Button
                 type="submit"
                 disabled={loading}
@@ -274,7 +253,6 @@ function LoginForm() {
               </Button>
             </form>
 
-            {/* Forgot password — staff only */}
             {role !== 'client' && (
               <p className="text-center text-sm text-muted-foreground mt-6">
                 <Link
@@ -286,7 +264,6 @@ function LoginForm() {
               </p>
             )}
 
-            {/* QR hint — clients only */}
             {role === 'client' && (
               <p className="text-center text-xs text-muted-foreground mt-6 leading-relaxed">
                 Vous pouvez aussi scanner votre{' '}
@@ -295,7 +272,6 @@ function LoginForm() {
             )}
           </div>
 
-          {/* Footer */}
           <p className="text-center text-xs text-muted-foreground/70 mt-6">
             © {new Date().getFullYear()} After-Sales Platform · Tous droits réservés
           </p>

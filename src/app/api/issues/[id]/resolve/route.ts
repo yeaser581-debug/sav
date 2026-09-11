@@ -5,7 +5,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { randomUUID } from 'crypto';
 import path from 'path';
 
-const MAX_SIZE = 25 * 1024 * 1024; // 25MB per file
+const MAX_SIZE = 25 * 1024 * 1024;
 const ALLOWED_PREFIXES = ['image/', 'video/'];
 
 export async function POST(

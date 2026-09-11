@@ -176,7 +176,6 @@ export default function AdminAgentsPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -204,14 +203,12 @@ export default function AdminAgentsPage() {
         </Button>
       </div>
 
-      {/* Success / global error */}
       {success && (
         <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
           {success}
         </div>
       )}
 
-      {/* Create form */}
       {showForm && (
         <Card className="bg-card border-border shadow-sm">
           <CardHeader className="px-6 py-5 border-b border-border">
@@ -287,7 +284,6 @@ export default function AdminAgentsPage() {
         </Card>
       )}
 
-      {/* Agents Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
@@ -318,7 +314,6 @@ export default function AdminAgentsPage() {
           {visibleAgents.map(agent => (
             <Card key={agent.id} className="bg-card border-border shadow-sm hover:shadow-md transition-shadow group">
               <CardContent className="p-6">
-                {/* Agent avatar + name */}
                 <div className="flex items-center gap-4 mb-5">
                   <div className="w-14 h-14 rounded-full bg-accent border-2 border-border flex items-center justify-center">
                     <span className="text-lg font-bold text-foreground">
@@ -340,7 +335,6 @@ export default function AdminAgentsPage() {
 
                 <Separator className="bg-border mb-4" />
 
-                {/* Details */}
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2.5">
                     <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -365,7 +359,6 @@ export default function AdminAgentsPage() {
         </div>
       )}
 
-      {/* Edit modal */}
       {editingAgent && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">
@@ -440,7 +433,6 @@ export default function AdminAgentsPage() {
         </div>
       )}
 
-      {/* Confirm edit */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -1,8 +1,3 @@
-// Status isn't a category, it's a position in the ticket's lifecycle
-// (En attente agent → En cours → Résolue → Confirmée), so the marker shows how far
-// along it is — the same idea as SeverityBadge's bars, applied to progress instead
-// of intensity. Rejected/disputed tickets left the normal flow, so they get a
-// distinct "stopped" mark instead of a track that would misleadingly imply progress.
 function Track({ filled, total, colorClass }: { filled: number; total: number; colorClass: string }) {
   return (
     <span className="inline-flex gap-0.75" aria-hidden="true">

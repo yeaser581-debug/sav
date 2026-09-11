@@ -177,7 +177,6 @@ export default function AdminBuildingsPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -211,7 +210,6 @@ export default function AdminBuildingsPage() {
         </div>
       )}
 
-      {/* Create form */}
       {showForm && (
         <Card className="bg-card border-border shadow-sm">
           <CardHeader className="px-6 py-5 border-b border-border">
@@ -281,7 +279,6 @@ export default function AdminBuildingsPage() {
         </Card>
       )}
 
-      {/* Buildings Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -312,12 +309,10 @@ export default function AdminBuildingsPage() {
             <Card key={building.id} className="bg-card border-border shadow-sm hover:shadow-md transition-shadow group">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  {/* Icon */}
                   <div className="w-12 h-12 rounded-xl bg-accent border border-border flex items-center justify-center shrink-0 group-hover:bg-accent/70 transition-colors">
                     <Building2 className="h-5 w-5 text-foreground" />
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="text-base font-semibold text-foreground mb-1">
@@ -373,7 +368,6 @@ export default function AdminBuildingsPage() {
         </div>
       )}
 
-      {/* Edit modal */}
       {editingBuilding && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">
@@ -438,7 +432,6 @@ export default function AdminBuildingsPage() {
         </div>
       )}
 
-      {/* Confirm edit */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

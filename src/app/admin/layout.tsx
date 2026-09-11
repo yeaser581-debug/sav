@@ -5,10 +5,6 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminSidebarSkeleton from '@/components/admin/AdminSidebarSkeleton';
 import { InstallPrompt } from '@/components/InstallPrompt';
 
-// Isolated in its own component (and Suspense boundary) because it reads
-// headers() — a runtime API. If this lived directly in AdminLayout, the whole
-// layout render would block on it, and admin/loading.tsx would never get a
-// chance to show its fallback for {children} while the page itself loads.
 async function AdminSidebarServer() {
   const headersList = await headers();
   const role = headersList.get('x-user-role');

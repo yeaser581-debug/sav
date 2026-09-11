@@ -85,13 +85,11 @@ export default function NewIssuePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Back Link */}
       <Link href="/client/issues" className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors w-fit">
         <ArrowLeft className="h-4 w-4" />
         Retour à mes réclamations
       </Link>
 
-      {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Nouvelle réclamation</h1>
         <p className="text-muted-foreground mt-1 text-sm">Déclarez un dysfonctionnement ou une anomalie constatée dans votre logement.</p>
@@ -101,7 +99,6 @@ export default function NewIssuePage() {
         <CardContent className="p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
 
-            {/* Description Textarea */}
             <div className="space-y-2.5">
               <Label htmlFor="description" className="text-sm font-bold text-foreground">
                 Description détaillée du problème <span className="text-destructive">*</span>
@@ -120,7 +117,6 @@ export default function NewIssuePage() {
               </p>
             </div>
 
-            {/* Media Upload Area */}
             <div className="space-y-2.5">
               <Label className="text-sm font-bold text-foreground">
                 Pièces jointes (Photos, Vidéos, Audio)
@@ -132,14 +128,12 @@ export default function NewIssuePage() {
               />
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 text-xs font-semibold text-destructive">
                 {error}
               </div>
             )}
 
-            {/* Footer Buttons */}
             <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
               <Button
                 type="button"

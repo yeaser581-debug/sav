@@ -165,7 +165,6 @@ export default function AdminAreasPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -199,7 +198,6 @@ export default function AdminAreasPage() {
         </div>
       )}
 
-      {/* Create form */}
       {showForm && (
         <Card className="bg-card border-border shadow-sm">
           <CardHeader className="px-6 py-5 border-b border-border">
@@ -253,7 +251,6 @@ export default function AdminAreasPage() {
         </Card>
       )}
 
-      {/* Areas Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -322,7 +319,6 @@ export default function AdminAreasPage() {
         </div>
       )}
 
-      {/* Edit modal */}
       {editingArea && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative">
@@ -378,7 +374,6 @@ export default function AdminAreasPage() {
         </div>
       )}
 
-      {/* Confirm edit */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

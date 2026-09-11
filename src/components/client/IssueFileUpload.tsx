@@ -81,7 +81,6 @@ export function IssueFileUpload({
   const xhrRef = useRef<Map<string, XMLHttpRequest>>(new Map());
   const timerRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  // Notify parent of the currently-submittable set of media
   useEffect(() => {
     onChange(
       items
@@ -96,7 +95,6 @@ export function IssueFileUpload({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
-  // Cleanup on unmount: abort in-flight uploads, clear timers, revoke blob URLs
   useEffect(() => {
     return () => {
       xhrRef.current.forEach(xhr => xhr.abort());
@@ -124,7 +122,7 @@ export function IssueFileUpload({
     xhr.onload = () => {
       xhrRef.current.delete(localId);
       let data: any = null;
-      try { data = JSON.parse(xhr.responseText); } catch { /* ignore */ }
+      try { data = JSON.parse(xhr.responseText); } catch { }
 
       if (xhr.status >= 200 && xhr.status < 300 && data?.id) {
         setItems(prev => prev.map(i => i.localId === localId
@@ -219,7 +217,6 @@ export function IssueFileUpload({
     const item = items.find(i => i.localId === localId);
     if (!item) return;
 
-    // Nothing durable committed yet — cancel outright, no undo needed.
     if (item.status === 'uploading') {
       xhrRef.current.get(localId)?.abort();
       xhrRef.current.delete(localId);
@@ -251,7 +248,6 @@ export function IssueFileUpload({
     });
   };
 
-  // Drag reactivity — inspect dragged item types where the browser exposes them
   const onDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     if (disabled) return;

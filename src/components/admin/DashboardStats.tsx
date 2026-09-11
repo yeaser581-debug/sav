@@ -88,9 +88,6 @@ export function DashboardStats({
 }) {
   const [open, setOpen] = useState<StatKey | null>(null);
 
-  // "En attente" is the number that actually demands action today, so it gets the
-  // hero treatment (bold accent fill) instead of sitting in an identical box next
-  // to three reference numbers that don't need the same urgency.
   const secondary: { key: StatKey; title: string; value: number; icon: React.ElementType }[] = [
     { key: 'total', title: 'Total réclamations', value: totalIssues, icon: AlertTriangle },
     { key: 'agents', title: 'Agents actifs', value: agentCount, icon: Users },
@@ -153,7 +150,6 @@ export function DashboardStats({
         </div>
       </div>
 
-      {/* ── Total réclamations ─────────────────────────────────── */}
       <Sheet open={open === 'total'} onOpenChange={(o) => !o && setOpen(null)}>
         <SheetContent side="right">
           <SheetHeader>
@@ -193,7 +189,6 @@ export function DashboardStats({
         </SheetContent>
       </Sheet>
 
-      {/* ── En attente ─────────────────────────────────────────── */}
       <Sheet open={open === 'pending'} onOpenChange={(o) => !o && setOpen(null)}>
         <SheetContent side="right">
           <SheetHeader>
@@ -235,7 +230,6 @@ export function DashboardStats({
         </SheetContent>
       </Sheet>
 
-      {/* ── Agents actifs ──────────────────────────────────────── */}
       <Sheet open={open === 'agents'} onOpenChange={(o) => !o && setOpen(null)}>
         <SheetContent side="right">
           <SheetHeader>
@@ -279,7 +273,6 @@ export function DashboardStats({
         </SheetContent>
       </Sheet>
 
-      {/* ── Clients inscrits ───────────────────────────────────── */}
       <Sheet open={open === 'clients'} onOpenChange={(o) => !o && setOpen(null)}>
         <SheetContent side="right">
           <SheetHeader>

@@ -213,7 +213,6 @@ export default function AdminClientsPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -247,7 +246,6 @@ export default function AdminClientsPage() {
         </div>
       )}
 
-      {/* Create form */}
       {showForm && (
         <Card className="bg-card border-border shadow-sm">
           <CardHeader className="px-6 py-5 border-b border-border">
@@ -356,7 +354,6 @@ export default function AdminClientsPage() {
         </Card>
       )}
 
-      {/* Clients Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
@@ -389,7 +386,6 @@ export default function AdminClientsPage() {
             return (
               <Card key={client.id} className="bg-card border-border shadow-sm hover:shadow-md transition-shadow group">
                 <CardContent className="p-6">
-                  {/* Header */}
                   <div className="flex items-center gap-3 mb-5">
                     <div className="w-12 h-12 rounded-full bg-accent border-2 border-border flex items-center justify-center">
                       <Home className="h-5 w-5 text-foreground" />
@@ -418,7 +414,6 @@ export default function AdminClientsPage() {
                     )}
                   </div>
 
-                  {/* QR Code */}
                   <div className="flex flex-col items-center mb-5 p-4 bg-muted rounded-xl border border-border">
                     <div className="bg-white p-2 rounded-lg shadow-sm mb-2">
                       <QRCodeSVG value={loginUrl} size={128} />
@@ -443,7 +438,6 @@ export default function AdminClientsPage() {
 
                   <Separator className="bg-border mb-4" />
 
-                  {/* Details */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground flex items-center gap-1.5">
@@ -477,7 +471,6 @@ export default function AdminClientsPage() {
         </div>
       )}
 
-      {/* Edit modal */}
       {editingClient && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <Card className="bg-card border-border w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -598,7 +591,6 @@ export default function AdminClientsPage() {
         </div>
       )}
 
-      {/* Confirm edit */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -63,7 +63,6 @@ export default function AdminContractPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -102,7 +101,6 @@ export default function AdminContractPage() {
         </div>
       </div>
 
-      {/* Info banner */}
       <div className="flex items-start gap-3 rounded-lg bg-accent/50 border border-border px-4 py-3">
         <Info className="h-4 w-4 text-foreground mt-0.5 shrink-0" />
         <p className="text-sm text-muted-foreground">
@@ -110,7 +108,6 @@ export default function AdminContractPage() {
         </p>
       </div>
 
-      {/* Editor */}
       <Card className="bg-card border-border shadow-sm">
         <CardHeader className="px-6 py-5 border-b border-border flex flex-row items-center justify-between">
           <div>

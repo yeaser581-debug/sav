@@ -169,7 +169,6 @@ export default function ApiTesterPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
       <div className="space-y-1">
         <div className="flex items-center gap-2 mb-1">
           <div className="h-5 w-1 rounded-full bg-amber-500" />
@@ -187,7 +186,6 @@ export default function ApiTesterPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Endpoint picker */}
         <Card className="bg-card border-border shadow-sm xl:col-span-1">
           <CardHeader className="border-b border-border pb-4">
             <CardTitle className="text-sm font-semibold text-foreground">Endpoints connus</CardTitle>
@@ -221,7 +219,6 @@ export default function ApiTesterPage() {
           </CardContent>
         </Card>
 
-        {/* Request builder + response */}
         <div className="xl:col-span-2 space-y-6">
           <Card className="bg-card border-border shadow-sm">
             <CardHeader className="border-b border-border pb-4">
@@ -283,7 +280,6 @@ export default function ApiTesterPage() {
             </CardContent>
           </Card>
 
-          {/* Response */}
           <Card className="bg-card border-border shadow-sm">
             <CardHeader className="border-b border-border pb-4">
               <div className="flex items-center justify-between">
@@ -314,7 +310,6 @@ export default function ApiTesterPage() {
             </CardContent>
           </Card>
 
-          {/* Recent history */}
           {history.length > 0 && (
             <Card className="bg-card border-border shadow-sm">
               <CardHeader className="border-b border-border pb-4">
@@ -342,7 +337,6 @@ export default function ApiTesterPage() {
         </div>
       </div>
 
-      {/* Confirm DELETE */}
       <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

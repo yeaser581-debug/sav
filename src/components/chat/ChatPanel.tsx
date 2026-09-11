@@ -54,7 +54,6 @@ function MessageMedia({ msg }: { msg: ChatMessage }) {
     );
   }
 
-  // AUDIO (voice note)
   return (
     <audio src={msg.mediaUrl} controls className="h-10 max-w-[220px]" />
   );
@@ -262,7 +261,6 @@ export function ChatPanel({
     setRecording(false);
     if (cancel) {
       recordedChunksRef.current = [];
-      // Detach the handler so a cancelled recording never gets sent.
       if (mediaRecorderRef.current) mediaRecorderRef.current.onstop = () => {
         mediaRecorderRef.current?.stream.getTracks().forEach(t => t.stop());
       };

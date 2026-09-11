@@ -21,9 +21,6 @@ export function isStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches || nav.standalone === true;
 }
 
-// Shared by both the one-time banner and the always-there sidebar entry, so
-// installing (or the browser's own install event firing) is reflected in
-// whichever of those happens to be mounted, independently of each other.
 export function useInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [ios, setIos] = useState(false);

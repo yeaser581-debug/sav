@@ -84,15 +84,12 @@ function AgentIssuesPageInner() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Gestion des réclamations</h1>
         <p className="text-muted-foreground mt-1 text-sm">Prenez en charge de nouvelles demandes ou suivez vos chantiers en cours.</p>
       </div>
 
-      {/* Filters Bar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card border border-border rounded-xl p-3 shadow-sm">
-        {/* Tab Buttons */}
         <div className="flex bg-muted border border-border rounded-lg p-1 w-full md:w-auto">
           {[
             { id: 'ALL', label: 'Toutes', count: counts.ALL },
@@ -114,7 +111,6 @@ function AgentIssuesPageInner() {
           ))}
         </div>
 
-        {/* Search Input */}
         <div className="relative w-full md:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -126,7 +122,6 @@ function AgentIssuesPageInner() {
         </div>
       </div>
 
-      {/* Table Card */}
       {initialLoading ? (
         <div className="flex justify-center py-16">
           <svg className="animate-spin h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24">
