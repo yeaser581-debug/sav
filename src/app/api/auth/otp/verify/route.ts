@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { enforce } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,6 +10,9 @@ export async function POST(req: NextRequest) {
     if (!email || !code || !newPassword) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
+
+    const limited = enforce(req, 'otp-verify', { limit: 10, windowMs: 10 * 60 * 1000, identifier: email });
+    if (limited) return limited;
 
     const otp = await prisma.oTP.findFirst({
       where: {

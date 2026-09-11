@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { signToken } from '@/lib/auth';
+import { enforce } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,6 +11,9 @@ export async function POST(req: NextRequest) {
     if (!email || !password || !role) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
+
+    const limited = enforce(req, 'login', { limit: 8, windowMs: 10 * 60 * 1000, identifier: email });
+    if (limited) return limited;
 
     let user: { id: number; email: string; passwordHash: string; name: string; isSuperAdmin?: boolean; isActive?: boolean } | null = null;
 

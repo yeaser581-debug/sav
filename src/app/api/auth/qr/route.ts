@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { signToken } from '@/lib/auth';
 import { getPublicBaseUrl } from '@/lib/request';
+import { consume, clientIp } from '@/lib/rate-limit';
 
 export async function GET(req: NextRequest) {
   const baseUrl = getPublicBaseUrl(req);
@@ -12,6 +13,11 @@ export async function GET(req: NextRequest) {
 
     if (!token) {
       return NextResponse.redirect(new URL('/login?error=missing_token', baseUrl));
+    }
+
+    const { allowed } = consume(`qr:${clientIp(req)}`, 20, 10 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.redirect(new URL('/login?error=rate_limited', baseUrl));
     }
 
     const client = await prisma.client.findFirst({ where: { qrToken: token, deletedAt: null } });

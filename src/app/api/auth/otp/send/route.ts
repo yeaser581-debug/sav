@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import { enforce } from '@/lib/rate-limit';
 
 function generateOTP(): string {
   return crypto.randomInt(100000, 999999).toString();
@@ -22,6 +23,9 @@ export async function POST(req: NextRequest) {
     if (!email) {
       return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
+
+    const limited = enforce(req, 'otp-send', { limit: 3, windowMs: 10 * 60 * 1000, identifier: email });
+    if (limited) return limited;
 
     const admin = await prisma.admin.findUnique({ where: { email } });
     const agent = await prisma.agent.findFirst({ where: { email, deletedAt: null } });
