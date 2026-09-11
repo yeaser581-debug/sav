@@ -39,16 +39,16 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
   return (
     <>
       <div className="md:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-3 border-b border-border bg-card">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-foreground flex items-center justify-center shrink-0">
             <span className="text-background text-[10px] font-bold tracking-wider">AS</span>
           </div>
-          <p className="text-foreground font-semibold text-sm">After-Sales</p>
+          <p className="text-foreground font-semibold text-sm hidden min-[380px]:block">After-Sales</p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <ThemeToggle className="h-8 w-8 text-muted-foreground hover:text-foreground" />
           <OutboxIndicator variant="icon" />
-          <InstallMenuItem variant="icon" />
+          <InstallMenuItem variant="pill" />
           <NotificationBell userId={userId} />
           <Button
             variant="ghost"
