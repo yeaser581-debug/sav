@@ -5,6 +5,12 @@ export type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 };
 
+declare global {
+  interface Window {
+    __installPrompt?: BeforeInstallPromptEvent | null;
+  }
+}
+
 export function isIos() {
   if (typeof navigator === 'undefined') return false;
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -35,22 +41,28 @@ export function useInstallPrompt() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIos(isIos());
     setStandalone(isStandalone());
+    setDeferredPrompt(window.__installPrompt ?? null);
 
     const onInstalled = () => {
+      window.__installPrompt = null;
       setDeferredPrompt(null);
       setStandalone(true);
       setJustInstalled(true);
     };
     const onBeforeInstall = (e: Event) => {
       e.preventDefault();
+      window.__installPrompt = e as BeforeInstallPromptEvent;
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
+    const onPromptChange = () => setDeferredPrompt(window.__installPrompt ?? null);
 
     window.addEventListener('appinstalled', onInstalled);
     window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('installpromptchange', onPromptChange);
     return () => {
       window.removeEventListener('appinstalled', onInstalled);
       window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('installpromptchange', onPromptChange);
     };
   }, []);
 
@@ -58,6 +70,7 @@ export function useInstallPrompt() {
     if (!deferredPrompt) return;
     await deferredPrompt.prompt();
     await deferredPrompt.userChoice;
+    window.__installPrompt = null;
     setDeferredPrompt(null);
   };
 

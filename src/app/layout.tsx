@@ -38,6 +38,21 @@ export const viewport: Viewport = {
   themeColor: "#2952a3",
 };
 
+const CAPTURE_INSTALL_PROMPT = `
+(function () {
+  window.__installPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    window.__installPrompt = e;
+    window.dispatchEvent(new Event('installpromptchange'));
+  });
+  window.addEventListener('appinstalled', function () {
+    window.__installPrompt = null;
+    window.dispatchEvent(new Event('installpromptchange'));
+  });
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -49,6 +64,9 @@ export default function RootLayout({
       className={`${roboto.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: CAPTURE_INSTALL_PROMPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider
           attribute="class"

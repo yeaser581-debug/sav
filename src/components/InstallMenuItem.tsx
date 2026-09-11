@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Download, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { InstallInstructionsDialog } from '@/components/InstallInstructionsDialog';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 
 export function InstallMenuItem({ variant = 'row' }: { variant?: 'row' | 'icon' | 'pill' }) {
@@ -45,19 +45,7 @@ export function InstallMenuItem({ variant = 'row' }: { variant?: 'row' | 'icon' 
           Installer l&apos;application
         </Button>
       )}
-
-      <Dialog open={showInfo} onOpenChange={setShowInfo}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Installer l&apos;application</DialogTitle>
-            <DialogDescription>
-              {ios
-                ? "Appuyez sur le bouton de partage de Safari, puis « Sur l'écran d'accueil »."
-                : "Utilisez le menu de votre navigateur (généralement les trois points en haut à droite) et choisissez « Installer l'application » ou « Ajouter à l'écran d'accueil »."}
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <InstallInstructionsDialog open={showInfo} onOpenChange={setShowInfo} ios={ios} />
     </>
   );
 }
