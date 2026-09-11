@@ -14,8 +14,6 @@ const adapter = new PrismaMariaDb({
   password: process.env.DATABASE_PASSWORD || "",
   database: process.env.DATABASE_NAME || "aftersales_db",
   connectionLimit: 5,
-  // Real MySQL 8 servers (Railway's included) default to caching_sha2_password,
-  // which needs this to exchange the RSA key without a TLS connection.
   allowPublicKeyRetrieval: true,
 });
 const prisma = new PrismaClient({ adapter });
@@ -25,7 +23,6 @@ async function main() {
 
   const passwordHash = await bcrypt.hash('password123', 10);
 
-  // 1. Admin
   const admin = await prisma.admin.upsert({
     where: { email: 'admin@aftersales.com' },
     update: {},
@@ -37,7 +34,6 @@ async function main() {
   });
   console.log(`✅ Admin: ${admin.email}`);
 
-  // 2. Agents
   const agent1 = await prisma.agent.upsert({
     where: { email: 'youssef@aftersales.com' },
     update: {},
@@ -61,7 +57,6 @@ async function main() {
   });
   console.log('✅ Agents: Youssef & Sara');
 
-  // 3. Areas (use findFirst + create pattern to avoid id issues)
   let area1 = await prisma.area.findFirst({ where: { name: 'Hay Riad' } });
   if (!area1) {
     area1 = await prisma.area.create({
@@ -77,7 +72,6 @@ async function main() {
   }
   console.log('✅ Areas: Hay Riad & Gauthier');
 
-  // 4. Buildings
   let building1 = await prisma.building.findFirst({ where: { name: 'Résidence Palmiers' } });
   if (!building1) {
     building1 = await prisma.building.create({
@@ -101,7 +95,6 @@ async function main() {
   }
   console.log('✅ Buildings: Palmiers & Jasmin');
 
-  // 5. Clients
   const clientsData = [
     { name: 'Ahmed Alami', login: 'ahmed.alami', unit: 'A1', buildingId: building1.id },
     { name: 'Fatima Zahra', login: 'fatima.zahra', unit: 'B2', buildingId: building1.id },
@@ -125,7 +118,6 @@ async function main() {
   }
   console.log(`✅ ${clientsData.length} Clients created`);
 
-  // 6. Contract
   const existingContract = await prisma.contract.findFirst({ where: { isActive: true } });
   if (!existingContract) {
     await prisma.contract.create({
