@@ -1,5 +1,5 @@
-const CACHE_NAME = 'after-sales-shell-v3';
-const RUNTIME_CACHE = 'after-sales-runtime-v3';
+const CACHE_NAME = 'after-sales-shell-v4';
+const RUNTIME_CACHE = 'after-sales-runtime-v4';
 const SHELL_ASSETS = [
   '/manifest.json',
   '/icons/icon-192.png',
@@ -98,13 +98,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const fromNetwork = () =>
+    fetch(request).then((res) => {
+      if (res.ok) putInRuntimeCache(event, request, res);
+      return res;
+    });
+
+  if (url.pathname.startsWith('/_next/')) {
+    event.respondWith(
+      fromNetwork().catch(() => caches.match(request, { ignoreVary: true }))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request, { ignoreVary: true }).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((res) => {
-        if (res.ok) putInRuntimeCache(event, request, res);
-        return res;
-      });
+      if (!cached) return fromNetwork();
+      event.waitUntil(fromNetwork().catch(() => {}));
+      return cached;
     })
   );
 });
