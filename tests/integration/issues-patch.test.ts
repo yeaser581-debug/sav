@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { PATCH as patchIssue } from '@/app/api/issues/[id]/route';
+import { PATCH as patchIssue, GET as getIssue } from '@/app/api/issues/[id]/route';
 import { prisma } from '@/lib/prisma';
 import { resetDb, seedAdmin, seedAgent, seedClient, seedIssue } from '../helpers/db';
 import { authedRequest, unauthedRequest, routeParams } from '../helpers/request';
@@ -204,6 +204,27 @@ describe('PATCH /api/issues/[id]', () => {
       expect(notifications[0].title).toContain(String(issue.id));
       expect(notifications[0].message).toContain('Déjà traité sous la réclamation #3.');
       expect(notifications[0].link).toBe(`/client/issues/${issue.id}`);
+    });
+
+    it('exposes the reason to the resident so their page can show it', async () => {
+      const client = await seedClient();
+      const admin = await seedAdmin();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT' });
+
+      await patch(issue.id, { id: admin.id, email: admin.email, role: 'admin' }, {
+        status: 'REJECTED',
+        rejectionReason: 'Hors garantie décennale.',
+      });
+
+      const res = await getIssue(
+        authedRequest(`/api/issues/${issue.id}`, { id: client.id, email: client.login, role: 'client' }),
+        routeParams({ id: String(issue.id) })
+      );
+      expect(res.status).toBe(200);
+
+      const data = await res.json();
+      expect(data.status).toBe('REJECTED');
+      expect(data.rejectionReason).toBe('Hors garantie décennale.');
     });
 
     it('does not let a client reject their own issue', async () => {

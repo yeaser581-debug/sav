@@ -23,6 +23,7 @@ import {
   FolderOpen,
   ShieldCheck,
   AlertTriangle,
+  XCircle,
   X,
 } from 'lucide-react';
 
@@ -41,6 +42,7 @@ type IssueDetails = {
   messages: Message[];
   agent: { name: string } | null;
   disputeReason: string | null;
+  rejectionReason: string | null;
 };
 
 const statusLabels: Record<string, string> = {
@@ -335,6 +337,31 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                   <p className="text-sm text-foreground bg-muted border border-border rounded-xl p-4 leading-relaxed">
                     {issue.proof.find(p => p.note)?.note}
                   </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {issue.status === 'REJECTED' && (
+            <Card className="border-destructive/20 bg-destructive/5 shadow-md relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-destructive" />
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start gap-3">
+                  <XCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">Cette r&eacute;clamation a &eacute;t&eacute; refus&eacute;e</h3>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      Elle ne sera pas prise en charge. Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, r&eacute;pondez dans la discussion ci-dessous.
+                    </p>
+                  </div>
+                </div>
+                {issue.rejectionReason && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Motif du refus</h4>
+                    <p className="text-sm text-foreground bg-muted border border-border rounded-xl p-4 leading-relaxed whitespace-pre-wrap">
+                      {issue.rejectionReason}
+                    </p>
+                  </div>
                 )}
               </CardContent>
             </Card>
