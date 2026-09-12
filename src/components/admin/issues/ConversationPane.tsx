@@ -6,6 +6,9 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   ArrowLeft, User, HardHat, Calendar, Paperclip,
   AlertTriangle, Info, AlertOctagon, ShieldCheck
@@ -51,6 +54,11 @@ export function ConversationPane({ issueId }: { issueId: number }) {
   const [reopenAgentId, setReopenAgentId] = useState('');
   const [reopening, setReopening] = useState(false);
 
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejecting, setRejecting] = useState(false);
+  const [rejectError, setRejectError] = useState('');
+
   const fetchIssue = () => {
     fetch(`/api/issues/${issueId}`)
       .then(res => res.ok ? res.json() : Promise.reject(res.status))
@@ -75,6 +83,34 @@ export function ConversationPane({ issueId }: { issueId: number }) {
       if (res.ok) fetchIssue();
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const rejectIssue = async () => {
+    const reason = rejectReason.trim();
+    if (!reason || rejecting) return;
+    setRejecting(true);
+    setRejectError('');
+    try {
+      const res = await fetch(`/api/issues/${issueId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'REJECTED', rejectionReason: reason }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        pushNotifications(data.targetUserIds);
+        setRejectOpen(false);
+        setRejectReason('');
+        fetchIssue();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setRejectError(data.error || 'Le rejet a échoué.');
+      }
+    } catch {
+      setRejectError('Erreur de connexion.');
+    } finally {
+      setRejecting(false);
     }
   };
 
@@ -193,18 +229,29 @@ export function ConversationPane({ issueId }: { issueId: number }) {
               </div>
             </div>
           ) : (
-            <Select onValueChange={(v: string | null) => v && assignAgent(v)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Assigner un agent...">
-                  {(value: string | null) => value ? (agents.find(a => a.id.toString() === value)?.name ?? value) : 'Assigner un agent...'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {agents.map(a => (
-                  <SelectItem key={a.id} value={a.id.toString()}>{a.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Select onValueChange={(v: string | null) => v && assignAgent(v)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Assigner un agent...">
+                    {(value: string | null) => value ? (agents.find(a => a.id.toString() === value)?.name ?? value) : 'Assigner un agent...'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map(a => (
+                    <SelectItem key={a.id} value={a.id.toString()}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {issue.status === 'PENDING_AGENT' && (
+                <Button
+                  onClick={() => setRejectOpen(true)}
+                  variant="outline"
+                  className="w-full border-destructive/30 hover:border-destructive/50 text-destructive hover:text-destructive hover:bg-destructive/10 text-xs font-semibold h-9 rounded-lg"
+                >
+                  Rejeter sans assigner
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -387,6 +434,52 @@ export function ConversationPane({ issueId }: { issueId: number }) {
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={rejectOpen} onOpenChange={(open: boolean) => { setRejectOpen(open); if (!open) setRejectError(''); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-1.5 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Rejeter la réclamation
+            </DialogTitle>
+            <DialogDescription>
+              Cette réclamation sera clôturée sans être assignée à un agent. Le résident sera informé du motif.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Label htmlFor="adminRejectionReason" className="text-xs text-muted-foreground font-semibold">
+              Motif du rejet *
+            </Label>
+            <Textarea
+              id="adminRejectionReason"
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+              placeholder="Ex: Le dommage constaté sort du cadre contractuel de la garantie décennale..."
+              rows={4}
+              className="bg-muted/40 border-border focus-visible:ring-destructive/40 rounded-xl resize-none p-3"
+            />
+            {rejectError && <p className="text-xs text-destructive">{rejectError}</p>}
+          </div>
+
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              onClick={() => setRejectOpen(false)}
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent text-xs font-semibold h-9"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={rejectIssue}
+              disabled={!rejectReason.trim() || rejecting}
+              className="bg-destructive text-white hover:bg-destructive/90 text-xs font-semibold h-9 px-4 rounded-lg shadow-md active:scale-95 disabled:opacity-65"
+            >
+              {rejecting ? 'Rejet...' : 'Confirmer le rejet'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

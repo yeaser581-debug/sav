@@ -93,13 +93,25 @@ describe('PATCH /api/issues/[id]', () => {
       expect(updated?.status).toBe('IN_PROGRESS');
     });
 
-    it('can reject an unassigned pending issue', async () => {
+    it('can reject an unassigned pending issue with a reason', async () => {
+      const client = await seedClient();
+      const agent = await seedAgent();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT', agentId: null });
+
+      const res = await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'REJECTED', rejectionReason: 'Hors garantie' });
+      expect(res.status).toBe(200);
+    });
+
+    it('cannot reject without a reason', async () => {
       const client = await seedClient();
       const agent = await seedAgent();
       const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT', agentId: null });
 
       const res = await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'REJECTED' });
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(400);
+
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.status).toBe('PENDING_AGENT');
     });
 
     it('cannot act on an issue assigned to a different agent', async () => {
@@ -120,6 +132,89 @@ describe('PATCH /api/issues/[id]', () => {
       await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'RESOLVED' });
       const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
       expect(updated?.resolvedAt).not.toBeNull();
+    });
+  });
+
+  describe('admin rejection', () => {
+    it('can reject a pending issue without assigning an agent', async () => {
+      const client = await seedClient();
+      const admin = await seedAdmin();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT', agentId: null });
+
+      const res = await patch(issue.id, { id: admin.id, email: admin.email, role: 'admin' }, {
+        status: 'REJECTED',
+        rejectionReason: 'Hors du cadre contractuel de la garantie.',
+      });
+      expect(res.status).toBe(200);
+
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.status).toBe('REJECTED');
+      expect(updated?.rejectionReason).toBe('Hors du cadre contractuel de la garantie.');
+      expect(updated?.agentId).toBeNull();
+    });
+
+    it('rejects a rejection with no reason', async () => {
+      const client = await seedClient();
+      const admin = await seedAdmin();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT' });
+
+      const res = await patch(issue.id, { id: admin.id, email: admin.email, role: 'admin' }, { status: 'REJECTED' });
+      expect(res.status).toBe(400);
+
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.status).toBe('PENDING_AGENT');
+    });
+
+    it('rejects a rejection whose reason is only whitespace', async () => {
+      const client = await seedClient();
+      const admin = await seedAdmin();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT' });
+
+      const res = await patch(issue.id, { id: admin.id, email: admin.email, role: 'admin' }, { status: 'REJECTED', rejectionReason: '   ' });
+      expect(res.status).toBe(400);
+
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.status).toBe('PENDING_AGENT');
+    });
+
+    it('trims the stored reason', async () => {
+      const client = await seedClient();
+      const admin = await seedAdmin();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT' });
+
+      await patch(issue.id, { id: admin.id, email: admin.email, role: 'admin' }, { status: 'REJECTED', rejectionReason: '  Doublon  ' });
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.rejectionReason).toBe('Doublon');
+    });
+
+    it('notifies the client with the reason', async () => {
+      const client = await seedClient();
+      const admin = await seedAdmin();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT' });
+
+      const res = await patch(issue.id, { id: admin.id, email: admin.email, role: 'admin' }, {
+        status: 'REJECTED',
+        rejectionReason: 'Déjà traité sous la réclamation #3.',
+      });
+      const data = await res.json();
+      expect(data.targetUserIds).toEqual([client.id]);
+
+      const notifications = await prisma.notification.findMany({ where: { userId: client.id, userRole: 'client' } });
+      expect(notifications).toHaveLength(1);
+      expect(notifications[0].title).toContain(String(issue.id));
+      expect(notifications[0].message).toContain('Déjà traité sous la réclamation #3.');
+      expect(notifications[0].link).toBe(`/client/issues/${issue.id}`);
+    });
+
+    it('does not let a client reject their own issue', async () => {
+      const client = await seedClient();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT' });
+
+      const res = await patch(issue.id, { id: client.id, email: client.login, role: 'client' }, { status: 'REJECTED', rejectionReason: 'je veux' });
+      expect(res.status).toBe(403);
+
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.status).toBe('PENDING_AGENT');
     });
   });
 

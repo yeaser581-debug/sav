@@ -83,6 +83,12 @@ export async function PATCH(
     }
   }
 
+  const rejectionReason = typeof body.rejectionReason === 'string' ? body.rejectionReason.trim() : '';
+
+  if (body.status === 'REJECTED' && !rejectionReason) {
+    return NextResponse.json({ error: 'Le motif du rejet est obligatoire.' }, { status: 400 });
+  }
+
   const isReopeningDispute = body.status === 'IN_PROGRESS' && payload.role === 'admin' && issue.status === 'DISPUTED';
 
   const updated = await prisma.issue.update({
@@ -90,7 +96,7 @@ export async function PATCH(
     data: {
       ...(body.status && { status: body.status }),
       ...(body.severity && payload.role !== 'client' && { severity: body.severity }),
-      ...(body.rejectionReason && payload.role !== 'client' && { rejectionReason: body.rejectionReason }),
+      ...(rejectionReason && payload.role !== 'client' && { rejectionReason }),
       ...(body.status === 'DISPUTED' && { disputeReason: (body.disputeReason as string | undefined)?.trim() || null }),
       ...(isReopeningDispute && { disputeReason: null }),
       ...(body.deadlineAt && payload.role === 'admin' && { deadlineAt: new Date(body.deadlineAt) }),
@@ -122,6 +128,19 @@ export async function PATCH(
         })),
       });
     }
+  }
+
+  if (body.status === 'REJECTED') {
+    targetUserIds = [issue.clientId];
+    await prisma.notification.create({
+      data: {
+        userId: issue.clientId,
+        userRole: 'client',
+        title: `Réclamation #${issue.id} rejetée`,
+        message: `Motif : "${rejectionReason.slice(0, 200)}"`,
+        link: `/client/issues/${issue.id}`,
+      },
+    });
   }
 
   if (isReopeningDispute) {
