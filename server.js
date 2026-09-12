@@ -6,8 +6,10 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaMariaDb } = require('@prisma/adapter-mariadb');
+const { principalIsValid, canAccessIssue } = require('./src/lib/socket-auth');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production';
+const REVALIDATE_INTERVAL_MS = 60 * 1000;
 
 const prisma = new PrismaClient({
   adapter: new PrismaMariaDb({
@@ -21,20 +23,8 @@ const prisma = new PrismaClient({
   }),
 });
 
-async function canAccessIssue(user, issueId) {
-  if (!Number.isInteger(issueId) || issueId <= 0) return false;
-  if (user.role === 'admin') return true;
-
-  const issue = await prisma.issue.findUnique({
-    where: { id: issueId },
-    select: { clientId: true, agentId: true, status: true },
-  });
-  if (!issue) return false;
-
-  if (user.role === 'client') return issue.clientId === user.id;
-  if (user.role === 'agent') return issue.agentId === user.id || issue.status === 'PENDING_AGENT';
-  return false;
-}
+const isValidPrincipal = (user) => principalIsValid(prisma, user);
+const mayAccessIssue = (user, issueId) => canAccessIssue(prisma, user, issueId);
 
 function joinedRoom(socket, issueId) {
   return Number.isInteger(issueId) && socket.rooms.has(`issue_${issueId}`);
@@ -77,14 +67,34 @@ app.prepare().then(() => {
 
   const io = new Server(server);
 
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     const user = getUserFromCookieHeader(socket.handshake.headers.cookie);
     if (!user) {
+      return next(new Error('unauthorized'));
+    }
+    if (!(await isValidPrincipal(user))) {
+      console.warn(`[SOCKET AUTH] rejected ${user.role} ${user.id}: account disabled or removed`);
       return next(new Error('unauthorized'));
     }
     socket.data.user = user;
     next();
   });
+
+  setInterval(async () => {
+    const checked = new Map();
+    for (const socket of io.sockets.sockets.values()) {
+      const user = socket.data.user;
+      if (!user) continue;
+
+      const key = `${user.role}:${user.id}`;
+      if (!checked.has(key)) checked.set(key, await isValidPrincipal(user));
+      if (checked.get(key)) continue;
+
+      console.warn(`[SOCKET AUTH] disconnecting ${key}: account disabled or removed`);
+      socket.emit('force_logout', user.id);
+      socket.disconnect(true);
+    }
+  }, REVALIDATE_INTERVAL_MS).unref();
 
   io.on('connection', (socket) => {
     const user = socket.data.user;
@@ -94,7 +104,7 @@ app.prepare().then(() => {
 
     socket.on('join_issue', async (issueId) => {
       const id = Number(issueId);
-      if (!(await canAccessIssue(user, id))) {
+      if (!(await mayAccessIssue(user, id))) {
         console.warn(`Socket ${socket.id} (user ${user.id}, ${user.role}) denied join of issue ${issueId}`);
         socket.emit('join_denied', issueId);
         return;
