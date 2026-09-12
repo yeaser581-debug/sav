@@ -198,6 +198,21 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         Retour aux réclamations
       </Link>
 
+      {issue.status === 'REJECTED' ? (
+        <Card className="border-destructive/25 bg-destructive/5 p-5 hidden md:block">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-destructive/10 border border-destructive/25 flex items-center justify-center shrink-0">
+              <XCircle className="h-5 w-5 text-destructive" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-foreground">Dossier clos</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Cette demande n&apos;a pas &eacute;t&eacute; retenue et ne fera pas l&apos;objet d&apos;une intervention.
+              </p>
+            </div>
+          </div>
+        </Card>
+      ) : (
       <Card className="bg-card border-border p-5 hidden md:block">
         <div className="flex items-center justify-between">
           {[
@@ -221,7 +236,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                 </div>
               </div>
               {idx < arr.length - 1 && (
-                <div className={`h-[1px] flex-1 mx-4 ${
+                <div className={`h-px flex-1 mx-4 ${
                   currentStep > item.step ? 'bg-foreground/30' : 'bg-border'
                 }`} />
               )}
@@ -229,6 +244,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
           ))}
         </div>
       </Card>
+      )}
 
       <div className="lg:hidden flex bg-muted border border-border rounded-lg p-1">
         {([
@@ -255,6 +271,53 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className={`lg:col-span-2 space-y-6 ${mobileTab === 'details' ? 'block' : 'hidden'} lg:block`}>
+          {issue.status === 'REJECTED' && (
+            <Card className="border-destructive/25 bg-destructive/5 shadow-md">
+              <CardHeader className="pb-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center shrink-0">
+                    <XCircle className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div className="min-w-0">
+                    <CardTitle className="text-base font-bold text-foreground">R&eacute;clamation refus&eacute;e</CardTitle>
+                    <CardDescription className="text-xs mt-1 leading-relaxed">
+                      Apr&egrave;s examen, cette demande n&apos;a pas &eacute;t&eacute; retenue et ne fera pas l&apos;objet d&apos;une intervention.
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4 pt-0">
+                {issue.rejectionReason ? (
+                  <div>
+                    <p className="text-[11px] font-bold text-destructive uppercase tracking-wider mb-2">Motif du refus</p>
+                    <div className="border-l-2 border-destructive/40 bg-background/60 border border-border rounded-r-xl rounded-l-sm py-3 px-4">
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{issue.rejectionReason}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">Aucun motif n&apos;a &eacute;t&eacute; pr&eacute;cis&eacute;.</p>
+                )}
+
+                <div className="flex items-start gap-2.5 rounded-xl border border-border bg-background/60 p-3">
+                  <AlertTriangle className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Vous pensez qu&apos;il s&apos;agit d&apos;une erreur&nbsp;? R&eacute;pondez dans la discussion, votre gestionnaire sera notifi&eacute;.
+                    </p>
+                    <Button
+                      onClick={() => setMobileTab('chat')}
+                      variant="outline"
+                      className="lg:hidden mt-2.5 h-8 px-3 text-xs font-semibold rounded-lg"
+                    >
+                      Ouvrir la discussion
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="bg-card border-border shadow-md">
             <CardHeader className="border-b border-border pb-5">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -337,31 +400,6 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                   <p className="text-sm text-foreground bg-muted border border-border rounded-xl p-4 leading-relaxed">
                     {issue.proof.find(p => p.note)?.note}
                   </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {issue.status === 'REJECTED' && (
-            <Card className="border-destructive/20 bg-destructive/5 shadow-md relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-destructive" />
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start gap-3">
-                  <XCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">Cette r&eacute;clamation a &eacute;t&eacute; refus&eacute;e</h3>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      Elle ne sera pas prise en charge. Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, r&eacute;pondez dans la discussion ci-dessous.
-                    </p>
-                  </div>
-                </div>
-                {issue.rejectionReason && (
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Motif du refus</h4>
-                    <p className="text-sm text-foreground bg-muted border border-border rounded-xl p-4 leading-relaxed whitespace-pre-wrap">
-                      {issue.rejectionReason}
-                    </p>
-                  </div>
                 )}
               </CardContent>
             </Card>
