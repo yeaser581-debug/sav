@@ -27,6 +27,36 @@ function formatDuration(totalSeconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+function MessageStamp({
+  createdAt,
+  onDelete,
+  block = false,
+}: {
+  createdAt: string;
+  onDelete?: () => void;
+  block?: boolean;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-[11px] text-muted-foreground ${
+        block ? 'mt-1 flex justify-end' : 'float-right ml-3 mt-1'
+      }`}
+    >
+      {new Date(createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+      {onDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="-mr-1 inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:bg-destructive/10 focus-visible:text-destructive motion-reduce:transition-none"
+          aria-label="Supprimer le message"
+        >
+          <Trash2 className="h-3 w-3" />
+        </button>
+      )}
+    </span>
+  );
+}
+
 function MessageMedia({ msg }: { msg: ChatMessage }) {
   const [open, setOpen] = useState(false);
   if (!msg.mediaUrl) return null;
@@ -281,7 +311,8 @@ export function ChatPanel({
         </div>
       </CardHeader>
 
-      <div ref={scrollRef} className="flex flex-1 flex-col justify-end gap-3.5 min-h-0 overflow-y-auto p-4">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="flex min-h-full flex-col justify-end gap-3.5">
         {!leadMessage && messages.filter(m => !hiddenIds.has(m.id)).length === 0 && pendingMessages.length === 0 ? (
           <div className="text-center py-12">
             <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
@@ -296,14 +327,12 @@ export function ChatPanel({
                   {leadMessage.senderLabel.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div className="min-w-30 max-w-[80%] rounded-2xl rounded-bl-sm border border-border bg-muted px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
+              <div className="flow-root min-w-30 max-w-[80%] rounded-2xl rounded-bl-sm border border-border bg-muted px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
                 <p className="mb-1 text-[11px] font-bold text-muted-foreground">
                   Réclamation initiale — {leadMessage.senderLabel}
                 </p>
+                <MessageStamp createdAt={leadMessage.createdAt} />
                 <p className="whitespace-pre-wrap">{leadMessage.content}</p>
-                <span className="float-right ml-3 mt-1 text-[11px] text-muted-foreground">
-                  {new Date(leadMessage.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                </span>
               </div>
             </div>
           )}
@@ -320,26 +349,26 @@ export function ChatPanel({
                   </Avatar>
                 )}
                 <div className="min-w-30 max-w-[80%]">
-                  <div className={`px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground ${
+                  <div className={`flow-root px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground ${
                     isMe
                       ? 'bg-accent border border-primary/20 rounded-2xl rounded-br-sm'
                       : 'bg-muted border border-border rounded-2xl rounded-bl-sm'
                   }`}>
+                    {msg.message && (
+                      <MessageStamp
+                        createdAt={msg.createdAt}
+                        onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
+                      />
+                    )}
                     {msg.mediaUrl && <MessageMedia msg={msg} />}
                     {msg.message && <p className={`whitespace-pre-wrap ${msg.mediaUrl ? 'mt-2' : ''}`}>{msg.message}</p>}
-                    <span className="float-right ml-3 mt-1 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                      {isMe && (
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteMessage(msg)}
-                          className="text-muted-foreground hover:text-destructive transition-colors"
-                          aria-label="Supprimer le message"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      )}
-                    </span>
+                    {!msg.message && (
+                      <MessageStamp
+                        block
+                        createdAt={msg.createdAt}
+                        onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -350,12 +379,12 @@ export function ChatPanel({
 
         {pendingMessages.map(msg => (
           <div key={msg.id} className="flex flex-row-reverse items-end gap-2">
-            <div className="min-w-30 max-w-[80%] rounded-2xl rounded-br-sm border border-primary/20 bg-accent/60 px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
-              <p className="whitespace-pre-wrap">{msg.content}</p>
+            <div className="flow-root min-w-30 max-w-[80%] rounded-2xl rounded-br-sm border border-primary/20 bg-accent/60 px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
               <span className="float-right ml-3 mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Clock className="h-2.5 w-2.5" />
                 En attente
               </span>
+              <p className="whitespace-pre-wrap">{msg.content}</p>
             </div>
           </div>
         ))}
@@ -374,6 +403,7 @@ export function ChatPanel({
             </div>
           </div>
         )}
+        </div>
       </div>
 
       <form onSubmit={sendMessage} className="p-4 border-t border-border bg-muted/40 shrink-0 rounded-b-xl">
