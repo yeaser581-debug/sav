@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Film, Music, FileText } from 'lucide-react';
+import { VoiceNote } from '@/components/ui/voice-note';
 
 export type IssueMediaItem = { id: number; type: string; url: string };
 
@@ -55,7 +56,7 @@ export function MediaGallery({ media }: { media: IssueMediaItem[] }) {
                 <video src={active.url} controls autoPlay className="max-h-[70vh] w-full" />
               )}
               {active.type === 'AUDIO' && (
-                <audio src={active.url} controls autoPlay className="w-full max-w-sm my-8" />
+                <div className="my-8 flex justify-center"><VoiceNote src={active.url} /></div>
               )}
               {active.type !== 'PHOTO' && active.type !== 'VIDEO' && active.type !== 'AUDIO' && (
                 <a href={active.url} target="_blank" rel="noreferrer" className="text-sm font-semibold text-foreground hover:underline p-8">

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { VoiceNote } from '@/components/ui/voice-note';
 import { outboxFetch, subscribe } from '@/lib/outbox';
 import { MessageSquare, Send, Paperclip, Mic, X, Trash2, Clock } from 'lucide-react';
 
@@ -58,9 +59,7 @@ function MessageMedia({ msg }: { msg: ChatMessage }) {
     );
   }
 
-  return (
-    <audio src={msg.mediaUrl} controls className="h-10 max-w-[220px]" />
-  );
+  return <VoiceNote src={msg.mediaUrl} />;
 }
 
 export function ChatPanel({
