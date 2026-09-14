@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
 import { Separator } from '@/components/ui/separator';
 import { InstallCard } from '@/components/client/InstallCard';
+import { PushToggle } from '@/components/PushToggle';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +48,7 @@ export default async function ClientDashboard() {
       </div>
 
       <InstallCard />
+      <PushToggle variant="card" />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 bg-card border-border shadow-sm">

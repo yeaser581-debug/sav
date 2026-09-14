@@ -5,6 +5,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import type { Issue } from '@prisma/client';
+import { sendPush, sendPushToMany } from '@/lib/push';
 
 const MAX_SIZE = 25 * 1024 * 1024;
 const ALLOWED_PREFIXES = ['image/', 'video/', 'audio/'];
@@ -24,11 +25,26 @@ async function notifyForMessage(issue: Issue, role: 'client' | 'admin', preview:
       })),
     });
     targetUserIds.push(...admins.map(a => a.id));
+    await sendPushToMany(
+      admins.map(a => ({ userId: a.id, userRole: 'admin' })),
+      {
+        title: `Message d'un résident (Réclamation #${issue.id})`,
+        body: preview,
+        link: `/admin/issues/${issue.id}`,
+        tag: `issue-${issue.id}`,
+      }
+    );
   } else {
     await prisma.notification.create({
       data: { userId: issue.clientId, userRole: 'client', title: `Message de l'administration (#${issue.id})`, message: preview, link: `/client/issues/${issue.id}` },
     });
     targetUserIds.push(issue.clientId);
+    await sendPush(issue.clientId, 'client', {
+      title: `Message de l'administration (#${issue.id})`,
+      body: preview,
+      link: `/client/issues/${issue.id}`,
+      tag: `issue-${issue.id}`,
+    });
   }
 
   return targetUserIds;

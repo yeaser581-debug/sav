@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import { sendPush, sendPushToMany } from '@/lib/push';
 
 export async function GET(
   req: NextRequest,
@@ -127,6 +128,17 @@ export async function PATCH(
           link: `/admin/issues/${issue.id}`,
         })),
       });
+      await sendPushToMany(
+        targetUserIds.map(id => ({ userId: id, userRole: 'admin' })),
+        {
+          title: `Résolution contestée (Réclamation #${issue.id})`,
+          body: reason
+            ? `Le résident conteste la résolution : "${reason.slice(0, 200)}"`
+            : 'Le résident a contesté la résolution de cette réclamation.',
+          link: `/admin/issues/${issue.id}`,
+          tag: `issue-${issue.id}`,
+        }
+      );
     }
   }
 
@@ -140,6 +152,12 @@ export async function PATCH(
         message: `Motif : "${rejectionReason.slice(0, 200)}"`,
         link: `/client/issues/${issue.id}`,
       },
+    });
+    await sendPush(issue.clientId, 'client', {
+      title: `Réclamation #${issue.id} rejetée`,
+      body: `Motif : "${rejectionReason.slice(0, 200)}"`,
+      link: `/client/issues/${issue.id}`,
+      tag: `issue-${issue.id}`,
     });
   }
 
@@ -155,6 +173,12 @@ export async function PATCH(
           message: 'Une résolution contestée vous a été réassignée. Merci de reprendre le dossier.',
           link: `/agent/issues/${issue.id}`,
         },
+      });
+      await sendPush(finalAgentId, 'agent', {
+        title: `Dossier réouvert (Réclamation #${issue.id})`,
+        body: 'Une résolution contestée vous a été réassignée. Merci de reprendre le dossier.',
+        link: `/agent/issues/${issue.id}`,
+        tag: `issue-${issue.id}`,
       });
     }
   }

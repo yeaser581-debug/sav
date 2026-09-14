@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import { sendPush } from '@/lib/push';
 import { writeFile, mkdir } from 'fs/promises';
 import { randomUUID } from 'crypto';
 import path from 'path';
@@ -88,6 +89,13 @@ export async function POST(
         message: 'Votre agent a marqué cette réclamation comme résolue. Vérifiez les preuves et confirmez.',
         link: `/client/issues/${issue.id}`,
       },
+    });
+
+    await sendPush(issue.clientId, 'client', {
+      title: `Intervention résolue (Réclamation #${issue.id})`,
+      body: 'Votre agent a marqué cette réclamation comme résolue. Vérifiez les preuves et confirmez.',
+      link: `/client/issues/${issue.id}`,
+      tag: `issue-${issue.id}`,
     });
 
     return NextResponse.json({ success: true, issue: updatedIssue, targetUserIds: [issue.clientId] }, { status: 201 });

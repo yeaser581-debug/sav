@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { InstallMenuItem } from '@/components/InstallMenuItem';
+import { PushToggle } from '@/components/PushToggle';
 import { OutboxIndicator } from '@/components/client/OutboxIndicator';
 import { logout } from '@/lib/session';
 import { cn } from '@/lib/utils';
@@ -180,6 +181,7 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
             </div>
           </div>
           <OutboxIndicator />
+          <PushToggle />
           <InstallMenuItem />
           <Button
             variant="ghost"

@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { InstallMenuItem } from '@/components/InstallMenuItem';
+import { PushToggle } from '@/components/PushToggle';
 import { logout } from '@/lib/session';
 
 const nav = [
@@ -132,6 +133,7 @@ export default function AdminSidebar({ userName, userId, isSuperAdmin }: { userN
           <p className="text-muted-foreground text-xs truncate">{userName}</p>
         </div>
       </div>
+      <PushToggle />
       <InstallMenuItem />
       <Button
         variant="ghost"
