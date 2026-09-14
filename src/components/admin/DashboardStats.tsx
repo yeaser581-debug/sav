@@ -56,7 +56,7 @@ type PendingIssue = {
 
 type StatKey = 'total' | 'pending' | 'agents' | 'clients';
 
-const SEVERITY_LABELS: Record<string, string> = { CRITICAL: 'Critique', MEDIUM: 'Moyen', LOW: 'Faible' };
+const SEVERITY_LABELS: Record<string, string> = { CRITICAL: 'Urgent', MEDIUM: 'Moyen', LOW: 'Faible' };
 const SEVERITY_COLORS: Record<string, string> = {
   CRITICAL: 'bg-red-500',
   MEDIUM: 'bg-orange-500',

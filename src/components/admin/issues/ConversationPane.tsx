@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -16,7 +15,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MediaGallery } from '@/components/ui/media-gallery';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { SeverityBadge } from '@/components/ui/severity-badge';
+import { SeverityBadge, SEVERITY_OPTIONS, severityLabel } from '@/components/ui/severity-badge';
 import { OverdueTag } from '@/components/ui/overdue-tag';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { pushNotifications } from '@/lib/notify';
@@ -177,7 +176,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
   );
 
   const infoContent = (
-    <div className="space-y-5">
+    <div className="divide-y divide-border [&>*]:py-4 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-accent border border-border flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-foreground">
@@ -192,30 +191,28 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       </div>
 
-      <Separator />
-
       <div className="space-y-3">
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
             <AlertOctagon className="h-3.5 w-3.5" /> Priorité
           </p>
           <Select value={issue.severity ?? undefined} onValueChange={v => v && updateSeverity(v)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Non définie">
-                {(value: string | null) => ({ CRITICAL: 'Critique', MEDIUM: 'Moyen', LOW: 'Faible' } as Record<string, string>)[value ?? ''] ?? 'Non définie'}
+                {(value: string | null) => value ? severityLabel(value) : 'Non définie'}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="CRITICAL">Critique</SelectItem>
-              <SelectItem value="MEDIUM">Moyen</SelectItem>
-              <SelectItem value="LOW">Faible</SelectItem>
+              {SEVERITY_OPTIONS.map(o => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} variant="full" />
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
             <HardHat className="h-3.5 w-3.5" /> Agent assigné
           </p>
           {issue.agent ? (
@@ -258,14 +255,14 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
       {issue.rejectionReason && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
-          <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider mb-1.5">Motif de rejet</p>
+          <p className="text-xs font-medium text-destructive mb-1.5">Motif de rejet</p>
           <p className="text-foreground text-xs">{issue.rejectionReason}</p>
         </div>
       )}
 
       {issue.media.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
             <Paperclip className="h-3.5 w-3.5" /> Pièces jointes ({issue.media.length})
           </p>
           <MediaGallery media={issue.media} />
@@ -274,7 +271,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
       {issue.proof && issue.proof.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Preuve de résolution
           </p>
           <div className="space-y-2">
@@ -290,7 +287,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
       {issue.status === 'DISPUTED' && (
         <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-3 space-y-3">
-          <p className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
+          <p className="text-xs font-medium text-dispute flex items-center gap-1.5">
             <AlertTriangle className="h-3.5 w-3.5" /> Résolution contestée
           </p>
           {issue.disputeReason && (
@@ -325,7 +322,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
       {issue.visits.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
             <Calendar className="h-3.5 w-3.5" /> Visites planifiées
           </p>
           <div className="space-y-2">
@@ -343,10 +340,8 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         </div>
       )}
 
-      <Separator />
-
       <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+        <p className="text-xs font-medium text-muted-foreground mb-2">
           Autres réclamations de ce client
         </p>
         {issue.otherIssues.length === 0 ? (

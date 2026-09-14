@@ -1,48 +1,28 @@
-function Track({ filled, total, colorClass }: { filled: number; total: number; colorClass: string }) {
-  return (
-    <span className="inline-flex gap-0.75" aria-hidden="true">
-      {Array.from({ length: total }).map((_, i) => (
-        <span
-          key={i}
-          className={`block w-2.5 h-1 rounded-full ${i < filled ? colorClass : 'bg-muted'}`}
-        />
-      ))}
-    </span>
-  );
+const STATUS: Record<string, { label: string; text: string; dot: string; wash: string }> = {
+  PENDING_AGENT: { label: 'Nouvelle', text: 'text-muted-foreground', dot: 'bg-muted-foreground', wash: 'bg-muted' },
+  IN_PROGRESS: { label: 'En cours', text: 'text-warning', dot: 'bg-warning', wash: 'bg-warning-wash' },
+  RESOLVED: { label: 'Résolue', text: 'text-success', dot: 'bg-success', wash: 'bg-success-wash' },
+  CONFIRMED: { label: 'Confirmée', text: 'text-primary', dot: 'bg-primary', wash: 'bg-accent' },
+  DISPUTED: { label: 'Contestée', text: 'text-dispute', dot: 'bg-dispute', wash: 'bg-dispute-wash' },
+  REJECTED: { label: 'Rejetée', text: 'text-closed', dot: 'bg-closed', wash: 'bg-closed-wash' },
+};
+
+export function statusLabel(status: string): string {
+  return STATUS[status]?.label ?? status;
 }
 
-const LINEAR: Record<string, { label: string; stage: number; text: string; bar: string }> = {
-  PENDING_AGENT: { label: 'En attente agent', stage: 1, text: 'text-warning', bar: 'bg-warning' },
-  IN_PROGRESS: { label: 'En cours', stage: 2, text: 'text-warning', bar: 'bg-warning' },
-  RESOLVED: { label: 'Résolue', stage: 3, text: 'text-success', bar: 'bg-success' },
-  CONFIRMED: { label: 'Confirmée', stage: 4, text: 'text-success', bar: 'bg-success' },
-};
-
-const EXCEPTION: Record<string, string> = {
-  REJECTED: 'Rejetée',
-  DISPUTED: 'Contestée',
-};
-
 export function StatusBadge({ status }: { status: string }) {
-  const s = LINEAR[status];
-  if (s) {
-    return (
-      <span className={`inline-flex items-center gap-2 text-xs font-semibold ${s.text}`}>
-        <Track filled={s.stage} total={4} colorClass={s.bar} />
-        {s.label}
-      </span>
-    );
+  const s = STATUS[status];
+  if (!s) {
+    return <span className="text-xs font-semibold text-muted-foreground">{status}</span>;
   }
 
-  const label = EXCEPTION[status];
-  if (label) {
-    return (
-      <span className="inline-flex items-center gap-2 text-xs font-semibold text-destructive">
-        <span className="block w-1.75 h-1.75 rounded-xs bg-destructive shrink-0" aria-hidden="true" />
-        {label}
-      </span>
-    );
-  }
-
-  return <span className="text-xs font-semibold text-muted-foreground">{status}</span>;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full py-0.5 pl-1.5 pr-2 text-xs font-semibold whitespace-nowrap ${s.wash} ${s.text}`}
+    >
+      <span className={`block h-1.5 w-1.5 rounded-full ${s.dot}`} aria-hidden="true" />
+      {s.label}
+    </span>
+  );
 }

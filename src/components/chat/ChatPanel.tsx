@@ -33,8 +33,12 @@ function MessageMedia({ msg }: { msg: ChatMessage }) {
   if (msg.mediaType === 'PHOTO') {
     return (
       <>
-        <button type="button" onClick={() => setOpen(true)} className="block max-w-[220px] rounded-lg overflow-hidden">
-          <img src={msg.mediaUrl} alt="Photo" className="w-full h-auto object-cover" />
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="block aspect-square w-40 max-w-full overflow-hidden rounded-lg border border-border"
+        >
+          <img src={msg.mediaUrl} alt="Photo" className="h-full w-full object-cover" />
         </button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-2xl">
@@ -278,7 +282,7 @@ export function ChatPanel({
         </div>
       </CardHeader>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+      <div ref={scrollRef} className="flex flex-1 flex-col justify-end gap-3.5 min-h-0 overflow-y-auto p-4">
         {!leadMessage && messages.filter(m => !hiddenIds.has(m.id)).length === 0 && pendingMessages.length === 0 ? (
           <div className="text-center py-12">
             <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
@@ -287,62 +291,56 @@ export function ChatPanel({
         ) : (
           <>
           {leadMessage && (
-            <div className="flex gap-2.5 flex-row">
-              <Avatar className="h-7 w-7 shrink-0 mt-1">
-                <AvatarFallback className="bg-accent text-foreground text-[10px] font-bold">RE</AvatarFallback>
+            <div className="flex flex-row items-end gap-2">
+              <Avatar className="h-7 w-7 shrink-0">
+                <AvatarFallback className="bg-accent text-accent-foreground text-[10px] font-bold">
+                  {leadMessage.senderLabel.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
-              <div className="space-y-1 max-w-[80%]">
-                <div className="p-3 text-xs leading-relaxed font-medium bg-muted border border-border text-foreground rounded-2xl rounded-tl-sm">
-                  <p className="text-[9px] font-bold mb-1.5 uppercase tracking-wider text-muted-foreground">
-                    Réclamation initiale — {leadMessage.senderLabel}
-                  </p>
-                  <p className="whitespace-pre-wrap">{leadMessage.content}</p>
-                </div>
-                <p className="text-[9px] text-muted-foreground px-1">
-                  {new Date(leadMessage.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+              <div className="min-w-30 max-w-[80%] rounded-2xl rounded-bl-sm border border-border bg-muted px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
+                <p className="mb-1 text-[11px] font-bold text-muted-foreground">
+                  Réclamation initiale — {leadMessage.senderLabel}
                 </p>
+                <p className="whitespace-pre-wrap">{leadMessage.content}</p>
+                <span className="float-right ml-3 mt-1 text-[11px] text-muted-foreground">
+                  {new Date(leadMessage.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
               </div>
             </div>
           )}
           {messages.filter(m => !hiddenIds.has(m.id)).map(msg => {
             const isMe = msg.senderType === myRole;
-            const initials = msg.senderType === 'ADMIN' ? 'AD' : 'RE';
 
             return (
-              <div key={msg.id} className={`flex gap-2.5 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div key={msg.id} className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                 {!isMe && (
-                  <Avatar className="h-7 w-7 shrink-0 mt-1">
-                    <AvatarFallback className="bg-accent text-foreground text-[10px] font-bold">{initials}</AvatarFallback>
+                  <Avatar className="h-7 w-7 shrink-0">
+                    <AvatarFallback className="bg-accent text-accent-foreground text-[10px] font-bold">
+                      {msg.senderType === 'ADMIN' ? 'AD' : 'RE'}
+                    </AvatarFallback>
                   </Avatar>
                 )}
-                <div className="space-y-1 max-w-[80%]">
-                  <div className={`p-3 text-xs leading-relaxed font-medium ${
+                <div className="min-w-30 max-w-[80%]">
+                  <div className={`px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground ${
                     isMe
-                      ? 'bg-primary text-primary-foreground rounded-2xl rounded-tr-sm'
-                      : 'bg-muted border border-border text-foreground rounded-2xl rounded-tl-sm'
+                      ? 'bg-accent border border-primary/20 rounded-2xl rounded-br-sm'
+                      : 'bg-muted border border-border rounded-2xl rounded-bl-sm'
                   }`}>
-                    {!isMe && (
-                      <p className="text-[9px] font-bold mb-1.5 uppercase tracking-wider text-muted-foreground">
-                        {msg.senderType === 'ADMIN' ? 'Administration' : 'Résident'}
-                      </p>
-                    )}
                     {msg.mediaUrl && <MessageMedia msg={msg} />}
                     {msg.message && <p className={`whitespace-pre-wrap ${msg.mediaUrl ? 'mt-2' : ''}`}>{msg.message}</p>}
-                  </div>
-                  <div className={`flex items-center gap-1.5 px-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <p className="text-[9px] text-muted-foreground">
+                    <span className="float-right ml-3 mt-1 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
                       {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    {isMe && (
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteMessage(msg)}
-                        className="text-muted-foreground hover:text-destructive transition-colors"
-                        aria-label="Supprimer le message"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    )}
+                      {isMe && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteMessage(msg)}
+                          className="text-muted-foreground hover:text-destructive transition-colors"
+                          aria-label="Supprimer le message"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -352,27 +350,25 @@ export function ChatPanel({
         )}
 
         {pendingMessages.map(msg => (
-          <div key={msg.id} className="flex gap-2.5 flex-row-reverse">
-            <div className="space-y-1 max-w-[80%]">
-              <div className="p-3 text-xs leading-relaxed font-medium bg-primary/60 text-primary-foreground rounded-2xl rounded-tr-sm">
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-              </div>
-              <div className="flex items-center gap-1 px-1 justify-end text-muted-foreground">
+          <div key={msg.id} className="flex flex-row-reverse items-end gap-2">
+            <div className="min-w-30 max-w-[80%] rounded-2xl rounded-br-sm border border-primary/20 bg-accent/60 px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
+              <p className="whitespace-pre-wrap">{msg.content}</p>
+              <span className="float-right ml-3 mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                 <Clock className="h-2.5 w-2.5" />
-                <p className="text-[9px]">En attente d&apos;envoi</p>
-              </div>
+                En attente
+              </span>
             </div>
           </div>
         ))}
 
         {otherTyping && (
-          <div className="flex gap-2.5 flex-row">
-            <Avatar className="h-7 w-7 shrink-0 mt-1">
-              <AvatarFallback className="bg-accent text-foreground text-[10px] font-bold">
+          <div className="flex flex-row items-end gap-2">
+            <Avatar className="h-7 w-7 shrink-0">
+              <AvatarFallback className="bg-accent text-accent-foreground text-[10px] font-bold">
                 {myRole === 'CLIENT' ? 'AD' : 'RE'}
               </AvatarFallback>
             </Avatar>
-            <div className="bg-muted border border-border rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
+            <div className="bg-muted border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:-0.3s]" />
               <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:-0.15s]" />
               <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce" />

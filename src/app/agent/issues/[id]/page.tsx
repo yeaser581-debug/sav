@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { SeverityBadge } from '@/components/ui/severity-badge';
+import { SeverityBadge, SEVERITY_OPTIONS, severityLabel } from '@/components/ui/severity-badge';
 import { OverdueTag } from '@/components/ui/overdue-tag';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -288,13 +288,13 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                       <Select value={selectedSeverity} onValueChange={v => setSelectedSeverity(v ?? '')}>
                         <SelectTrigger className="h-9 text-xs bg-card border-border w-full">
                           <SelectValue placeholder="Priorité...">
-                            {(value: string | null) => ({ CRITICAL: 'Critique', MEDIUM: 'Moyen', LOW: 'Faible' } as Record<string, string>)[value ?? ''] ?? 'Priorité...'}
+                            {(value: string | null) => value ? severityLabel(value) : 'Priorité...'}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="CRITICAL">Critique</SelectItem>
-                          <SelectItem value="MEDIUM">Moyen</SelectItem>
-                          <SelectItem value="LOW">Faible</SelectItem>
+                          {SEVERITY_OPTIONS.map(o => (
+                            <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>

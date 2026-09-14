@@ -24,5 +24,9 @@ export function OverdueTag({
   }
 
   if (!info.overdue) return null;
-  return <span className="text-[9px] font-bold text-destructive uppercase tracking-wide shrink-0">En retard</span>;
+  return (
+    <span className="inline-flex shrink-0 items-center rounded-full border border-destructive px-1.5 py-px text-[10px] font-bold whitespace-nowrap text-destructive">
+      En retard
+    </span>
+  );
 }

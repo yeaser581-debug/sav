@@ -77,7 +77,8 @@ export async function GET(req: NextRequest) {
       where: fullWhere,
       include: {
         media: true,
-        client: { select: { unitNumber: true } },
+        client: { select: { unitNumber: true, name: true } },
+        agent: { select: { name: true } },
         ...(payload.role === 'admin'
           ? { messages: { orderBy: { createdAt: 'desc' as const }, take: 1, select: { message: true, mediaType: true, senderType: true, createdAt: true } } }
           : {}),

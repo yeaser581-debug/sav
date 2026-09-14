@@ -101,7 +101,7 @@ export function TriageWidget({ issues }: { issues: IssueTableItem[] }) {
         </div>
       </Link>
 
-      {critical.length > 0 && <Band label="Critique" tone="crit" issues={critical} linkHref="/admin/issues?severity=CRITICAL" />}
+      {critical.length > 0 && <Band label="Urgent" tone="crit" issues={critical} linkHref="/admin/issues?severity=CRITICAL" />}
       {critical.length > 0 && standard.length > 0 && <div className="h-px bg-border" />}
       {standard.length > 0 && <Band label="Standard" tone="std" issues={standard} linkHref="/admin/issues" />}
     </div>
