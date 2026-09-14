@@ -26,8 +26,19 @@ const nav = [
   { href: '/client/contract', label: 'Mon contrat', short: 'Contrat', icon: FileText },
 ];
 
+export function activeNavIndex(items: { href: string; exact?: boolean }[], pathname: string): number {
+  return items.reduce((best, item, i) => {
+    const matches = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+    if (!matches) return best;
+    if (best === -1) return i;
+    return item.href.length > items[best].href.length ? i : best;
+  }, -1);
+}
+
 export default function ClientSidebar({ userName, userId }: { userName: string; userId: number }) {
   const pathname = usePathname();
+
+  const activeIndex = activeNavIndex(nav, pathname);
 
   const initials = userName
     .split('@')[0]
@@ -61,32 +72,55 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
         </div>
       </div>
 
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card">
-        <div className="flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
-          {nav.map(item => {
-            const Icon = item.icon;
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-            const isCreate = item.href === '/client/issues/new';
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/90 supports-[backdrop-filter]:bg-card/75 backdrop-blur-xl">
+        <div className="relative flex h-14 items-stretch pb-[env(safe-area-inset-bottom)]">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute top-0 left-0 h-0',
+              'transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.33,1.08,0.6,1)]',
+              'motion-reduce:transition-none',
+              activeIndex < 0 && 'opacity-0'
+            )}
+            style={{
+              width: `${100 / nav.length}%`,
+              transform: `translateX(${Math.max(activeIndex, 0) * 100}%)`,
+            }}
+          >
+            <span className="absolute left-1/2 top-0 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/25 blur-md" />
+            <span className="absolute left-1/2 top-0 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary shadow-md shadow-primary/30" />
+          </div>
 
-            if (isCreate) {
-              return (
-                <Link key={item.href} href={item.href} className="flex-1 flex flex-col items-center justify-center relative">
-                  <div className="absolute -top-5 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 transition-transform">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-medium text-muted-foreground mt-7">{item.short}</span>
-                </Link>
-              );
-            }
+          {nav.map((item, i) => {
+            const Icon = item.icon;
+            const active = i === activeIndex;
 
             return (
-              <Link key={item.href} href={item.href} className="flex-1">
-                <div className={cn(
-                  'flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium',
-                  active ? 'text-foreground' : 'text-muted-foreground'
-                )}>
-                  <Icon className="h-5 w-5" />
-                  <span>{item.short}</span>
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                className="group relative flex-1"
+              >
+                <div className="flex h-full flex-col items-center justify-start gap-1 pt-2.5">
+                  <Icon
+                    className={cn(
+                      'relative h-5 w-5',
+                      'transition-[transform,color] duration-300 ease-[cubic-bezier(0.33,1.08,0.6,1)]',
+                      'motion-reduce:transition-none',
+                      active
+                        ? '-translate-y-5 text-primary-foreground'
+                        : 'text-muted-foreground group-active:scale-90'
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      'text-[10px] transition-colors duration-200 motion-reduce:transition-none',
+                      active ? 'font-bold text-primary' : 'font-medium text-muted-foreground'
+                    )}
+                  >
+                    {item.short}
+                  </span>
                 </div>
               </Link>
             );
@@ -114,11 +148,11 @@ export default function ClientSidebar({ userName, userId }: { userName: string; 
         <Separator />
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {nav.map(item => {
+          {nav.map((item, i) => {
             const Icon = item.icon;
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+            const active = i === activeIndex;
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined}>
                 <div className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150',
                   active
