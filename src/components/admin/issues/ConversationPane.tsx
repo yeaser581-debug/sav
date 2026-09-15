@@ -41,6 +41,8 @@ type IssueDetails = {
   visits: { id: number; scheduledAt: string; status: string }[];
   disputeReason: string | null;
   otherIssues: OtherIssue[];
+  adminLastReadAt: string | null;
+  clientLastReadAt: string | null;
 };
 
 export function ConversationPane({ issueId }: { issueId: number }) {
@@ -409,6 +411,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
               senderLabel: issue.client?.name || issue.client?.login || 'Résident',
               createdAt: issue.createdAt,
             }}
+            readState={{ adminLastReadAt: issue.adminLastReadAt, clientLastReadAt: issue.clientLastReadAt }}
           />
         </div>
 

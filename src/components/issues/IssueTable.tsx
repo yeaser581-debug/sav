@@ -18,6 +18,7 @@ export type IssueTableItem = {
   client?: { unitNumber?: string | null; name?: string | null } | null;
   agent?: { name?: string | null } | null;
   latestMessage?: { message: string; mediaType?: string | null; senderType?: string; createdAt: string | Date } | null;
+  unread?: boolean;
 };
 
 export function issueSubject(issue: IssueTableItem): string {
@@ -90,8 +91,15 @@ export function IssueTable({
               />
               <div className="min-w-0 flex-1 space-y-0.5 py-2.5 pr-3.5 pl-3">
                 <div className="flex items-baseline justify-between gap-2.5">
-                  <p className="truncate text-sm font-bold text-foreground">{issueSubject(issue)}</p>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                  <p className={`truncate text-sm text-foreground ${issue.unread === false ? 'font-medium' : 'font-bold'}`}>
+                    {issueSubject(issue)}
+                  </p>
+                  <span
+                    className={`inline-flex shrink-0 items-center gap-1.5 text-[11px] ${
+                      issue.unread ? 'font-bold text-primary' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {issue.unread && <span className="h-2 w-2 rounded-full bg-primary" aria-label="Non lue" />}
                     {timeAgo(issue.latestMessage?.createdAt ?? issue.createdAt ?? new Date())}
                   </span>
                 </div>

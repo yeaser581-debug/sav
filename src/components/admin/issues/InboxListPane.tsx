@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,9 +15,10 @@ import { PaginationControls } from '@/components/ui/pagination';
 import { IssueTable, type IssueTableItem } from '@/components/issues/IssueTable';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { Search } from 'lucide-react';
+import { onIssueRead } from '@/lib/read-state';
 
-type Counts = { total: number; urgent: number; inProgress: number; resolved: number };
-const DEFAULT_COUNTS: Counts = { total: 0, urgent: 0, inProgress: 0, resolved: 0 };
+type Counts = { total: number; urgent: number; inProgress: number; resolved: number; unread: number };
+const DEFAULT_COUNTS: Counts = { total: 0, urgent: 0, inProgress: 0, resolved: 0, unread: 0 };
 const LIMIT = 20;
 
 const STATUS_SELECT_LABELS: Record<string, string> = {
@@ -49,7 +50,18 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
   const searchParams = useSearchParams();
   const [issues, setIssues] = useState<IssueTableItem[]>([]);
   const [total, setTotal] = useState(0);
-  const [, setCounts] = useState<Counts>(DEFAULT_COUNTS);
+  const [counts, setCounts] = useState<Counts>(DEFAULT_COUNTS);
+  const issuesRef = useRef<IssueTableItem[]>([]);
+
+  useEffect(() => {
+    issuesRef.current = issues;
+  }, [issues]);
+
+  useEffect(() => onIssueRead((issueId) => {
+    if (!issuesRef.current.find(i => i.id === issueId)?.unread) return;
+    setIssues(prev => prev.map(i => (i.id === issueId ? { ...i, unread: false } : i)));
+    setCounts(c => ({ ...c, unread: Math.max(0, c.unread - 1) }));
+  }), []);
   const [initialLoading, setInitialLoading] = useState(true);
   const [refetching, setRefetching] = useState(false);
   const [search, setSearch] = useState('');
@@ -99,6 +111,7 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
       <div className="p-3 border-b border-border space-y-2 shrink-0">
         <h2 className="text-sm font-bold text-foreground px-1">
           Réclamations {total > 0 && <span className="text-muted-foreground font-normal">· {total}</span>}
+          {counts.unread > 0 && <span className="text-primary"> · {counts.unread} non lue{counts.unread > 1 ? 's' : ''}</span>}
         </h2>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SeverityBadge } from '@/components/ui/severity-badge';
 import { OverdueTag } from '@/components/ui/overdue-tag';
+import { SeenStatus } from '@/components/client/SeenStatus';
 import { PaginationControls } from '@/components/ui/pagination';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { Search, Plus, Calendar, ArrowRight, ClipboardList } from 'lucide-react';
@@ -20,6 +21,7 @@ type Issue = {
   severity: string;
   createdAt: string;
   agent?: { name: string } | null;
+  adminLastReadAt?: string | null;
 };
 
 type FilterKey = 'ALL' | 'PENDING' | 'IN_PROGRESS' | 'RESOLVED';
@@ -194,9 +196,12 @@ function ClientIssuesPageInner() {
                         </span>
                       </div>
 
-                      <h3 className="text-foreground font-semibold leading-relaxed transition-colors line-clamp-1">
-                        {issue.originalDescription}
-                      </h3>
+                      <div className="space-y-1.5">
+                        <h3 className="text-foreground font-semibold leading-relaxed transition-colors line-clamp-1">
+                          {issue.originalDescription}
+                        </h3>
+                        <SeenStatus adminLastReadAt={issue.adminLastReadAt} status={issue.status} />
+                      </div>
                     </div>
 
                     <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-border pt-4 lg:pt-0 lg:pl-6 shrink-0">

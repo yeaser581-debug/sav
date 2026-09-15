@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { VoiceNote } from '@/components/ui/voice-note';
 import { outboxFetch, subscribe } from '@/lib/outbox';
-import { MessageSquare, Send, Paperclip, Mic, X, Trash2, Clock } from 'lucide-react';
+import { MessageSquare, Send, Paperclip, Mic, X, Trash2, Clock, Check, CheckCheck } from 'lucide-react';
+import { adminHasUnread, clientHasUnread, isMessageSeen, latestMessageAt, announceIssueRead } from '@/lib/read-state';
 
 export type ChatMessage = {
   id: number;
@@ -30,10 +31,12 @@ function formatDuration(totalSeconds: number) {
 function MessageStamp({
   createdAt,
   onDelete,
+  seen,
   block = false,
 }: {
   createdAt: string;
   onDelete?: () => void;
+  seen?: boolean;
   block?: boolean;
 }) {
   return (
@@ -43,6 +46,13 @@ function MessageStamp({
       }`}
     >
       {new Date(createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+      {seen !== undefined && (
+        seen ? (
+          <CheckCheck className="h-3.5 w-3.5 text-primary" aria-label="Vu" />
+        ) : (
+          <Check className="h-3.5 w-3.5 text-muted-foreground/70" aria-label="Envoyé" />
+        )
+      )}
       {onDelete && (
         <button
           type="button"
@@ -103,6 +113,7 @@ export function ChatPanel({
   subtitle,
   className = 'h-[70vh] lg:h-[600px]',
   leadMessage,
+  readState,
 }: {
   issueId: number;
   myRole: 'CLIENT' | 'ADMIN';
@@ -114,6 +125,7 @@ export function ChatPanel({
   subtitle?: string;
   className?: string;
   leadMessage?: { content: string; senderLabel: string; createdAt: string };
+  readState?: { adminLastReadAt: string | null; clientLastReadAt: string | null };
 }) {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -142,6 +154,7 @@ export function ChatPanel({
     socket.emit('join_issue', issueId);
     socket.on('new_message', () => onRefresh());
     socket.on('message_deleted', () => onRefresh());
+    socket.on('messages_seen', () => onRefresh());
     socket.on('user_typing', () => {
       setOtherTyping(true);
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
@@ -169,6 +182,43 @@ export function ChatPanel({
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, otherTyping, pendingMessages]);
+
+  const markingRef = useRef(false);
+  const adminReadAt = readState?.adminLastReadAt ?? null;
+  const clientReadAt = readState?.clientLastReadAt ?? null;
+  const otherPartyReadAt = myRole === 'ADMIN' ? clientReadAt : adminReadAt;
+
+  useEffect(() => {
+    if (!readState) return;
+
+    const markRead = async () => {
+      if (document.visibilityState !== 'visible' || markingRef.current) return;
+
+      const unread = myRole === 'ADMIN'
+        ? adminHasUnread({ adminLastReadAt: adminReadAt, latestClientMessageAt: latestMessageAt(messages, 'CLIENT') })
+        : clientHasUnread({ clientLastReadAt: clientReadAt, latestAdminMessageAt: latestMessageAt(messages, 'ADMIN') });
+      if (!unread) return;
+
+      markingRef.current = true;
+      try {
+        const res = await fetch(`/api/issues/${issueId}/read`, { method: 'POST' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.changed) return;
+        socketRef.current?.emit('mark_seen', { issueId });
+        if (myRole === 'ADMIN') announceIssueRead(issueId);
+        onRefresh();
+      } catch {
+      } finally {
+        markingRef.current = false;
+      }
+    };
+
+    void markRead();
+    document.addEventListener('visibilitychange', markRead);
+    return () => document.removeEventListener('visibilitychange', markRead);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issueId, myRole, messages, adminReadAt, clientReadAt, readState === undefined]);
 
   const notifyTyping = () => {
     const now = Date.now();
@@ -358,6 +408,7 @@ export function ChatPanel({
                       <MessageStamp
                         createdAt={msg.createdAt}
                         onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
+                        seen={isMe && readState ? isMessageSeen(msg.createdAt, otherPartyReadAt) : undefined}
                       />
                     )}
                     {msg.mediaUrl && <MessageMedia msg={msg} />}
@@ -367,6 +418,7 @@ export function ChatPanel({
                         block
                         createdAt={msg.createdAt}
                         onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
+                        seen={isMe && readState ? isMessageSeen(msg.createdAt, otherPartyReadAt) : undefined}
                       />
                     )}
                   </div>

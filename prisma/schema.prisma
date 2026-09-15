@@ -107,6 +107,8 @@ model Issue {
   resolvedAt          DateTime?
   closedAt            DateTime?
   clientRequestId     String?           @unique
+  adminLastReadAt     DateTime?
+  clientLastReadAt    DateTime?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
   media               IssueMedia[]

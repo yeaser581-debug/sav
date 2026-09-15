@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma, IssueStatus, Severity } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import { adminUnreadIds, countAdminUnread } from '@/lib/unread';
 import { readdir, rename, mkdir } from 'fs/promises';
 import path from 'path';
 
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
     ? [{ severity: { sort: 'asc', nulls: 'last' } }, { createdAt: 'desc' }]
     : [{ createdAt: 'desc' }];
 
-  const [issues, total, statusGroups, urgentCount] = await Promise.all([
+  const [issues, total, statusGroups, urgentCount, unreadCount] = await Promise.all([
     prisma.issue.findMany({
       where: fullWhere,
       include: {
@@ -92,6 +93,7 @@ export async function GET(req: NextRequest) {
     payload.role === 'admin'
       ? prisma.issue.count({ where: { ...roleWhere, severity: 'CRITICAL' } })
       : Promise.resolve(0),
+    payload.role === 'admin' ? countAdminUnread() : Promise.resolve(0),
   ]);
 
   const statusCount = (status: string) =>
@@ -100,15 +102,17 @@ export async function GET(req: NextRequest) {
   const resolvedCount = RESOLVED_STATUSES.reduce((sum, s) => sum + statusCount(s), 0);
 
   const counts = payload.role === 'admin'
-    ? { total: roleTotal, urgent: urgentCount, inProgress: statusCount('IN_PROGRESS'), resolved: resolvedCount }
+    ? { total: roleTotal, urgent: urgentCount, inProgress: statusCount('IN_PROGRESS'), resolved: resolvedCount, unread: unreadCount }
     : payload.role === 'agent'
     ? { ALL: roleTotal, UNASSIGNED: statusCount('PENDING_AGENT'), IN_PROGRESS: statusCount('IN_PROGRESS'), RESOLVED: resolvedCount }
     : { ALL: roleTotal, PENDING: statusCount('PENDING_AGENT'), IN_PROGRESS: statusCount('IN_PROGRESS'), RESOLVED: resolvedCount };
 
+  const unreadIds = payload.role === 'admin' ? await adminUnreadIds(issues) : new Set<number>();
+
   const mappedIssues = payload.role === 'admin'
     ? issues.map((issue) => {
         const { messages, ...rest } = issue as typeof issue & { messages?: { message: string; mediaType: string | null; senderType: string; createdAt: Date }[] };
-        return { ...rest, latestMessage: messages?.[0] ?? null };
+        return { ...rest, latestMessage: messages?.[0] ?? null, unread: unreadIds.has(issue.id) };
       })
     : issues;
 

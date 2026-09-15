@@ -124,6 +124,12 @@ app.prepare().then(() => {
       socket.to(`issue_${id}`).emit('user_typing');
     });
 
+    socket.on('mark_seen', (data) => {
+      const id = Number(data?.issueId);
+      if (!joinedRoom(socket, id)) return;
+      socket.to(`issue_${id}`).emit('messages_seen', { issueId: id });
+    });
+
     socket.on('delete_message', (data) => {
       const id = Number(data?.issueId);
       if (!joinedRoom(socket, id)) return;

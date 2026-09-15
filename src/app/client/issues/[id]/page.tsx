@@ -12,6 +12,7 @@ import { OverdueTag } from '@/components/ui/overdue-tag';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MediaGallery } from '@/components/ui/media-gallery';
 import { ChatPanel } from '@/components/chat/ChatPanel';
+import { SeenStatus } from '@/components/client/SeenStatus';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { pushNotifications } from '@/lib/notify';
 import { outboxFetch } from '@/lib/outbox';
@@ -43,6 +44,8 @@ type IssueDetails = {
   agent: { name: string } | null;
   disputeReason: string | null;
   rejectionReason: string | null;
+  adminLastReadAt: string | null;
+  clientLastReadAt: string | null;
 };
 
 const statusLabels: Record<string, string> = {
@@ -343,6 +346,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                       minute: '2-digit',
                     })}
                   </CardDescription>
+                  <SeenStatus adminLastReadAt={issue.adminLastReadAt} status={issue.status} variant="pill" />
                   <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} variant="full" />
                 </div>
                 {issue.agent && (
@@ -452,6 +456,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
             disabledReason="Cette réclamation est clôturée. Les messages sont désactivés."
             subtitle="Fil de discussion avec l'administration"
             className="h-full lg:h-[600px]"
+            readState={{ adminLastReadAt: issue.adminLastReadAt, clientLastReadAt: issue.clientLastReadAt }}
           />
         </div>
       </div>
