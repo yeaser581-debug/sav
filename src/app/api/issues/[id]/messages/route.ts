@@ -6,6 +6,8 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import type { Issue } from '@prisma/client';
 import { sendPush, sendPushToMany } from '@/lib/push';
+import { decideMessagePosting } from '@/lib/issue-workflow';
+import { toSnapshot } from '@/lib/issue-workflow-server';
 
 const MAX_SIZE = 25 * 1024 * 1024;
 const ALLOWED_PREFIXES = ['image/', 'video/', 'audio/'];
@@ -75,8 +77,12 @@ export async function POST(
 
     const contentType = req.headers.get('content-type') || '';
     const role = payload.role as 'client' | 'admin';
+    const posting = decideMessagePosting(role, toSnapshot(issue).status);
 
     if (contentType.includes('multipart/form-data')) {
+      if (!posting.ok) {
+        return NextResponse.json({ error: posting.message }, { status: posting.httpStatus });
+      }
       const formData = await req.formData();
       const file = formData.get('file') as File | null;
       const caption = (formData.get('content') as string | null)?.trim() || '';
@@ -131,6 +137,10 @@ export async function POST(
       if (existing) {
         return NextResponse.json({ success: true, message: existing, targetUserIds: [] }, { status: 200 });
       }
+    }
+
+    if (!posting.ok) {
+      return NextResponse.json({ error: posting.message }, { status: posting.httpStatus });
     }
 
     const message = await prisma.issueMessage.create({

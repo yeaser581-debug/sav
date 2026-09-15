@@ -60,9 +60,11 @@ describe('PATCH /api/issues/[id]', () => {
       const client = await seedClient();
       const issue = await seedIssue({ clientId: client.id, status: 'RESOLVED', severity: null });
 
-      await patch(issue.id, { id: client.id, email: client.login, role: 'client' }, { status: 'CONFIRMED', severity: 'CRITICAL' });
+      const res = await patch(issue.id, { id: client.id, email: client.login, role: 'client' }, { status: 'CONFIRMED', severity: 'CRITICAL' });
+      expect(res.status).toBe(403);
       const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
       expect(updated?.severity).toBeNull();
+      expect(updated?.status).toBe('RESOLVED');
     });
 
     it('disputing records the reason and notifies every admin', async () => {
@@ -85,12 +87,26 @@ describe('PATCH /api/issues/[id]', () => {
       const agent = await seedAgent();
       const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT', agentId: null });
 
-      const res = await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'IN_PROGRESS' });
+      const res = await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'IN_PROGRESS', severity: 'MEDIUM' });
       expect(res.status).toBe(200);
 
       const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
       expect(updated?.agentId).toBe(agent.id);
       expect(updated?.status).toBe('IN_PROGRESS');
+      expect(updated?.severity).toBe('MEDIUM');
+    });
+
+    it('cannot claim without qualifying the priority, as the screen requires', async () => {
+      const client = await seedClient();
+      const agent = await seedAgent();
+      const issue = await seedIssue({ clientId: client.id, status: 'PENDING_AGENT', agentId: null });
+
+      const res = await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'IN_PROGRESS' });
+      expect(res.status).toBe(400);
+
+      const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
+      expect(updated?.status).toBe('PENDING_AGENT');
+      expect(updated?.agentId).toBeNull();
     });
 
     it('can reject an unassigned pending issue with a reason', async () => {
@@ -124,14 +140,17 @@ describe('PATCH /api/issues/[id]', () => {
       expect(res.status).toBe(403);
     });
 
-    it('resolving their own issue sets resolvedAt', async () => {
+    it('cannot mark their own issue resolved here: resolving requires proof', async () => {
       const client = await seedClient();
       const agent = await seedAgent();
       const issue = await seedIssue({ clientId: client.id, status: 'IN_PROGRESS', agentId: agent.id });
 
-      await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'RESOLVED' });
+      const res = await patch(issue.id, { id: agent.id, email: agent.email, role: 'agent' }, { status: 'RESOLVED' });
+      expect(res.status).toBe(403);
+
       const updated = await prisma.issue.findUnique({ where: { id: issue.id } });
-      expect(updated?.resolvedAt).not.toBeNull();
+      expect(updated?.status).toBe('IN_PROGRESS');
+      expect(updated?.resolvedAt).toBeNull();
     });
   });
 

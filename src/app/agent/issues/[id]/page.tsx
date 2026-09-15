@@ -12,6 +12,7 @@ import { OverdueTag } from '@/components/ui/overdue-tag';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { toast } from 'sonner';
 import { MediaGallery } from '@/components/ui/media-gallery';
 import { pushNotifications } from '@/lib/notify';
 import {
@@ -147,9 +148,15 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
       if (res.ok) {
         setShowRejectModal(false);
         fetchIssue();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setShowRejectModal(false);
+        toast.error(data.error || 'Cette action n’a pas pu être effectuée.');
+        fetchIssue();
       }
     } catch (err) {
       console.error(err);
+      toast.error('Erreur de connexion.');
     }
   };
 
@@ -165,9 +172,14 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
       if (res.ok) {
         setShowVisitModal(false);
         fetchIssue();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || 'La visite n’a pas pu être planifiée.');
+        fetchIssue();
       }
     } catch (err) {
       console.error(err);
+      toast.error('Erreur de connexion.');
     }
   };
 

@@ -15,7 +15,7 @@ import { ChatPanel } from '@/components/chat/ChatPanel';
 import { SeenStatus } from '@/components/client/SeenStatus';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { pushNotifications } from '@/lib/notify';
-import { outboxFetch } from '@/lib/outbox';
+import { outboxFetch, subscribe } from '@/lib/outbox';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
@@ -74,6 +74,24 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.id]);
 
+  useEffect(() => {
+    const issueId = Number(resolvedParams.id);
+    return subscribe((event) => {
+      if (event.type === 'queued' || event.meta?.kind !== 'status' || event.meta.issueId !== issueId) return;
+      if (event.type === 'failed') {
+        toast.error('Votre action faite hors ligne n’a pas pu être appliquée. La réclamation a peut-être changé entre-temps.');
+      }
+      fetchIssue();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedParams.id]);
+
+  const showRefusal = async (res: Response) => {
+    const data = await res.json().catch(() => ({}));
+    toast.error(data.error || 'Cette action n’a pas pu être effectuée.');
+    fetchIssue();
+  };
+
   const fetchIssue = () => {
     fetch(`/api/issues/${resolvedParams.id}`)
       .then(res => {
@@ -108,6 +126,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
     }
 
     if (result.res.ok) fetchIssue();
+    else await showRefusal(result.res);
   };
 
   const closeDisputeModal = () => {
@@ -156,6 +175,9 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
         setDisputeReason('');
         pushNotifications(data.targetUserIds);
         fetchIssue();
+      } else {
+        setShowDisputeModal(false);
+        await showRefusal(result.res);
       }
     } finally {
       setDisputing(false);

@@ -19,6 +19,7 @@ import { SeverityBadge, SEVERITY_OPTIONS, severityLabel } from '@/components/ui/
 import { OverdueTag } from '@/components/ui/overdue-tag';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { pushNotifications } from '@/lib/notify';
+import { toast } from 'sonner';
 import { timeAgo } from '@/lib/utils';
 
 type Media = { id: number; type: string; url: string };
@@ -82,9 +83,17 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         body: JSON.stringify({ agentId: parseInt(agentId), status: 'IN_PROGRESS' }),
       });
       if (res.ok) fetchIssue();
+      else await showRefusal(res);
     } catch (err) {
       console.error(err);
+      toast.error('Erreur de connexion.');
     }
+  };
+
+  const showRefusal = async (res: Response) => {
+    const data = await res.json().catch(() => ({}));
+    toast.error(data.error || 'Cette action n’a pas pu être effectuée.');
+    fetchIssue();
   };
 
   const rejectIssue = async () => {
@@ -123,8 +132,10 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         body: JSON.stringify({ severity }),
       });
       if (res.ok) fetchIssue();
+      else await showRefusal(res);
     } catch (err) {
       console.error(err);
+      toast.error('Erreur de connexion.');
     }
   };
 
@@ -143,9 +154,12 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         pushNotifications(data.targetUserIds);
         setReopenAgentId('');
         fetchIssue();
+      } else {
+        await showRefusal(res);
       }
     } catch (err) {
       console.error(err);
+      toast.error('Erreur de connexion.');
     } finally {
       setReopening(false);
     }

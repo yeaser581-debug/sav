@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import { sendPush, sendPushToMany } from '@/lib/push';
+import {
+  canAccessIssue,
+  decideIssueChange,
+  parseIssueChange,
+  type Actor,
+  type TransitionName,
+} from '@/lib/issue-workflow';
+import {
+  isActiveAgent,
+  parseIssueId,
+  STALE_ISSUE_MESSAGE,
+  toSnapshot,
+  whereStillMatches,
+} from '@/lib/issue-workflow-server';
 
 export async function GET(
   req: NextRequest,
@@ -60,128 +74,107 @@ export async function PATCH(
   if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const issueId = parseInt(id);
-  const body = await req.json();
+  const issueId = parseIssueId(id);
+  if (issueId === null) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  const body: unknown = await req.json().catch(() => undefined);
 
   const issue = await prisma.issue.findUnique({ where: { id: issueId } });
   if (!issue) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  if (payload.role === 'client') {
-    if (issue.clientId !== payload.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-    if (!['CONFIRMED', 'DISPUTED'].includes(body.status)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  const actor: Actor = { role: payload.role, id: payload.id };
+  if (!canAccessIssue(actor, toSnapshot(issue))) {
+    return NextResponse.json({ error: "Vous n'avez pas accès à cette réclamation." }, { status: 403 });
   }
 
-  if (payload.role === 'agent') {
-    const isOwnIssue = issue.agentId === payload.id;
-    const isClaimingOrRejecting = issue.status === 'PENDING_AGENT' && !issue.agentId
-      && ['IN_PROGRESS', 'REJECTED'].includes(body.status);
-    if (!isOwnIssue && !isClaimingOrRejecting) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  const parsed = parseIssueChange(body);
+  if (!parsed.ok) return NextResponse.json({ error: parsed.message }, { status: 400 });
+
+  const now = new Date();
+  const decision = decideIssueChange(actor, toSnapshot(issue), parsed.change, now);
+
+  if (decision.outcome === 'refuse') {
+    return NextResponse.json({ error: decision.message }, { status: decision.httpStatus });
+  }
+  if (decision.outcome === 'noop') {
+    return NextResponse.json({ ...issue, targetUserIds: [], unchanged: true });
   }
 
-  const rejectionReason = typeof body.rejectionReason === 'string' ? body.rejectionReason.trim() : '';
-
-  if (body.status === 'REJECTED' && !rejectionReason) {
-    return NextResponse.json({ error: 'Le motif du rejet est obligatoire.' }, { status: 400 });
+  if (decision.agentToVerify !== null && !(await isActiveAgent(decision.agentToVerify))) {
+    return decision.agentToVerify === actor.id && actor.role === 'agent'
+      ? NextResponse.json({ error: 'Votre compte agent a été désactivé.' }, { status: 403 })
+      : NextResponse.json({ error: "Cet agent n'existe pas ou a été désactivé." }, { status: 400 });
   }
 
-  const isReopeningDispute = body.status === 'IN_PROGRESS' && payload.role === 'admin' && issue.status === 'DISPUTED';
-
-  const updated = await prisma.issue.update({
-    where: { id: issueId },
-    data: {
-      ...(body.status && { status: body.status }),
-      ...(body.severity && payload.role !== 'client' && { severity: body.severity }),
-      ...(rejectionReason && payload.role !== 'client' && { rejectionReason }),
-      ...(body.status === 'DISPUTED' && { disputeReason: (body.disputeReason as string | undefined)?.trim() || null }),
-      ...(isReopeningDispute && { disputeReason: null }),
-      ...(body.deadlineAt && payload.role === 'admin' && { deadlineAt: new Date(body.deadlineAt) }),
-      ...(body.agentId && payload.role === 'admin' && { agentId: body.agentId }),
-      ...(body.status === 'IN_PROGRESS' && payload.role === 'agent' && !issue.agentId && { agentId: payload.id }),
-      ...(body.aiDescription && payload.role !== 'client' && { aiDescription: body.aiDescription }),
-      ...(body.status === 'RESOLVED' && { resolvedAt: new Date() }),
-      ...(body.status === 'IN_PROGRESS' && { resolvedAt: null }),
-      ...(body.status === 'CONFIRMED' && { closedAt: new Date() }),
-    },
+  const { count } = await prisma.issue.updateMany({
+    where: whereStillMatches(issueId, decision.expect),
+    data: decision.data,
   });
 
-  let targetUserIds: number[] = [];
+  if (count === 0) {
+    const fresh = await prisma.issue.findUnique({ where: { id: issueId } });
+    if (!fresh) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  if (body.status === 'DISPUTED') {
-    const admins = await prisma.admin.findMany({ select: { id: true } });
-    targetUserIds = admins.map(a => a.id);
-    if (targetUserIds.length > 0) {
-      const reason = (body.disputeReason as string | undefined)?.trim();
-      await prisma.notification.createMany({
-        data: targetUserIds.map(id => ({
-          userId: id,
-          userRole: 'admin',
-          title: `Résolution contestée (Réclamation #${issue.id})`,
-          message: reason
-            ? `Le résident conteste la résolution : "${reason.slice(0, 200)}"`
-            : 'Le résident a contesté la résolution de cette réclamation.',
-          link: `/admin/issues/${issue.id}`,
-        })),
-      });
-      await sendPushToMany(
-        targetUserIds.map(id => ({ userId: id, userRole: 'admin' })),
-        {
-          title: `Résolution contestée (Réclamation #${issue.id})`,
-          body: reason
-            ? `Le résident conteste la résolution : "${reason.slice(0, 200)}"`
-            : 'Le résident a contesté la résolution de cette réclamation.',
-          link: `/admin/issues/${issue.id}`,
-          tag: `issue-${issue.id}`,
-        }
-      );
-    }
+    const retry = decideIssueChange(actor, toSnapshot(fresh), parsed.change, now);
+    if (retry.outcome === 'noop') return NextResponse.json({ ...fresh, targetUserIds: [], unchanged: true });
+    if (retry.outcome === 'refuse') return NextResponse.json({ error: retry.message }, { status: retry.httpStatus });
+    return NextResponse.json({ error: STALE_ISSUE_MESSAGE }, { status: 409 });
   }
 
-  if (body.status === 'REJECTED') {
-    targetUserIds = [issue.clientId];
-    await prisma.notification.create({
-      data: {
-        userId: issue.clientId,
-        userRole: 'client',
-        title: `Réclamation #${issue.id} rejetée`,
-        message: `Motif : "${rejectionReason.slice(0, 200)}"`,
-        link: `/client/issues/${issue.id}`,
-      },
-    });
-    await sendPush(issue.clientId, 'client', {
-      title: `Réclamation #${issue.id} rejetée`,
-      body: `Motif : "${rejectionReason.slice(0, 200)}"`,
-      link: `/client/issues/${issue.id}`,
-      tag: `issue-${issue.id}`,
-    });
-  }
-
-  if (isReopeningDispute) {
-    const finalAgentId = body.agentId ?? issue.agentId;
-    if (finalAgentId) {
-      targetUserIds = [finalAgentId];
-      await prisma.notification.create({
-        data: {
-          userId: finalAgentId,
-          userRole: 'agent',
-          title: `Dossier réouvert (Réclamation #${issue.id})`,
-          message: 'Une résolution contestée vous a été réassignée. Merci de reprendre le dossier.',
-          link: `/agent/issues/${issue.id}`,
-        },
-      });
-      await sendPush(finalAgentId, 'agent', {
-        title: `Dossier réouvert (Réclamation #${issue.id})`,
-        body: 'Une résolution contestée vous a été réassignée. Merci de reprendre le dossier.',
-        link: `/agent/issues/${issue.id}`,
-        tag: `issue-${issue.id}`,
-      });
-    }
-  }
+  const updated = await prisma.issue.findUniqueOrThrow({ where: { id: issueId } });
+  const targetUserIds = await notifyTransition(decision.transition, updated);
 
   return NextResponse.json({ ...updated, targetUserIds });
+}
+
+async function notifyTransition(
+  transition: TransitionName | null,
+  issue: { id: number; clientId: number; agentId: number | null; rejectionReason: string | null; disputeReason: string | null }
+): Promise<number[]> {
+  const tag = `issue-${issue.id}`;
+
+  switch (transition) {
+    case 'dispute': {
+      const admins = await prisma.admin.findMany({ select: { id: true } });
+      const adminIds = admins.map(a => a.id);
+      if (adminIds.length === 0) return [];
+
+      const title = `Résolution contestée (Réclamation #${issue.id})`;
+      const message = issue.disputeReason
+        ? `Le résident conteste la résolution : "${issue.disputeReason.slice(0, 200)}"`
+        : 'Le résident a contesté la résolution de cette réclamation.';
+      const link = `/admin/issues/${issue.id}`;
+
+      await prisma.notification.createMany({
+        data: adminIds.map(userId => ({ userId, userRole: 'admin', title, message, link })),
+      });
+      await sendPushToMany(adminIds.map(userId => ({ userId, userRole: 'admin' })), { title, body: message, link, tag });
+      return adminIds;
+    }
+
+    case 'reject': {
+      const title = `Réclamation #${issue.id} rejetée`;
+      const message = `Motif : "${(issue.rejectionReason ?? '').slice(0, 200)}"`;
+      const link = `/client/issues/${issue.id}`;
+
+      await prisma.notification.create({ data: { userId: issue.clientId, userRole: 'client', title, message, link } });
+      await sendPush(issue.clientId, 'client', { title, body: message, link, tag });
+      return [issue.clientId];
+    }
+
+    case 'reopenDispute': {
+      if (issue.agentId === null) return [];
+
+      const title = `Dossier réouvert (Réclamation #${issue.id})`;
+      const message = 'Une résolution contestée vous a été réassignée. Merci de reprendre le dossier.';
+      const link = `/agent/issues/${issue.id}`;
+
+      await prisma.notification.create({ data: { userId: issue.agentId, userRole: 'agent', title, message, link } });
+      await sendPush(issue.agentId, 'agent', { title, body: message, link, tag });
+      return [issue.agentId];
+    }
+
+    default:
+      return [];
+  }
 }

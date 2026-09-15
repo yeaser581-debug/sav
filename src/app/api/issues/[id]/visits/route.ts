@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import { decideVisitScheduling } from '@/lib/issue-workflow';
+import { parseIssueId, toSnapshot } from '@/lib/issue-workflow-server';
 
 export async function POST(
   req: NextRequest,
@@ -8,29 +10,40 @@ export async function POST(
 ) {
   const token = req.cookies.get('token')?.value;
   const payload = token ? verifyToken(token) : null;
-  if (!payload || payload.role !== 'agent') {
+  if (!payload) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (payload.role !== 'agent') {
+    return NextResponse.json({ error: 'Seul l’agent assigné peut planifier une visite.' }, { status: 403 });
   }
 
   const { id } = await params;
-  const issueId = parseInt(id);
+  const issueId = parseIssueId(id);
+  if (issueId === null) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  const body: unknown = await req.json().catch(() => null);
+  const rawDate = typeof body === 'object' && body !== null ? (body as Record<string, unknown>).scheduledAt : undefined;
+  if (typeof rawDate !== 'string' || !rawDate.trim()) {
+    return NextResponse.json({ error: 'Date and time required' }, { status: 400 });
+  }
+  const scheduledAt = new Date(rawDate);
+  if (Number.isNaN(scheduledAt.getTime())) {
+    return NextResponse.json({ error: 'Date de visite invalide.' }, { status: 400 });
+  }
 
   try {
-    const { scheduledAt } = await req.json();
-
-    if (!scheduledAt) {
-      return NextResponse.json({ error: 'Date and time required' }, { status: 400 });
-    }
-
     const issue = await prisma.issue.findUnique({ where: { id: issueId } });
-    if (!issue || issue.agentId !== payload.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!issue) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+    const decision = decideVisitScheduling({ role: 'agent', id: payload.id }, toSnapshot(issue));
+    if (!decision.ok) {
+      return NextResponse.json({ error: decision.message }, { status: decision.httpStatus });
     }
 
     const visit = await prisma.visit.create({
       data: {
         issueId,
-        scheduledAt: new Date(scheduledAt),
+        scheduledAt,
       },
     });
 

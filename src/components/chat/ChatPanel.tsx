@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { VoiceNote } from '@/components/ui/voice-note';
+import { toast } from 'sonner';
 import { outboxFetch, subscribe } from '@/lib/outbox';
 import { MessageSquare, Send, Paperclip, Mic, X, Trash2, Clock, Check, CheckCheck } from 'lucide-react';
 import { adminHasUnread, clientHasUnread, isMessageSeen, latestMessageAt, announceIssueRead } from '@/lib/read-state';
@@ -172,8 +173,11 @@ export function ChatPanel({
 
   useEffect(() => {
     return subscribe((event) => {
-      if (event.type !== 'sent' || event.meta?.kind !== 'message' || event.meta.issueId !== issueId) return;
+      if (event.type === 'queued' || event.meta?.kind !== 'message' || event.meta.issueId !== issueId) return;
       setPendingMessages(prev => prev.filter(m => m.id !== event.id));
+      if (event.type === 'failed') {
+        toast.error('Un message écrit hors ligne n’a pas pu être envoyé. La réclamation a peut-être été clôturée entre-temps.');
+      }
       onRefresh();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -257,7 +261,14 @@ export function ChatPanel({
         return;
       }
 
-      if (result.res.ok) afterSent(await result.res.json());
+      if (result.res.ok) {
+        afterSent(await result.res.json());
+      } else {
+        const data = await result.res.json().catch(() => ({}));
+        toast.error(data.error || 'Le message n’a pas pu être envoyé.');
+        setNewMessage(current => current || content);
+        onRefresh();
+      }
     } finally {
       setSending(false);
     }
@@ -270,7 +281,15 @@ export function ChatPanel({
       const form = new FormData();
       form.append('file', file);
       const res = await fetch(`/api/issues/${issueId}/messages`, { method: 'POST', body: form });
-      if (res.ok) afterSent(await res.json());
+      if (res.ok) {
+        afterSent(await res.json());
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || 'Le fichier n’a pas pu être envoyé.');
+        onRefresh();
+      }
+    } catch {
+      toast.error('Erreur de connexion.');
     } finally {
       setSending(false);
     }
