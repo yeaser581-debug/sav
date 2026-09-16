@@ -60,8 +60,8 @@ export default function ActivateAccountPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
-            <Label className="text-foreground text-sm">Nouveau mot de passe</Label>
-            <Input
+            <Label htmlFor="password" className="text-foreground text-sm">Nouveau mot de passe</Label>
+            <Input id="password"
               type="password"
               required
               value={password}
@@ -71,8 +71,8 @@ export default function ActivateAccountPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-foreground text-sm">Confirmer le mot de passe</Label>
-            <Input
+            <Label htmlFor="confirm" className="text-foreground text-sm">Confirmer le mot de passe</Label>
+            <Input id="confirm"
               type="password"
               required
               value={confirm}

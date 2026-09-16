@@ -228,8 +228,8 @@ export default function AdminAgentsPage() {
             )}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Nom complet *</Label>
-                <Input
+                <Label htmlFor="form-name" className="text-foreground text-sm">Nom complet *</Label>
+                <Input id="form-name"
                   required
                   type="text"
                   value={form.name}
@@ -239,8 +239,8 @@ export default function AdminAgentsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Email *</Label>
-                <Input
+                <Label htmlFor="form-email" className="text-foreground text-sm">Email *</Label>
+                <Input id="form-email"
                   required
                   type="email"
                   value={form.email}
@@ -250,8 +250,8 @@ export default function AdminAgentsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Mot de passe temporaire *</Label>
-                <Input
+                <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe temporaire *</Label>
+                <Input id="form-password"
                   required
                   type="password"
                   value={form.password}
@@ -261,8 +261,8 @@ export default function AdminAgentsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Téléphone</Label>
-                <Input
+                <Label htmlFor="form-phone" className="text-foreground text-sm">Téléphone</Label>
+                <Input id="form-phone"
                   type="tel"
                   value={form.phone}
                   onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -383,8 +383,8 @@ export default function AdminAgentsPage() {
               )}
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nom complet *</Label>
-                  <Input
+                  <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom complet *</Label>
+                  <Input id="editForm-name"
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -392,8 +392,8 @@ export default function AdminAgentsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Email *</Label>
-                  <Input
+                  <Label htmlFor="editForm-email" className="text-foreground text-sm">Email *</Label>
+                  <Input id="editForm-email"
                     required
                     type="email"
                     value={editForm.email}
@@ -402,8 +402,8 @@ export default function AdminAgentsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Téléphone</Label>
-                  <Input
+                  <Label htmlFor="editForm-phone" className="text-foreground text-sm">Téléphone</Label>
+                  <Input id="editForm-phone"
                     type="tel"
                     value={editForm.phone}
                     onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
@@ -411,8 +411,8 @@ export default function AdminAgentsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nouveau mot de passe</Label>
-                  <Input
+                  <Label htmlFor="editForm-password" className="text-foreground text-sm">Nouveau mot de passe</Label>
+                  <Input id="editForm-password"
                     type="password"
                     value={editForm.password}
                     onChange={e => setEditForm({ ...editForm, password: e.target.value })}

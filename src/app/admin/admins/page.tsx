@@ -210,8 +210,8 @@ export default function AdminAdminsPage() {
             )}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Nom complet *</Label>
-                <Input
+                <Label htmlFor="form-name" className="text-foreground text-sm">Nom complet *</Label>
+                <Input id="form-name"
                   required
                   type="text"
                   value={form.name}
@@ -221,8 +221,8 @@ export default function AdminAdminsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Email *</Label>
-                <Input
+                <Label htmlFor="form-email" className="text-foreground text-sm">Email *</Label>
+                <Input id="form-email"
                   required
                   type="email"
                   value={form.email}
@@ -232,8 +232,8 @@ export default function AdminAdminsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Mot de passe temporaire *</Label>
-                <Input
+                <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe temporaire *</Label>
+                <Input id="form-password"
                   required
                   type="password"
                   value={form.password}
@@ -245,6 +245,9 @@ export default function AdminAdminsPage() {
               <div className="flex items-center gap-2.5 pt-6">
                 <button
                   type="button"
+                  id="form-isSuperAdmin"
+                  role="checkbox"
+                  aria-checked={form.isSuperAdmin}
                   onClick={() => setForm({ ...form, isSuperAdmin: !form.isSuperAdmin })}
                   className={`h-5 w-5 rounded-md border shrink-0 flex items-center justify-center transition-colors ${
                     form.isSuperAdmin ? 'bg-primary border-primary' : 'bg-muted border-border'
@@ -252,7 +255,8 @@ export default function AdminAdminsPage() {
                 >
                   {form.isSuperAdmin && <ShieldCheck className="h-3.5 w-3.5 text-primary-foreground" />}
                 </button>
-                <Label className="text-foreground text-sm cursor-pointer" onClick={() => setForm({ ...form, isSuperAdmin: !form.isSuperAdmin })}>
+                {/* The label forwards its click to the button, so it must not toggle as well. */}
+                <Label htmlFor="form-isSuperAdmin" className="text-foreground text-sm cursor-pointer">
                   Accorder les privilèges Super Admin
                 </Label>
               </div>
@@ -378,8 +382,8 @@ export default function AdminAdminsPage() {
               )}
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nom complet *</Label>
-                  <Input
+                  <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom complet *</Label>
+                  <Input id="editForm-name"
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -387,8 +391,8 @@ export default function AdminAdminsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Email *</Label>
-                  <Input
+                  <Label htmlFor="editForm-email" className="text-foreground text-sm">Email *</Label>
+                  <Input id="editForm-email"
                     required
                     type="email"
                     value={editForm.email}
@@ -397,8 +401,8 @@ export default function AdminAdminsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nouveau mot de passe</Label>
-                  <Input
+                  <Label htmlFor="editForm-password" className="text-foreground text-sm">Nouveau mot de passe</Label>
+                  <Input id="editForm-password"
                     type="password"
                     value={editForm.password}
                     onChange={e => setEditForm({ ...editForm, password: e.target.value })}
@@ -409,6 +413,9 @@ export default function AdminAdminsPage() {
                 <div className="flex items-center gap-2.5">
                   <button
                     type="button"
+                    id="editForm-isSuperAdmin"
+                    role="checkbox"
+                    aria-checked={editForm.isSuperAdmin}
                     onClick={() => setEditForm({ ...editForm, isSuperAdmin: !editForm.isSuperAdmin })}
                     className={`h-5 w-5 rounded-md border shrink-0 flex items-center justify-center transition-colors ${
                       editForm.isSuperAdmin ? 'bg-primary border-primary' : 'bg-muted border-border'
@@ -416,7 +423,7 @@ export default function AdminAdminsPage() {
                   >
                     {editForm.isSuperAdmin && <ShieldCheck className="h-3.5 w-3.5 text-primary-foreground" />}
                   </button>
-                  <Label className="text-foreground text-sm cursor-pointer" onClick={() => setEditForm({ ...editForm, isSuperAdmin: !editForm.isSuperAdmin })}>
+                  <Label htmlFor="editForm-isSuperAdmin" className="text-foreground text-sm cursor-pointer">
                     Privilèges Super Admin
                   </Label>
                 </div>

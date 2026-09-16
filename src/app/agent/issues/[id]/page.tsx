@@ -504,7 +504,9 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
             <CardContent>
               <form onSubmit={submitResolve} className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground font-semibold">Preuve de résolution *</Label>
+                  {/* The drop zone below is itself a <label> around the input,
+                      so this one is a heading rather than a second label. */}
+                  <p className="text-xs text-muted-foreground font-semibold">Preuve de résolution *</p>
                   <label className="flex flex-col items-center justify-center gap-1.5 border border-dashed border-border rounded-xl p-5 cursor-pointer hover:border-foreground/30 hover:bg-accent/40 transition-colors text-center">
                     <Upload className="h-5 w-5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground font-medium">Cliquez pour ajouter des photos/vidéos</span>

@@ -212,8 +212,8 @@ export default function AdminAreasPage() {
           <CardContent className="px-6 py-5">
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Nom de la zone *</Label>
-                <Input
+                <Label htmlFor="form-name" className="text-foreground text-sm">Nom de la zone *</Label>
+                <Input id="form-name"
                   required
                   type="text"
                   value={form.name}
@@ -223,9 +223,9 @@ export default function AdminAreasPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Agent responsable</Label>
+                <Label htmlFor="form-agentId" className="text-foreground text-sm">Agent responsable</Label>
                 <Select value={form.agentId} onValueChange={v => setForm({ ...form, agentId: v ?? '' })}>
-                  <SelectTrigger className="bg-muted border-border w-full">
+                  <SelectTrigger id="form-agentId" className="bg-muted border-border w-full">
                     <SelectValue placeholder="Aucun agent (à assigner plus tard)">
                       {(value: string | null) => value ? (agents.find(a => String(a.id) === value)?.name ?? value) : 'Aucun agent (à assigner plus tard)'}
                     </SelectValue>
@@ -338,8 +338,8 @@ export default function AdminAreasPage() {
             <CardContent>
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nom de la zone *</Label>
-                  <Input
+                  <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom de la zone *</Label>
+                  <Input id="editForm-name"
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -347,9 +347,9 @@ export default function AdminAreasPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Agent responsable</Label>
+                  <Label htmlFor="editForm-agentId" className="text-foreground text-sm">Agent responsable</Label>
                   <Select value={editForm.agentId} onValueChange={v => setEditForm({ ...editForm, agentId: v ?? '' })}>
-                    <SelectTrigger className="bg-muted border-border w-full">
+                    <SelectTrigger id="editForm-agentId" className="bg-muted border-border w-full">
                       <SelectValue placeholder="Aucun agent">
                         {(value: string | null) => value ? (agents.find(a => String(a.id) === value)?.name ?? value) : 'Aucun agent'}
                       </SelectValue>

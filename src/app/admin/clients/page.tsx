@@ -265,8 +265,8 @@ export default function AdminClientsPage() {
             )}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Identifiant (Login) *</Label>
-                <Input
+                <Label htmlFor="form-login" className="text-foreground text-sm">Identifiant (Login) *</Label>
+                <Input id="form-login"
                   required
                   type="text"
                   value={form.login}
@@ -276,8 +276,8 @@ export default function AdminClientsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Mot de passe temporaire *</Label>
-                <Input
+                <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe temporaire *</Label>
+                <Input id="form-password"
                   required
                   type="password"
                   value={form.password}
@@ -287,8 +287,8 @@ export default function AdminClientsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Numéro d&apos;unité *</Label>
-                <Input
+                <Label htmlFor="form-unitNumber" className="text-foreground text-sm">Numéro d&apos;unité *</Label>
+                <Input id="form-unitNumber"
                   required
                   type="text"
                   value={form.unitNumber}
@@ -298,8 +298,9 @@ export default function AdminClientsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Immeuble</Label>
+                <Label htmlFor="form-buildingId" className="text-foreground text-sm">Immeuble</Label>
                 <select
+                  id="form-buildingId"
                   value={form.buildingId}
                   onChange={e => setForm({ ...form, buildingId: e.target.value })}
                   className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -311,8 +312,8 @@ export default function AdminClientsPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Nom complet</Label>
-                <Input
+                <Label htmlFor="form-name" className="text-foreground text-sm">Nom complet</Label>
+                <Input id="form-name"
                   type="text"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
@@ -321,8 +322,8 @@ export default function AdminClientsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Téléphone</Label>
-                <Input
+                <Label htmlFor="form-phone" className="text-foreground text-sm">Téléphone</Label>
+                <Input id="form-phone"
                   type="tel"
                   value={form.phone}
                   onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -331,8 +332,8 @@ export default function AdminClientsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Email</Label>
-                <Input
+                <Label htmlFor="form-email" className="text-foreground text-sm">Email</Label>
+                <Input id="form-email"
                   type="email"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
@@ -495,8 +496,8 @@ export default function AdminClientsPage() {
               )}
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Identifiant (Login) *</Label>
-                  <Input
+                  <Label htmlFor="editForm-login" className="text-foreground text-sm">Identifiant (Login) *</Label>
+                  <Input id="editForm-login"
                     required
                     value={editForm.login}
                     onChange={e => setEditForm({ ...editForm, login: e.target.value })}
@@ -504,8 +505,8 @@ export default function AdminClientsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Numéro d&apos;unité *</Label>
-                  <Input
+                  <Label htmlFor="editForm-unitNumber" className="text-foreground text-sm">Numéro d&apos;unité *</Label>
+                  <Input id="editForm-unitNumber"
                     required
                     value={editForm.unitNumber}
                     onChange={e => setEditForm({ ...editForm, unitNumber: e.target.value })}
@@ -513,8 +514,9 @@ export default function AdminClientsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Immeuble</Label>
+                  <Label htmlFor="editForm-buildingId" className="text-foreground text-sm">Immeuble</Label>
                   <select
+                    id="editForm-buildingId"
                     value={editForm.buildingId}
                     onChange={e => setEditForm({ ...editForm, buildingId: e.target.value })}
                     className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -526,16 +528,16 @@ export default function AdminClientsPage() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nom complet</Label>
-                  <Input
+                  <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom complet</Label>
+                  <Input id="editForm-name"
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
                     className="bg-muted border-border text-foreground"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Téléphone</Label>
-                  <Input
+                  <Label htmlFor="editForm-phone" className="text-foreground text-sm">Téléphone</Label>
+                  <Input id="editForm-phone"
                     type="tel"
                     value={editForm.phone}
                     onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
@@ -543,8 +545,8 @@ export default function AdminClientsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Email</Label>
-                  <Input
+                  <Label htmlFor="editForm-email" className="text-foreground text-sm">Email</Label>
+                  <Input id="editForm-email"
                     type="email"
                     value={editForm.email}
                     onChange={e => setEditForm({ ...editForm, email: e.target.value })}
@@ -552,8 +554,8 @@ export default function AdminClientsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nouveau mot de passe temporaire</Label>
-                  <Input
+                  <Label htmlFor="editForm-password" className="text-foreground text-sm">Nouveau mot de passe temporaire</Label>
+                  <Input id="editForm-password"
                     type="password"
                     value={editForm.password}
                     onChange={e => setEditForm({ ...editForm, password: e.target.value })}
@@ -567,6 +569,9 @@ export default function AdminClientsPage() {
                 <div className="flex items-center gap-2.5">
                   <button
                     type="button"
+                    id="editForm-regenerateQr"
+                    role="checkbox"
+                    aria-checked={editForm.regenerateQr}
                     onClick={() => setEditForm({ ...editForm, regenerateQr: !editForm.regenerateQr })}
                     className={`h-5 w-5 rounded-md border shrink-0 flex items-center justify-center transition-colors ${
                       editForm.regenerateQr ? 'bg-primary border-primary' : 'bg-muted border-border'
@@ -574,7 +579,7 @@ export default function AdminClientsPage() {
                   >
                     {editForm.regenerateQr && <RefreshCw className="h-3 w-3 text-primary-foreground" />}
                   </button>
-                  <Label className="text-foreground text-sm cursor-pointer" onClick={() => setEditForm({ ...editForm, regenerateQr: !editForm.regenerateQr })}>
+                  <Label htmlFor="editForm-regenerateQr" className="text-foreground text-sm cursor-pointer">
                     Régénérer le QR code (invalide l&apos;ancien)
                   </Label>
                 </div>

@@ -224,8 +224,8 @@ export default function AdminBuildingsPage() {
           <CardContent className="px-6 py-5">
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Nom du bâtiment *</Label>
-                <Input
+                <Label htmlFor="form-name" className="text-foreground text-sm">Nom du bâtiment *</Label>
+                <Input id="form-name"
                   required
                   type="text"
                   value={form.name}
@@ -235,8 +235,8 @@ export default function AdminBuildingsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Adresse complète *</Label>
-                <Input
+                <Label htmlFor="form-address" className="text-foreground text-sm">Adresse complète *</Label>
+                <Input id="form-address"
                   required
                   type="text"
                   value={form.address}
@@ -246,9 +246,9 @@ export default function AdminBuildingsPage() {
                 />
               </div>
               <div className="space-y-1.5 md:col-span-2">
-                <Label className="text-foreground text-sm">Zone</Label>
+                <Label htmlFor="form-areaId" className="text-foreground text-sm">Zone</Label>
                 <Select value={form.areaId} onValueChange={v => setForm({ ...form, areaId: v ?? '' })}>
-                  <SelectTrigger className="bg-muted border-border w-full">
+                  <SelectTrigger id="form-areaId" className="bg-muted border-border w-full">
                     <SelectValue placeholder="Aucune zone (à assigner plus tard)">
                       {(value: string | null) => value ? (areas.find(a => String(a.id) === value)?.name ?? value) : 'Aucune zone (à assigner plus tard)'}
                     </SelectValue>
@@ -387,8 +387,8 @@ export default function AdminBuildingsPage() {
             <CardContent>
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Nom du bâtiment *</Label>
-                  <Input
+                  <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom du bâtiment *</Label>
+                  <Input id="editForm-name"
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -396,8 +396,8 @@ export default function AdminBuildingsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Adresse complète *</Label>
-                  <Input
+                  <Label htmlFor="editForm-address" className="text-foreground text-sm">Adresse complète *</Label>
+                  <Input id="editForm-address"
                     required
                     value={editForm.address}
                     onChange={e => setEditForm({ ...editForm, address: e.target.value })}
@@ -405,9 +405,9 @@ export default function AdminBuildingsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-sm">Zone</Label>
+                  <Label htmlFor="editForm-areaId" className="text-foreground text-sm">Zone</Label>
                   <Select value={editForm.areaId} onValueChange={v => setEditForm({ ...editForm, areaId: v ?? '' })}>
-                    <SelectTrigger className="bg-muted border-border w-full">
+                    <SelectTrigger id="editForm-areaId" className="bg-muted border-border w-full">
                       <SelectValue placeholder="Aucune zone">
                         {(value: string | null) => value ? (areas.find(a => String(a.id) === value)?.name ?? value) : 'Aucune zone'}
                       </SelectValue>

@@ -256,8 +256,8 @@ export default function ApiTesterPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-foreground text-xs">En-têtes (un par ligne, "Clé: Valeur")</Label>
-                <Textarea
+                <Label htmlFor="headersText" className="text-foreground text-xs">En-têtes (un par ligne, "Clé: Valeur")</Label>
+                <Textarea id="headersText"
                   value={headersText}
                   onChange={e => setHeadersText(e.target.value)}
                   rows={2}
@@ -267,8 +267,8 @@ export default function ApiTesterPage() {
 
               {method !== 'GET' && (
                 <div className="space-y-1.5">
-                  <Label className="text-foreground text-xs">Corps (JSON)</Label>
-                  <Textarea
+                  <Label htmlFor="bodyText" className="text-foreground text-xs">Corps (JSON)</Label>
+                  <Textarea id="bodyText"
                     value={bodyText}
                     onChange={e => setBodyText(e.target.value)}
                     rows={6}

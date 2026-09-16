@@ -191,11 +191,12 @@ function LoginForm() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">
+                <Label htmlFor="form-identifier" className="text-foreground text-sm">
                   {role === 'client' ? 'Identifiant client' : 'Adresse email'}
                 </Label>
                 {role === 'client' ? (
                   <Input
+                    id="form-identifier"
                     type="text"
                     required
                     value={form.login}
@@ -205,6 +206,7 @@ function LoginForm() {
                   />
                 ) : (
                   <Input
+                    id="form-identifier"
                     type="email"
                     required
                     value={form.email}
@@ -216,8 +218,8 @@ function LoginForm() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-foreground text-sm">Mot de passe</Label>
-                <Input
+                <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe</Label>
+                <Input id="form-password"
                   type="password"
                   required
                   value={form.password}

@@ -118,9 +118,11 @@ export default function NewIssuePage() {
             </div>
 
             <div className="space-y-2.5">
-              <Label className="text-sm font-bold text-foreground">
+              {/* A heading for the upload area, not a label: it has no single
+                  control to point at. */}
+              <p className="text-sm font-bold text-foreground">
                 Pièces jointes (Photos, Vidéos, Audio)
-              </Label>
+              </p>
               <IssueFileUpload
                 onChange={setMedia}
                 onBusyChange={setUploading}
