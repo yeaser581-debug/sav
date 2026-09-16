@@ -68,6 +68,8 @@ export default function AdminHistoryPage() {
   const [tab, setTab] = useState<'deleted' | 'history'>('deleted');
 
   const [deletedItems, setDeletedItems] = useState<DeletedItem[]>([]);
+  const [deletedTotal, setDeletedTotal] = useState(0);
+  const [deletedPage, setDeletedPage] = useState(1);
   const [deletedLoading, setDeletedLoading] = useState(true);
   const [restoringKey, setRestoringKey] = useState<string | null>(null);
 
@@ -80,14 +82,22 @@ export default function AdminHistoryPage() {
 
   const fetchDeleted = useCallback(() => {
     setDeletedLoading(true);
-    fetch('/api/superadmin/deleted')
+    fetch(`/api/superadmin/deleted?page=${deletedPage}&limit=${LIMIT}`)
       .then(res => {
-        if (res.status === 401) { setForbidden(true); return []; }
+        if (res.status === 401) { setForbidden(true); return { items: [], total: 0 }; }
         return res.json();
       })
-      .then(data => { setDeletedItems(Array.isArray(data) ? data : []); setDeletedLoading(false); })
+      .then(data => {
+        const items: DeletedItem[] = Array.isArray(data.items) ? data.items : [];
+        setDeletedTotal(data.total || 0);
+        // Someone else emptying the trash can leave us stranded past the last
+        // page; go back to the first rather than show an empty list.
+        if (items.length === 0 && deletedPage > 1) { setDeletedPage(1); return; }
+        setDeletedItems(items);
+        setDeletedLoading(false);
+      })
       .catch(() => { setDeletedItems([]); setDeletedLoading(false); });
-  }, []);
+  }, [deletedPage]);
 
   const fetchLogs = useCallback(() => {
     setLogsLoading(true);
@@ -121,7 +131,9 @@ export default function AdminHistoryPage() {
       const res = await fetch(`/api/${path}/${item.id}/restore`, { method: 'POST' });
       if (res.ok) {
         toast.success(`"${item.label}" restauré.`);
-        fetchDeleted();
+        // Restoring the last row of a page would otherwise leave it empty.
+        if (deletedItems.length === 1 && deletedPage > 1) setDeletedPage(p => p - 1);
+        else fetchDeleted();
         fetchLogs();
       } else {
         const d = await res.json();
@@ -166,7 +178,7 @@ export default function AdminHistoryPage() {
           }`}
         >
           <Trash2 className="h-3.5 w-3.5" /> Éléments supprimés
-          <span className="ml-1 text-[10px] bg-background px-1.5 py-0.5 rounded-full border border-border">{deletedItems.length}</span>
+          <span className="ml-1 text-[10px] bg-background px-1.5 py-0.5 rounded-full border border-border">{deletedTotal}</span>
         </button>
         <button
           type="button"
@@ -183,7 +195,7 @@ export default function AdminHistoryPage() {
         <Card className="bg-card border-border shadow-sm">
           <CardHeader className="border-b border-border pb-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {deletedItems.length} élément{deletedItems.length !== 1 ? 's' : ''} dans la corbeille
+              {deletedTotal} élément{deletedTotal !== 1 ? 's' : ''} dans la corbeille
             </CardTitle>
             <CardDescription className="text-xs">Les suppressions sont réversibles — restaurez un élément pour qu&apos;il redevienne actif.</CardDescription>
           </CardHeader>
@@ -233,6 +245,7 @@ export default function AdminHistoryPage() {
                 })}
               </div>
             )}
+            <PaginationControls page={deletedPage} total={deletedTotal} limit={LIMIT} onPageChange={setDeletedPage} />
           </CardContent>
         </Card>
       ) : (
