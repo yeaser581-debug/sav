@@ -124,12 +124,27 @@ describe.each(Object.entries(themes))('%s theme', (_name, t) => {
 });
 
 describe('the two themes', () => {
-  it('share the same terracotta brand family', () => {
-    const hue = (hex: string) => {
-      const [, a, b] = oklab(hex);
-      return (Math.atan2(b, a) * 180) / Math.PI;
-    };
-    expect(Math.abs(hue(themes.light.primary) - hue(themes.dark.primary))).toBeLessThan(12);
+  // The brand is the ink itself: near-neutral in both themes, and it flips with
+  // the ground so a primary button is always the strongest thing on the page.
+  const chroma = (hex: string) => {
+    const [, a, b] = oklab(hex);
+    return Math.hypot(a, b);
+  };
+
+  it('keeps the brand neutral, so it never competes with a status', () => {
+    expect(chroma(themes.light.primary)).toBeLessThan(0.03);
+    expect(chroma(themes.dark.primary)).toBeLessThan(0.03);
+  });
+
+  it('flips the brand with the ground', () => {
+    expect(luminance(themes.light.primary)).toBeLessThan(luminance(themes.light.background));
+    expect(luminance(themes.dark.primary)).toBeGreaterThan(luminance(themes.dark.background));
+  });
+
+  it('keeps hover and selection visible against the page', () => {
+    for (const t of Object.values(themes)) {
+      expect(perceptualDistance(t.background, t.muted)).toBeGreaterThanOrEqual(0.02);
+    }
   });
 
   it('defines the same set of tokens', () => {
