@@ -23,6 +23,9 @@ export type ChatMessage = {
   createdAt: string;
 };
 
+const MAX_RECORD_SECONDS = 180;
+const METER_BARS = 32;
+
 function formatDuration(totalSeconds: number) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -134,6 +137,7 @@ export function ChatPanel({
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [micError, setMicError] = useState('');
+  const [levels, setLevels] = useState<number[]>(() => Array(METER_BARS).fill(0));
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
   const [pendingMessages, setPendingMessages] = useState<{ id: string; content: string; createdAt: string }[]>([]);
 
@@ -142,6 +146,8 @@ export function ChatPanel({
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingThrottleRef = useRef(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const meterFrameRef = useRef<number | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -167,6 +173,16 @@ export function ChatPanel({
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       deleteTimersRef.current.forEach(t => clearTimeout(t));
       deleteTimersRef.current.clear();
+      // Leaving mid-recording must release the microphone, not keep it live.
+      if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+      if (meterFrameRef.current !== null) cancelAnimationFrame(meterFrameRef.current);
+      void audioContextRef.current?.close().catch(() => {});
+      audioContextRef.current = null;
+      const recorder = mediaRecorderRef.current;
+      if (recorder) {
+        recorder.onstop = null; // nothing left to send the take to
+        recorder.stream.getTracks().forEach(t => t.stop());
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issueId]);
@@ -330,6 +346,44 @@ export function ChatPanel({
     if (file) sendFile(file);
   };
 
+  // Draws the microphone's own level, so it is obvious the recording is picking
+  // something up rather than only that time is passing.
+  const startMeter = (stream: MediaStream) => {
+    const context = new AudioContext();
+    audioContextRef.current = context;
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 256;
+    context.createMediaStreamSource(stream).connect(analyser);
+
+    const samples = new Uint8Array(analyser.frequencyBinCount);
+    let lastFrame = 0;
+
+    const tick = (now: number) => {
+      meterFrameRef.current = requestAnimationFrame(tick);
+      if (now - lastFrame < 70) return;
+      lastFrame = now;
+
+      analyser.getByteTimeDomainData(samples);
+      let sum = 0;
+      for (const sample of samples) {
+        const deviation = (sample - 128) / 128;
+        sum += deviation * deviation;
+      }
+      const level = Math.min(1, Math.sqrt(sum / samples.length) * 3.2);
+      setLevels(prev => [...prev.slice(1), level]);
+    };
+
+    meterFrameRef.current = requestAnimationFrame(tick);
+  };
+
+  const stopMeter = () => {
+    if (meterFrameRef.current !== null) cancelAnimationFrame(meterFrameRef.current);
+    meterFrameRef.current = null;
+    void audioContextRef.current?.close().catch(() => {});
+    audioContextRef.current = null;
+    setLevels(Array(METER_BARS).fill(0));
+  };
+
   const startRecording = async () => {
     setMicError('');
     try {
@@ -352,7 +406,14 @@ export function ChatPanel({
       recorder.start();
       setRecording(true);
       setRecordSeconds(0);
-      recordTimerRef.current = setInterval(() => setRecordSeconds(s => s + 1), 1000);
+      startMeter(stream);
+      recordTimerRef.current = setInterval(() => {
+        setRecordSeconds(s => {
+          // Stop on its own rather than let the upload be refused for size.
+          if (s + 1 >= MAX_RECORD_SECONDS) stopRecording(false);
+          return s + 1;
+        });
+      }, 1000);
     } catch {
       setMicError('Micro indisponible ou accès refusé.');
     }
@@ -360,6 +421,7 @@ export function ChatPanel({
 
   const stopRecording = (cancel = false) => {
     if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+    stopMeter();
     setRecording(false);
     if (cancel) {
       recordedChunksRef.current = [];
@@ -484,21 +546,44 @@ export function ChatPanel({
           <div className="flex items-center gap-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => stopRecording(true)}
-              className="h-9 w-9 p-0 shrink-0 text-muted-foreground hover:text-destructive"
+              title="Annuler l'enregistrement"
+              aria-label="Annuler l'enregistrement"
+              className="h-9 w-9 p-0 shrink-0 rounded-full border-border text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-transparent"
             >
               <X className="h-4 w-4" />
             </Button>
-            <div className="flex-1 flex items-center gap-2 bg-card border border-border rounded-lg h-9 px-3">
-              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse shrink-0" />
-              <span className="text-xs font-mono text-foreground">{formatDuration(recordSeconds)}</span>
-              <span className="text-[10px] text-muted-foreground">Enregistrement du message vocal...</span>
+            <div
+              role="status"
+              className="flex-1 min-w-0 flex items-center gap-2.5 h-9 px-3 rounded-full bg-destructive-wash border border-destructive/30"
+            >
+              <span className="h-2 w-2 rounded-full bg-destructive shrink-0 animate-pulse motion-reduce:animate-none" />
+              <span className="text-xs font-mono tabular-nums text-destructive shrink-0">
+                {formatDuration(recordSeconds)}
+              </span>
+              {/* Live microphone level: shows the recording is picking sound up. */}
+              <span aria-hidden className="flex-1 min-w-0 flex items-center justify-end gap-0.5 h-4 overflow-hidden">
+                {levels.map((level, i) => (
+                  <span
+                    key={i}
+                    className="w-0.5 rounded-full bg-destructive shrink-0"
+                    style={{ height: `${2 + level * 14}px`, opacity: 0.3 + level * 0.7 }}
+                  />
+                ))}
+              </span>
+              {recordSeconds >= MAX_RECORD_SECONDS - 30 && (
+                <span className="text-[10px] text-destructive shrink-0">
+                  il reste {formatDuration(MAX_RECORD_SECONDS - recordSeconds)}
+                </span>
+              )}
             </div>
             <Button
               type="button"
               onClick={() => stopRecording(false)}
-              className="h-9 w-9 p-0 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+              title="Envoyer le message vocal"
+              aria-label="Envoyer le message vocal"
+              className="h-9 w-9 p-0 shrink-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
             >
               <Send className="h-3.5 w-3.5" />
             </Button>
