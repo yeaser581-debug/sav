@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 // admins spend the day in the app, so they get the dark one. The role comes
 // from the proxy, before anything is painted, so nobody sees the wrong theme
 // first. Either of them can switch, and their choice is remembered.
-const THEME_BACKGROUND = { light: "#edf0f3", dark: "#101318" } as const;
+const THEME_BACKGROUND = { light: "#ebf0f4", dark: "#1f232c" } as const;
 
 async function defaultThemeForRequest(): Promise<"light" | "dark"> {
   const role = (await headers()).get("x-user-role");

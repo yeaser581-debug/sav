@@ -90,6 +90,7 @@ const UI_PAIRS: [string, string][] = [
 const MUST_DIFFER: [string, string][] = [
   ['primary', 'destructive'],
   ['primary', 'warning'],
+  ['primary', 'success'],
   ['warning', 'destructive'],
   ['warning', 'success'],
   ['success', 'neutral'],
@@ -124,16 +125,8 @@ describe.each(Object.entries(themes))('%s theme', (_name, t) => {
 });
 
 describe('the two themes', () => {
-  // The brand is the ink itself: near-neutral in both themes, and it flips with
-  // the ground so a primary button is always the strongest thing on the page.
-  const chroma = (hex: string) => {
-    const [, a, b] = oklab(hex);
-    return Math.hypot(a, b);
-  };
-
-  it('keeps the brand neutral, so it never competes with a status', () => {
-    expect(chroma(themes.light.primary)).toBeLessThan(0.03);
-    expect(chroma(themes.dark.primary)).toBeLessThan(0.03);
+  it('keeps the dark theme off pure black, so long sessions stay comfortable', () => {
+    expect(luminance(themes.dark.background)).toBeGreaterThan(0.015);
   });
 
   it('flips the brand with the ground', () => {

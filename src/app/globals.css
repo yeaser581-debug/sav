@@ -56,10 +56,10 @@
 }
 
 /*
- * "Ardoise" — the After-Sales design system.
- * Cool near-white and graphite grounds. The brand colour is the ink itself —
- * near-black on light, near-white on dark — so nothing competes with a status
- * for attention, and emphasis comes from weight rather than from colour.
+ * "Azur" — the After-Sales design system.
+ * Cool, slightly blue-leaning grounds and a bright blue brand. The dark theme
+ * is a deep grey rather than near-black, which keeps long sessions from
+ * feeling heavy.
  *
  * Status colours form four families: neutral, warning (in progress), success
  * and destructive (danger). Families differ by hue; states inside a family
@@ -72,20 +72,20 @@
  * Residents default to the light theme, admins to the dark one; anyone can switch.
  */
 :root {
-  --background: #edf0f3;
-  --foreground: #181b20;
+  --background: #ebf0f4;
+  --foreground: #1b1f28;
   --card: #ffffff;
-  --card-foreground: #181b20;
+  --card-foreground: #1b1f28;
   --popover: #ffffff;
-  --popover-foreground: #181b20;
-  --primary: #23262e;
+  --popover-foreground: #1b1f28;
+  --primary: #0961bb;
   --primary-foreground: #ffffff;
-  --secondary: #e4e8ed;
-  --secondary-foreground: #181b20;
-  --muted: #e4e8ed;
-  --muted-foreground: #575e69;
-  --accent: #e5e8ed;
-  --accent-foreground: #23262e;
+  --secondary: #e0e7ee;
+  --secondary-foreground: #1b1f28;
+  --muted: #e0e7ee;
+  --muted-foreground: #5c6472;
+  --accent: #d9eafc;
+  --accent-foreground: #02468b;
   --destructive: #ad0445;
   --destructive-wash: #fde2e5;
   --success: #006d65;
@@ -94,11 +94,11 @@
   --warning-wash: #f7ebc6;
   --neutral: #4a4d53;
   --neutral-wash: #e3e6ec;
-  --border: #dce0e6;
-  --input: #6e7581;
-  --ring: #23262e;
+  --border: #d8dfe7;
+  --input: #727b8a;
+  --ring: #0961bb;
   --radius: 0.5rem;
-  --chart-1: #23262e;
+  --chart-1: #0961bb;
   --chart-2: #006d65;
   --chart-3: #786107;
   --chart-4: #4a4d53;
@@ -106,36 +106,36 @@
 }
 
 .dark {
-  --background: #101318;
-  --foreground: #e8ebef;
-  --card: #1b1e24;
-  --card-foreground: #e8ebef;
-  --popover: #1b1e24;
-  --popover-foreground: #e8ebef;
-  --primary: #e5e8ec;
-  --primary-foreground: #13161c;
-  --secondary: #252930;
-  --secondary-foreground: #e8ebef;
-  --muted: #252930;
-  --muted-foreground: #9ea5b0;
-  --accent: #2f333a;
-  --accent-foreground: #e5e8ec;
-  --destructive: #f6668f;
-  --destructive-wash: #3a171f;
-  --success: #5fc9bc;
-  --success-wash: #112d2a;
-  --warning: #ebbc63;
-  --warning-wash: #35280d;
-  --neutral: #a2a5aa;
-  --neutral-wash: #2a2d32;
-  --border: #30343d;
-  --input: #666c78;
-  --ring: #e5e8ec;
-  --chart-1: #e5e8ec;
-  --chart-2: #5fc9bc;
-  --chart-3: #ebbc63;
-  --chart-4: #a2a5aa;
-  --chart-5: #f6668f;
+  --background: #1f232c;
+  --foreground: #eff2f7;
+  --card: #2a2f39;
+  --card-foreground: #eff2f7;
+  --popover: #2a2f39;
+  --popover-foreground: #eff2f7;
+  --primary: #89c3ff;
+  --primary-foreground: #15202d;
+  --secondary: #353b46;
+  --secondary-foreground: #eff2f7;
+  --muted: #353b46;
+  --muted-foreground: #b0b8c5;
+  --accent: #2d496d;
+  --accent-foreground: #c6e1ff;
+  --destructive: #fa96a3;
+  --destructive-wash: #522a30;
+  --success: #74ddd0;
+  --success-wash: #1b423e;
+  --warning: #efcd79;
+  --warning-wash: #4b3e1f;
+  --neutral: #b9bec6;
+  --neutral-wash: #3c4046;
+  --border: #414855;
+  --input: #7c8799;
+  --ring: #89c3ff;
+  --chart-1: #89c3ff;
+  --chart-2: #74ddd0;
+  --chart-3: #efcd79;
+  --chart-4: #b9bec6;
+  --chart-5: #fa96a3;
 }
 
 @layer base {
