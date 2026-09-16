@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
 
           {step === 'done' && (
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 border border-green-500/30">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success-wash border border-success/30">
                 <span className="text-3xl">✅</span>
               </div>
               <p className="text-foreground">Votre mot de passe a été mis à jour avec succès.</p>

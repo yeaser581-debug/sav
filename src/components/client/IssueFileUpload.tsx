@@ -375,7 +375,7 @@ export function IssueFileUpload({
                       <p className="text-[10px] text-muted-foreground mt-0.5">Suppression en cours...</p>
                     ) : (
                       <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                        <CheckCircle2 className="h-2.5 w-2.5 text-emerald-500" />
+                        <CheckCircle2 className="h-2.5 w-2.5 text-success" />
                         {formatFileSize(item.file.size)}
                       </p>
                     )}

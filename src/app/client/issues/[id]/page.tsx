@@ -413,7 +413,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
             <Card className="bg-card border-border shadow-md">
               <CardHeader className="border-b border-border pb-4">
                 <CardTitle className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                  <ShieldCheck className="h-4 w-4 text-success" />
                   Preuve de résolution
                 </CardTitle>
                 <CardDescription className="text-xs text-muted-foreground mt-0.5">
@@ -432,11 +432,11 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
           )}
 
           {issue.status === 'RESOLVED' && (
-            <Card className="border-emerald-500/20 bg-emerald-500/5 shadow-md relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
+            <Card className="border-success/20 bg-success-wash shadow-md relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-success" />
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-success shrink-0 mt-0.5" />
                   <div>
                     <h3 className="text-sm font-bold text-foreground">L'intervention a été marquée comme résolue</h3>
                     <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
@@ -454,7 +454,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                   </Button>
                   <Button
                     onClick={() => updateStatus('CONFIRMED')}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 h-9 rounded-lg shadow-md shadow-emerald-600/10 active:scale-95"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold px-4 py-2 h-9 rounded-lg shadow-md active:scale-95"
                   >
                     Confirmer la résolution
                   </Button>

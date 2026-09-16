@@ -62,10 +62,10 @@ const ENDPOINTS: EndpointDef[] = [
 ];
 
 const METHOD_COLORS: Record<Method, string> = {
-  GET: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20',
-  POST: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20',
-  PATCH: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20',
-  DELETE: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20',
+  GET: 'text-accent-foreground bg-accent border-primary/20',
+  POST: 'text-success bg-success-wash border-success/20',
+  PATCH: 'text-warning bg-warning-wash border-warning/20',
+  DELETE: 'text-destructive bg-destructive-wash border-destructive/20',
 };
 
 type HistoryEntry = { method: Method; path: string; status: number; durationMs: number; at: Date };
@@ -73,10 +73,10 @@ type ResponseState = { status: number; statusText: string; durationMs: number; b
 
 function statusColor(status: number) {
   if (status === 0) return 'text-muted-foreground bg-muted border-border';
-  if (status < 300) return 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20';
-  if (status < 400) return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20';
-  if (status < 500) return 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20';
-  return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20';
+  if (status < 300) return 'text-success bg-success-wash border-success/20';
+  if (status < 400) return 'text-accent-foreground bg-accent border-primary/20';
+  if (status < 500) return 'text-warning bg-warning-wash border-warning/20';
+  return 'text-destructive bg-destructive-wash border-destructive/20';
 }
 
 export default function ApiTesterPage() {
@@ -171,7 +171,7 @@ export default function ApiTesterPage() {
     <div className="space-y-6 pb-12">
       <div className="space-y-1">
         <div className="flex items-center gap-2 mb-1">
-          <div className="h-5 w-1 rounded-full bg-amber-500" />
+          <div className="h-5 w-1 rounded-full bg-warning" />
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Super Admin
           </span>

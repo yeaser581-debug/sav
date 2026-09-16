@@ -346,7 +346,7 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                     </Button>
                     <Button
                       onClick={() => setShowResolveModal(true)}
-                      className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 h-9 rounded-lg shadow-md shadow-emerald-600/10 active:scale-95"
+                      className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold px-4 h-9 rounded-lg shadow-md active:scale-95"
                     >
                       Marquer résolu
                     </Button>
@@ -494,7 +494,7 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
             </Button>
             <CardHeader>
               <CardTitle className="text-md font-bold text-foreground flex items-center gap-1.5">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-success" />
                 Marquer comme résolu
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -563,7 +563,7 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                   <Button
                     type="submit"
                     disabled={resolving || resolveFiles.length === 0}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold h-9 px-4 rounded-lg shadow-md active:scale-95 disabled:opacity-60"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold h-9 px-4 rounded-lg shadow-md active:scale-95 disabled:opacity-60"
                   >
                     {resolving ? 'Envoi...' : 'Confirmer la résolution'}
                   </Button>

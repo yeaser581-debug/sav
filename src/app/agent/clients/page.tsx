@@ -1,14 +1,7 @@
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-
-const STATUS_COLORS: Record<string, string> = {
-  PENDING_AGENT: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
-  IN_PROGRESS:   'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-  RESOLVED:      'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-  CONFIRMED:     'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-  REJECTED:      'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-};
+import { StatusBadge } from '@/components/ui/status-badge';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,10 +59,9 @@ export default async function AgentClientsPage() {
                     <td className="p-4 text-muted-foreground text-sm">{client.building?.name || '—'}</td>
                     <td className="p-4">
                       {lastIssue ? (
-                        <Link href={`/agent/issues/${lastIssue.id}`}>
-                          <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${STATUS_COLORS[lastIssue.status] || 'bg-muted text-muted-foreground border border-border'}`}>
-                            #{lastIssue.id} — {lastIssue.status}
-                          </span>
+                        <Link href={`/agent/issues/${lastIssue.id}`} className="inline-flex items-center gap-2">
+                          <span className="font-mono text-xs text-muted-foreground">#{lastIssue.id}</span>
+                          <StatusBadge status={lastIssue.status} />
                         </Link>
                       ) : (
                         <span className="text-muted-foreground text-xs">Aucune</span>
@@ -103,10 +95,9 @@ export default async function AgentClientsPage() {
                     <span className="truncate">{client.building?.name || '—'}</span>
                   </div>
                   {lastIssue ? (
-                    <Link href={`/agent/issues/${lastIssue.id}`} className="inline-block">
-                      <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${STATUS_COLORS[lastIssue.status] || 'bg-muted text-muted-foreground border border-border'}`}>
-                        #{lastIssue.id} — {lastIssue.status}
-                      </span>
+                    <Link href={`/agent/issues/${lastIssue.id}`} className="inline-flex items-center gap-2">
+                      <span className="font-mono text-xs text-muted-foreground">#{lastIssue.id}</span>
+                      <StatusBadge status={lastIssue.status} />
                     </Link>
                   ) : (
                     <span className="text-muted-foreground text-xs">Aucune réclamation</span>

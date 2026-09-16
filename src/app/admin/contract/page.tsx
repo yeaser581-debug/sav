@@ -84,7 +84,7 @@ export default function AdminContractPage() {
             <div className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border ${
               isError
                 ? 'bg-destructive/10 border-destructive/30 text-destructive'
-                : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
+                : 'bg-success-wash border-success/30 text-success'
             }`}>
               {isError ? <AlertCircle className="h-3.5 w-3.5" /> : <CheckCircle className="h-3.5 w-3.5" />}
               {message}
@@ -121,7 +121,7 @@ export default function AdminContractPage() {
           </div>
           <div className="flex items-center gap-3">
             {hasChanges && (
-              <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2 py-1 rounded">
+              <span className="text-xs font-medium text-warning bg-warning-wash border border-warning/20 px-2 py-1 rounded">
                 Modifications non sauvegardées
               </span>
             )}

@@ -205,7 +205,7 @@ export default function AdminBuildingsPage() {
       </div>
 
       {success && (
-        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+        <div className="rounded-lg bg-success-wash border border-success/30 px-4 py-3 text-sm text-success">
           {success}
         </div>
       )}
@@ -260,7 +260,7 @@ export default function AdminBuildingsPage() {
                   </SelectContent>
                 </Select>
                 {areas.length === 0 && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                  <p className="text-xs text-warning">
                     Aucune zone créée. Créez d&apos;abord une zone dans l&apos;onglet Zones pour pouvoir router les réclamations vers un agent.
                   </p>
                 )}
@@ -344,7 +344,7 @@ export default function AdminBuildingsPage() {
                       <>
                         <Separator className="my-3 bg-border" />
                         <div className="space-y-1.5">
-                          <span className="text-xs text-amber-600 dark:text-amber-400 italic">Aucune zone assignée — les réclamations ne seront pas routées.</span>
+                          <span className="text-xs text-warning italic">Aucune zone assignée — les réclamations ne seront pas routées.</span>
                           <Select onValueChange={(v: string | null) => v && assignArea(building.id, v)}>
                             <SelectTrigger className="h-8 text-xs bg-muted border-border w-full">
                               <SelectValue placeholder="Assigner une zone...">

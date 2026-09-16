@@ -26,6 +26,14 @@ export type ChatMessage = {
 const MAX_RECORD_SECONDS = 180;
 const METER_BARS = 32;
 
+// One bubble shape for every sender. It is a wrapping flex line so the text and
+// the timestamp size the bubble together: short messages stay on one line and
+// long ones push the stamp onto its own, without a fixed minimum width.
+const BUBBLE =
+  'flex max-w-[85%] lg:max-w-[min(85%,44rem)] flex-wrap items-end justify-end gap-x-2 gap-y-1 ' +
+  'rounded-2xl border px-3 py-2 text-xs font-medium leading-relaxed text-foreground';
+const BUBBLE_TEXT = 'min-w-0 whitespace-pre-wrap break-words';
+
 function formatDuration(totalSeconds: number) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -36,19 +44,15 @@ function MessageStamp({
   createdAt,
   onDelete,
   seen,
-  block = false,
 }: {
   createdAt: string;
   onDelete?: () => void;
   seen?: boolean;
-  block?: boolean;
 }) {
+  // A flex item on the bubble's last line, not a float: a float is left out of
+  // the bubble's intrinsic width, which collapsed short messages to nothing.
   return (
-    <span
-      className={`inline-flex items-center gap-1 text-[11px] text-muted-foreground ${
-        block ? 'mt-1 flex justify-end' : 'float-right ml-3 mt-1'
-      }`}
-    >
+    <span className="inline-flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground">
       {new Date(createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
       {seen !== undefined && (
         seen ? (
@@ -458,12 +462,12 @@ export function ChatPanel({
                   {leadMessage.senderLabel.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div className="flow-root min-w-30 max-w-[80%] rounded-2xl rounded-bl-sm border border-border bg-muted px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
-                <p className="mb-1 text-[11px] font-bold text-muted-foreground">
+              <div className={`${BUBBLE} rounded-bl-sm border-border bg-muted`}>
+                <p className="w-full text-[11px] font-bold text-muted-foreground">
                   Réclamation initiale — {leadMessage.senderLabel}
                 </p>
+                <p className={BUBBLE_TEXT}>{leadMessage.content}</p>
                 <MessageStamp createdAt={leadMessage.createdAt} />
-                <p className="whitespace-pre-wrap">{leadMessage.content}</p>
               </div>
             </div>
           )}
@@ -479,30 +483,22 @@ export function ChatPanel({
                     </AvatarFallback>
                   </Avatar>
                 )}
-                <div className="min-w-30 max-w-[80%]">
-                  <div className={`flow-root px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground ${
-                    isMe
-                      ? 'bg-accent border border-primary/20 rounded-2xl rounded-br-sm'
-                      : 'bg-muted border border-border rounded-2xl rounded-bl-sm'
-                  }`}>
-                    {msg.message && (
-                      <MessageStamp
-                        createdAt={msg.createdAt}
-                        onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
-                        seen={isMe && readState ? isMessageSeen(msg.createdAt, otherPartyReadAt) : undefined}
-                      />
-                    )}
-                    {msg.mediaUrl && <MessageMedia msg={msg} />}
-                    {msg.message && <p className={`whitespace-pre-wrap ${msg.mediaUrl ? 'mt-2' : ''}`}>{msg.message}</p>}
-                    {!msg.message && (
-                      <MessageStamp
-                        block
-                        createdAt={msg.createdAt}
-                        onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
-                        seen={isMe && readState ? isMessageSeen(msg.createdAt, otherPartyReadAt) : undefined}
-                      />
-                    )}
-                  </div>
+                <div className={`${BUBBLE} ${
+                  isMe
+                    ? 'rounded-br-sm border-primary/20 bg-accent'
+                    : 'rounded-bl-sm border-border bg-muted'
+                }`}>
+                  {msg.mediaUrl && (
+                    <div className="w-full">
+                      <MessageMedia msg={msg} />
+                    </div>
+                  )}
+                  {msg.message && <p className={BUBBLE_TEXT}>{msg.message}</p>}
+                  <MessageStamp
+                    createdAt={msg.createdAt}
+                    onDelete={isMe ? () => handleDeleteMessage(msg) : undefined}
+                    seen={isMe && readState ? isMessageSeen(msg.createdAt, otherPartyReadAt) : undefined}
+                  />
                 </div>
               </div>
             );
@@ -512,12 +508,12 @@ export function ChatPanel({
 
         {pendingMessages.map(msg => (
           <div key={msg.id} className="flex flex-row-reverse items-end gap-2">
-            <div className="flow-root min-w-30 max-w-[80%] rounded-2xl rounded-br-sm border border-primary/20 bg-accent/60 px-3 pt-2.5 pb-2 text-xs leading-relaxed font-medium text-foreground">
-              <span className="float-right ml-3 mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+            <div className={`${BUBBLE} rounded-br-sm border-primary/20 bg-accent/60`}>
+              <p className={BUBBLE_TEXT}>{msg.content}</p>
+              <span className="inline-flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground">
                 <Clock className="h-2.5 w-2.5" />
                 En attente
               </span>
-              <p className="whitespace-pre-wrap">{msg.content}</p>
             </div>
           </div>
         ))}

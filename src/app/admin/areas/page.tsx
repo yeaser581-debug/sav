@@ -193,7 +193,7 @@ export default function AdminAreasPage() {
       </div>
 
       {success && (
-        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+        <div className="rounded-lg bg-success-wash border border-success/30 px-4 py-3 text-sm text-success">
           {success}
         </div>
       )}
@@ -301,7 +301,7 @@ export default function AdminAreasPage() {
                       {area.agent ? (
                         <span className="truncate">{area.agent.name}</span>
                       ) : (
-                        <span className="italic text-amber-600 dark:text-amber-400">Aucun agent assigné</span>
+                        <span className="italic text-warning">Aucun agent assigné</span>
                       )}
                     </div>
 

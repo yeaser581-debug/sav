@@ -97,8 +97,8 @@ export default function AdminSidebar({ userName, userId, isSuperAdmin }: { userN
       {isSuperAdmin && (
         <>
           <div className="flex items-center gap-1.5 px-3 pt-4 pb-1.5">
-            <ShieldCheck className="h-3 w-3 text-amber-500" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Super Admin</span>
+            <ShieldCheck className="h-3 w-3 text-warning" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-warning">Super Admin</span>
           </div>
           {superAdminNav.map(item => {
             const Icon = item.icon;
@@ -108,7 +108,7 @@ export default function AdminSidebar({ userName, userId, isSuperAdmin }: { userN
                 <div className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150',
                   active
-                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold border border-amber-500/20'
+                    ? 'bg-warning-wash text-warning font-semibold border border-warning/20'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
                 )}>
                   <Icon className="h-4 w-4 shrink-0" />

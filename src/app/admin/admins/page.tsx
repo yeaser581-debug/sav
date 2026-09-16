@@ -161,7 +161,7 @@ export default function AdminAdminsPage() {
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
-            <div className="h-5 w-1 rounded-full bg-amber-500" />
+            <div className="h-5 w-1 rounded-full bg-warning" />
             <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Super Admin
             </span>
@@ -186,7 +186,7 @@ export default function AdminAdminsPage() {
       </div>
 
       {success && (
-        <div className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+        <div className="rounded-lg bg-success-wash border border-success/30 px-4 py-3 text-sm text-success">
           {success}
         </div>
       )}
@@ -247,10 +247,10 @@ export default function AdminAdminsPage() {
                   type="button"
                   onClick={() => setForm({ ...form, isSuperAdmin: !form.isSuperAdmin })}
                   className={`h-5 w-5 rounded-md border shrink-0 flex items-center justify-center transition-colors ${
-                    form.isSuperAdmin ? 'bg-amber-500 border-amber-500' : 'bg-muted border-border'
+                    form.isSuperAdmin ? 'bg-primary border-primary' : 'bg-muted border-border'
                   }`}
                 >
-                  {form.isSuperAdmin && <ShieldCheck className="h-3.5 w-3.5 text-white" />}
+                  {form.isSuperAdmin && <ShieldCheck className="h-3.5 w-3.5 text-primary-foreground" />}
                 </button>
                 <Label className="text-foreground text-sm cursor-pointer" onClick={() => setForm({ ...form, isSuperAdmin: !form.isSuperAdmin })}>
                   Accorder les privilèges Super Admin
@@ -300,12 +300,12 @@ export default function AdminAdminsPage() {
                     <h3 className="text-base font-semibold text-foreground truncate">{admin.name}</h3>
                     <div className="flex flex-wrap items-center gap-1.5 mt-1">
                       {admin.isSuperAdmin && (
-                        <Badge variant="outline" className="text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 gap-1">
+                        <Badge variant="outline" className="text-warning bg-warning-wash border-warning/20 gap-1">
                           <ShieldCheck className="h-3 w-3" /> Super Admin
                         </Badge>
                       )}
                       <Badge variant="outline" className={admin.isActive
-                        ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20'
+                        ? 'text-success bg-success-wash border-success/20'
                         : 'text-muted-foreground bg-muted border-border'
                       }>
                         {admin.isActive ? 'Actif' : 'Désactivé'}
@@ -342,7 +342,7 @@ export default function AdminAdminsPage() {
                   className={`w-full text-xs gap-1.5 ${
                     admin.isActive
                       ? 'border-destructive/30 text-destructive hover:bg-destructive/10'
-                      : 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10'
+                      : 'border-success/30 text-success hover:bg-success-wash hover:text-success'
                   }`}
                 >
                   {admin.isActive ? <PowerOff className="h-3.5 w-3.5" /> : <Power className="h-3.5 w-3.5" />}
@@ -411,10 +411,10 @@ export default function AdminAdminsPage() {
                     type="button"
                     onClick={() => setEditForm({ ...editForm, isSuperAdmin: !editForm.isSuperAdmin })}
                     className={`h-5 w-5 rounded-md border shrink-0 flex items-center justify-center transition-colors ${
-                      editForm.isSuperAdmin ? 'bg-amber-500 border-amber-500' : 'bg-muted border-border'
+                      editForm.isSuperAdmin ? 'bg-primary border-primary' : 'bg-muted border-border'
                     }`}
                   >
-                    {editForm.isSuperAdmin && <ShieldCheck className="h-3.5 w-3.5 text-white" />}
+                    {editForm.isSuperAdmin && <ShieldCheck className="h-3.5 w-3.5 text-primary-foreground" />}
                   </button>
                   <Label className="text-foreground text-sm cursor-pointer" onClick={() => setEditForm({ ...editForm, isSuperAdmin: !editForm.isSuperAdmin })}>
                     Privilèges Super Admin
