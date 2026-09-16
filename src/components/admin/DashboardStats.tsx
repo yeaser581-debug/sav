@@ -58,9 +58,9 @@ type StatKey = 'total' | 'pending' | 'agents' | 'clients';
 
 const SEVERITY_LABELS: Record<string, string> = { CRITICAL: 'Urgent', MEDIUM: 'Moyen', LOW: 'Faible' };
 const SEVERITY_COLORS: Record<string, string> = {
-  CRITICAL: 'bg-red-500',
-  MEDIUM: 'bg-orange-500',
-  LOW: 'bg-zinc-400',
+  CRITICAL: 'bg-destructive',
+  MEDIUM: 'bg-warning',
+  LOW: 'bg-neutral',
 };
 
 function initials(name: string) {
@@ -315,12 +315,12 @@ export function DashboardStats({
 }
 
 const STATUS_BREAKDOWN = [
-  { label: 'En attente agent', key: 'PENDING_AGENT', color: 'bg-amber-500' },
-  { label: 'En cours', key: 'IN_PROGRESS', color: 'bg-indigo-500' },
-  { label: 'Résolu', key: 'RESOLVED', color: 'bg-emerald-500' },
-  { label: 'Confirmé', key: 'CONFIRMED', color: 'bg-emerald-600' },
-  { label: 'Rejeté', key: 'REJECTED', color: 'bg-red-500' },
-  { label: 'Contesté', key: 'DISPUTED', color: 'bg-rose-500' },
+  { label: 'En attente agent', key: 'PENDING_AGENT', color: 'bg-neutral' },
+  { label: 'En cours', key: 'IN_PROGRESS', color: 'bg-warning' },
+  { label: 'Résolu', key: 'RESOLVED', color: 'bg-success' },
+  { label: 'Confirmé', key: 'CONFIRMED', color: 'bg-success/60' },
+  { label: 'Rejeté', key: 'REJECTED', color: 'bg-neutral/50' },
+  { label: 'Contesté', key: 'DISPUTED', color: 'bg-warning/60' },
 ];
 
 export function StatusBreakdownCard({

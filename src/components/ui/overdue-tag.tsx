@@ -1,3 +1,4 @@
+import { Clock } from 'lucide-react';
 import { issueDeadline } from '@/lib/utils';
 
 export function OverdueTag({
@@ -25,7 +26,8 @@ export function OverdueTag({
 
   if (!info.overdue) return null;
   return (
-    <span className="inline-flex shrink-0 items-center rounded-full border border-destructive px-1.5 py-px text-[10px] font-bold whitespace-nowrap text-destructive">
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-destructive py-px pr-2 pl-1.5 text-[11px] font-bold whitespace-nowrap text-destructive">
+      <Clock className="h-3 w-3 shrink-0" aria-hidden="true" />
       En retard
     </span>
   );

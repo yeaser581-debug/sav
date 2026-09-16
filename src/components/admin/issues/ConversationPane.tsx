@@ -288,7 +288,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
       {issue.proof && issue.proof.length > 0 && (
         <div>
           <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Preuve de résolution
+            <ShieldCheck className="h-3.5 w-3.5 text-success" /> Preuve de résolution
           </p>
           <div className="space-y-2">
             <MediaGallery media={issue.proof} />
@@ -302,8 +302,8 @@ export function ConversationPane({ issueId }: { issueId: number }) {
       )}
 
       {issue.status === 'DISPUTED' && (
-        <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-3 space-y-3">
-          <p className="text-xs font-medium text-dispute flex items-center gap-1.5">
+        <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 space-y-3">
+          <p className="text-xs font-medium text-warning flex items-center gap-1.5">
             <AlertTriangle className="h-3.5 w-3.5" /> Résolution contestée
           </p>
           {issue.disputeReason && (
@@ -347,7 +347,7 @@ export function ConversationPane({ issueId }: { issueId: number }) {
                 <span className="text-xs text-foreground">
                   {new Date(v.scheduledAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-warning-wash text-warning border border-warning/30">
                   {v.status}
                 </span>
               </div>

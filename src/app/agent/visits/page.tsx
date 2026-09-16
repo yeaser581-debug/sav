@@ -20,17 +20,17 @@ type Visit = {
 };
 
 const STATUS_META: Record<string, { label: string; dot: string; block: string }> = {
-  PROPOSED: { label: 'Proposé', dot: 'bg-amber-500', block: 'bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-400' },
-  CONFIRMED: { label: 'Confirmé', dot: 'bg-blue-500', block: 'bg-blue-500/15 border-blue-500/40 text-blue-700 dark:text-blue-400' },
-  DECLINED: { label: 'Refusé', dot: 'bg-rose-500', block: 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400' },
-  CANCELLED: { label: 'Annulé', dot: 'bg-slate-400', block: 'bg-muted border-border text-muted-foreground' },
-  DONE: { label: 'Terminé', dot: 'bg-emerald-500', block: 'bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-400' },
+  PROPOSED: { label: 'Proposé', dot: 'bg-warning', block: 'bg-warning/15 border-warning/40 text-warning' },
+  CONFIRMED: { label: 'Confirmé', dot: 'bg-success/60', block: 'bg-success/10 border-success/40 text-success' },
+  DECLINED: { label: 'Refusé', dot: 'bg-destructive', block: 'bg-destructive/10 border-destructive/30 text-destructive' },
+  CANCELLED: { label: 'Annulé', dot: 'bg-neutral', block: 'bg-muted border-border text-muted-foreground' },
+  DONE: { label: 'Terminé', dot: 'bg-success', block: 'bg-success/15 border-success/40 text-success' },
 };
 
 const SEVERITY_META: Record<string, { label: string; color: string; text: string }> = {
-  CRITICAL: { label: 'Urgent', color: 'border-l-red-500', text: 'text-red-600 dark:text-red-400' },
-  MEDIUM: { label: 'Moyen', color: 'border-l-orange-400', text: 'text-orange-600 dark:text-orange-400' },
-  LOW: { label: 'Faible', color: 'border-l-slate-300 dark:border-l-slate-600', text: 'text-muted-foreground' },
+  CRITICAL: { label: 'Urgent', color: 'border-l-destructive', text: 'text-destructive' },
+  MEDIUM: { label: 'Moyen', color: 'border-l-warning', text: 'text-warning' },
+  LOW: { label: 'Faible', color: 'border-l-border', text: 'text-muted-foreground' },
 };
 
 const START_HOUR = 8;
@@ -415,8 +415,8 @@ export default function AgentVisitsPage() {
 
                   {today && showNowLine && (
                     <div className="absolute left-0 right-0 flex items-center z-10 pointer-events-none" style={{ top: nowOffset }}>
-                      <div className="h-1.5 w-1.5 rounded-full bg-red-500 -ml-0.5" />
-                      <div className="h-px flex-1 bg-red-500" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-destructive -ml-0.5" />
+                      <div className="h-px flex-1 bg-destructive" />
                     </div>
                   )}
 

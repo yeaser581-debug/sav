@@ -32,10 +32,8 @@
   --color-success-wash: var(--success-wash);
   --color-warning: var(--warning);
   --color-warning-wash: var(--warning-wash);
-  --color-dispute: var(--dispute);
-  --color-dispute-wash: var(--dispute-wash);
-  --color-closed: var(--closed);
-  --color-closed-wash: var(--closed-wash);
+  --color-neutral: var(--neutral);
+  --color-neutral-wash: var(--neutral-wash);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -58,81 +56,83 @@
 }
 
 /*
- * "Institut" — the After-Sales design system.
- * Cool white / near-ink neutrals, one confident cobalt accent (no gradient), and
- * semantic status colors (success/warning/destructive) kept separate from that accent.
- * Dark mode is a considered companion, not an inversion: a deep charcoal-navy ground
- * (not pure black) and a brightened cobalt so the accent stays legible.
+ * "Crépuscule" — the After-Sales design system.
+ * Warm linen and brown grounds, one terracotta brand colour in both themes, and
+ * status colours grouped into four families: neutral, warning (in progress),
+ * success and destructive (danger). Families differ by hue; states inside a
+ * family differ by icon and weight. destructive is never the brand colour.
+ *
+ * Every text pair the interface uses meets WCAG AA (4.5:1), control borders
+ * (input) and button shapes meet 3:1, and look-alike colours are kept apart.
+ * Values come from OKLCH, converted to sRGB; change them together, not one by one.
+ *
+ * Residents default to the light theme, admins to the dark one; anyone can switch.
  */
 :root {
-  --background: #fafaf9;
-  --foreground: #12141a;
-  --card: #ffffff;
-  --card-foreground: #12141a;
-  --popover: #ffffff;
-  --popover-foreground: #12141a;
-  --primary: #2952a3;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #12141a;
-  --muted: #f3f4f6;
-  --muted-foreground: #5b5e68;
-  --accent: #eaf0fb;
-  --accent-foreground: #1d3b78;
-  --destructive: #b23a34;
-  --destructive-wash: #fceae9;
-  --success: #1e7a46;
-  --success-wash: #e7f5ec;
-  --warning: #92620a;
-  --warning-wash: #fbf1df;
-  --dispute: #a2540d;
-  --dispute-wash: #fdf0e7;
-  --closed: #454851;
-  --closed-wash: #eceef1;
-  --border: #e7e8ec;
-  --input: #e7e8ec;
-  --ring: #2952a3;
+  --background: #f0e8de;
+  --foreground: #28201b;
+  --card: #fefbf7;
+  --card-foreground: #28201b;
+  --popover: #fefbf7;
+  --popover-foreground: #28201b;
+  --primary: #9e4421;
+  --primary-foreground: #fefbf7;
+  --secondary: #e6ded4;
+  --secondary-foreground: #28201b;
+  --muted: #e6ded4;
+  --muted-foreground: #645850;
+  --accent: #f8dcd0;
+  --accent-foreground: #80361b;
+  --destructive: #ad0445;
+  --destructive-wash: #fde2e5;
+  --success: #006d65;
+  --success-wash: #cfece7;
+  --warning: #745f06;
+  --warning-wash: #f2e6c1;
+  --neutral: #514b45;
+  --neutral-wash: #e4dcd6;
+  --border: #ded4c9;
+  --input: #7d6e63;
+  --ring: #9e4421;
   --radius: 0.5rem;
-  --chart-1: #2952a3;
-  --chart-2: #1e7a46;
-  --chart-3: #92620a;
-  --chart-4: #6c93e0;
-  --chart-5: #b23a34;
+  --chart-1: #9e4421;
+  --chart-2: #006d65;
+  --chart-3: #745f06;
+  --chart-4: #514b45;
+  --chart-5: #ad0445;
 }
 
 .dark {
-  --background: #0f1115;
-  --foreground: #f1f2f4;
-  --card: #17191f;
-  --card-foreground: #f1f2f4;
-  --popover: #17191f;
-  --popover-foreground: #f1f2f4;
-  --primary: #6c93e0;
-  --primary-foreground: #0b1220;
-  --secondary: #1d2027;
-  --secondary-foreground: #f1f2f4;
-  --muted: #1d2027;
-  --muted-foreground: #9a9da8;
-  --accent: #1b2740;
-  --accent-foreground: #90aeea;
-  --destructive: #e2726b;
-  --destructive-wash: #2e1a19;
-  --success: #4fbe82;
-  --success-wash: #16291f;
-  --warning: #e0ac49;
-  --warning-wash: #2b2313;
-  --dispute: #e0954f;
-  --dispute-wash: #2b2013;
-  --closed: #9a9da8;
-  --closed-wash: #22252c;
-  --border: #262932;
-  --input: #262932;
-  --ring: #6c93e0;
-  --chart-1: #6c93e0;
-  --chart-2: #4fbe82;
-  --chart-3: #e0ac49;
-  --chart-4: #90aeea;
-  --chart-5: #e2726b;
+  --background: #171311;
+  --foreground: #eee7df;
+  --card: #221d1a;
+  --card-foreground: #eee7df;
+  --popover: #221d1a;
+  --popover-foreground: #eee7df;
+  --primary: #d4774c;
+  --primary-foreground: #140e0b;
+  --secondary: #2c2623;
+  --secondary-foreground: #eee7df;
+  --muted: #2c2623;
+  --muted-foreground: #aea298;
+  --accent: #422518;
+  --accent-foreground: #f5bc9b;
+  --destructive: #f6668f;
+  --destructive-wash: #3a171f;
+  --success: #6dc3b8;
+  --success-wash: #102c29;
+  --warning: #ebbc63;
+  --warning-wash: #34260c;
+  --neutral: #afa299;
+  --neutral-wash: #2f2a27;
+  --border: #39312d;
+  --input: #72665e;
+  --ring: #d4774c;
+  --chart-1: #d4774c;
+  --chart-2: #6dc3b8;
+  --chart-3: #ebbc63;
+  --chart-4: #afa299;
+  --chart-5: #f6668f;
 }
 
 @layer base {
