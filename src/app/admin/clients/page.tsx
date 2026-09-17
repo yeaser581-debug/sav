@@ -15,7 +15,7 @@ import { PaginationControls } from '@/components/ui/pagination';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { invalidateJson, useJson } from '@/hooks/useJson';
-import { CLIENT_PAGE_SIZE, normalizeQuery } from '@/lib/client-search';
+import { CLIENT_PAGE_SIZE, SEARCH_MAX_LENGTH, normalizeQuery } from '@/lib/client-search';
 import { cn } from '@/lib/utils';
 import type { ClientListResponse, ClientRow } from '@/components/admin/clients/types';
 import { clientLabel, formatDay, homeLabel, initials, plural } from '@/components/admin/clients/format';
@@ -336,6 +336,7 @@ function ClientsDirectory() {
           onChange={e => onType(e.target.value)}
           placeholder="Nom, téléphone, email, login, appartement ou immeuble"
           autoComplete="off"
+          maxLength={SEARCH_MAX_LENGTH}
           className="h-10 bg-card pl-9 pr-9"
         />
         {loading && data && (

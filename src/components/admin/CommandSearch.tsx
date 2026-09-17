@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useJson } from '@/hooks/useJson';
-import { SEARCH_MIN_LENGTH, normalizeQuery } from '@/lib/client-search';
+import { SEARCH_MAX_LENGTH, SEARCH_MIN_LENGTH, normalizeQuery } from '@/lib/client-search';
 import { cn } from '@/lib/utils';
 import type { SearchResponse } from '@/components/admin/clients/types';
 import { clientLabel, homeLabel, initials } from '@/components/admin/clients/format';
@@ -155,6 +155,7 @@ function SearchBody({ onDone }: { onDone: () => void }) {
           placeholder="Rechercher un client ou une réclamation…"
           autoComplete="off"
           spellCheck={false}
+          maxLength={SEARCH_MAX_LENGTH}
           className="h-12 min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
         />
         <kbd className="hidden rounded border border-border px-1.5 font-mono text-[10px] text-muted-foreground sm:inline">Échap</kbd>
