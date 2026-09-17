@@ -315,9 +315,15 @@ describe('GET /api/clients/[id]/qr', () => {
 });
 
 describe('GET /api/search', () => {
-  it('does nothing below two characters', async () => {
-    await seedClient({ name: 'Ali' });
+  it('searches from a single letter', async () => {
+    await seedClient({ login: 'ali', name: 'Ali Benali' });
     const data = await body(await search(asAdmin('/api/search?q=a')));
+    expect(data.clients.map((c: { login: string }) => c.login)).toEqual(['ali']);
+  });
+
+  it('does nothing without a query', async () => {
+    await seedClient({ name: 'Ali' });
+    const data = await body(await search(asAdmin('/api/search?q=%20')));
     expect(data).toMatchObject({ clients: [], issues: [] });
   });
 

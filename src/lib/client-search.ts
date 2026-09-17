@@ -3,7 +3,7 @@
 
 import { ISSUE_STATUSES, type IssueStatusValue } from '@/lib/issue-workflow';
 
-export const SEARCH_MIN_LENGTH = 2;
+export const SEARCH_MIN_LENGTH = 1;
 export const SEARCH_MAX_LENGTH = 100;
 export const CLIENT_PAGE_SIZE = 20;
 export const HISTORY_PAGE_SIZE = 10;
