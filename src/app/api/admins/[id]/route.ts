@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import { getActorName, logUpdate } from '@/lib/audit';
 import bcrypt from 'bcryptjs';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 const ADMIN_SELECT = { id: true, name: true, email: true, isSuperAdmin: true, isActive: true, createdAt: true } as const;
 
@@ -19,6 +20,13 @@ export async function PATCH(
   const { id } = await params;
   const adminId = parseInt(id);
   const body = await req.json();
+
+  const tooLong = checkLengths([
+    ['Le nom', body.name, LIMITS.name],
+    ['L’email', body.email, LIMITS.email],
+    ['Le mot de passe', body.password, LIMITS.password],
+  ]);
+  if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
 
   try {
     const before = await prisma.admin.findUnique({ where: { id: adminId }, select: ADMIN_SELECT });

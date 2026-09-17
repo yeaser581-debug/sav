@@ -8,11 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import { VoiceNote } from '@/components/ui/voice-note';
 import { toast } from 'sonner';
 import { outboxFetch, subscribe } from '@/lib/outbox';
 import { MessageSquare, Send, Paperclip, Mic, X, Trash2, Clock, Check, CheckCheck } from 'lucide-react';
 import { adminHasUnread, clientHasUnread, isMessageSeen, latestMessageAt, announceIssueRead } from '@/lib/read-state';
+import { LIMITS } from '@/lib/limits';
 
 export type ChatMessage = {
   id: number;
@@ -144,6 +146,7 @@ export function ChatPanel({
   const [levels, setLevels] = useState<number[]>(() => Array(METER_BARS).fill(0));
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
   const [pendingMessages, setPendingMessages] = useState<{ id: string; content: string; createdAt: string }[]>([]);
+  const { confirm, confirmDialog } = useConfirm();
 
   const socketRef = useRef<Socket | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -316,6 +319,14 @@ export function ChatPanel({
   };
 
   const handleDeleteMessage = (msg: ChatMessage) => {
+    confirm({
+      title: 'Supprimer ce message ?',
+      description: 'Il disparaîtra de la conversation pour les deux parties. Vous aurez 5 secondes pour annuler.',
+      onConfirm: () => removeMessage(msg),
+    });
+  };
+
+  const removeMessage = (msg: ChatMessage) => {
     setHiddenIds(prev => new Set(prev).add(msg.id));
     showUndoToast({
       message: 'Message supprimé',
@@ -605,6 +616,7 @@ export function ChatPanel({
             <Input
               type="text"
               value={newMessage}
+              maxLength={LIMITS.message}
               onChange={e => { setNewMessage(e.target.value); notifyTyping(); }}
               placeholder="Écrivez votre message..."
               className="flex-1 bg-card border-border text-foreground placeholder-muted-foreground h-9 rounded-lg text-xs"
@@ -632,6 +644,8 @@ export function ChatPanel({
         )}
         {micError && <p className="text-[10px] text-destructive text-center mt-2">{micError}</p>}
       </form>
+
+      {confirmDialog}
     </Card>
   );
 }

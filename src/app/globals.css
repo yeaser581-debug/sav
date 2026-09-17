@@ -105,6 +105,19 @@
   --chart-5: #ad0445;
 }
 
+/*
+ * Width of the admin sidebar, and of the gap the page leaves for it. The
+ * sidebar toggle sets data-admin-sidebar on the document; the layout restores
+ * the saved value before the first paint so the page never jumps.
+ */
+:root {
+  --admin-sidebar-width: 16rem;
+}
+
+:root[data-admin-sidebar="mini"] {
+  --admin-sidebar-width: 4.5rem;
+}
+
 .dark {
   --background: #1f232c;
   --foreground: #eff2f7;

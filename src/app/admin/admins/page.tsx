@@ -11,11 +11,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { forceLogout } from '@/lib/notify';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { ShieldCheck, ShieldAlert, Plus, X, Mail, Calendar, Pencil, Power, PowerOff } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 type Admin = {
   id: number;
@@ -43,6 +45,7 @@ export default function AdminAdminsPage() {
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editError, setEditError] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => { fetchAdmins(); }, []);
 
@@ -118,6 +121,19 @@ export default function AdminAdminsPage() {
     } finally {
       setEditSubmitting(false);
     }
+  };
+
+  const askToggleActive = (admin: Admin) => {
+    if (!admin.isActive) {
+      void toggleActive(admin);
+      return;
+    }
+    confirm({
+      title: `Désactiver « ${admin.name} » ?`,
+      description: 'Ce compte sera déconnecté immédiatement et ne pourra plus se connecter. Vous pourrez le réactiver à tout moment.',
+      confirmLabel: 'Désactiver',
+      onConfirm: () => toggleActive(admin),
+    });
   };
 
   const toggleActive = async (admin: Admin) => {
@@ -211,7 +227,7 @@ export default function AdminAdminsPage() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="form-name" className="text-foreground text-sm">Nom complet *</Label>
-                <Input id="form-name"
+                <Input id="form-name" maxLength={LIMITS.name}
                   required
                   type="text"
                   value={form.name}
@@ -222,7 +238,7 @@ export default function AdminAdminsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-email" className="text-foreground text-sm">Email *</Label>
-                <Input id="form-email"
+                <Input id="form-email" maxLength={LIMITS.email}
                   required
                   type="email"
                   value={form.email}
@@ -233,7 +249,7 @@ export default function AdminAdminsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe temporaire *</Label>
-                <Input id="form-password"
+                <Input id="form-password" maxLength={LIMITS.password}
                   required
                   type="password"
                   value={form.password}
@@ -342,7 +358,7 @@ export default function AdminAdminsPage() {
                   variant="outline"
                   size="sm"
                   disabled={togglingId === admin.id}
-                  onClick={() => toggleActive(admin)}
+                  onClick={() => askToggleActive(admin)}
                   className={`w-full text-xs gap-1.5 ${
                     admin.isActive
                       ? 'border-destructive/30 text-destructive hover:bg-destructive/10'
@@ -383,7 +399,7 @@ export default function AdminAdminsPage() {
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom complet *</Label>
-                  <Input id="editForm-name"
+                  <Input id="editForm-name" maxLength={LIMITS.name}
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -392,7 +408,7 @@ export default function AdminAdminsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-email" className="text-foreground text-sm">Email *</Label>
-                  <Input id="editForm-email"
+                  <Input id="editForm-email" maxLength={LIMITS.email}
                     required
                     type="email"
                     value={editForm.email}
@@ -402,7 +418,7 @@ export default function AdminAdminsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-password" className="text-foreground text-sm">Nouveau mot de passe</Label>
-                  <Input id="editForm-password"
+                  <Input id="editForm-password" maxLength={LIMITS.password}
                     type="password"
                     value={editForm.password}
                     onChange={e => setEditForm({ ...editForm, password: e.target.value })}
@@ -459,6 +475,8 @@ export default function AdminAdminsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {confirmDialog}
     </div>
   );
 }

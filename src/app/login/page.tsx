@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Loader2,
 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 type Role = 'admin' | 'agent' | 'client';
 
@@ -196,7 +197,7 @@ function LoginForm() {
                 </Label>
                 {role === 'client' ? (
                   <Input
-                    id="form-identifier"
+                    id="form-identifier" maxLength={LIMITS.email}
                     type="text"
                     required
                     value={form.login}
@@ -206,7 +207,7 @@ function LoginForm() {
                   />
                 ) : (
                   <Input
-                    id="form-identifier"
+                    id="form-identifier" maxLength={LIMITS.email}
                     type="email"
                     required
                     value={form.email}
@@ -219,7 +220,7 @@ function LoginForm() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe</Label>
-                <Input id="form-password"
+                <Input id="form-password" maxLength={LIMITS.password}
                   type="password"
                   required
                   value={form.password}

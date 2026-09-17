@@ -12,6 +12,7 @@ import { showUndoToast } from '@/components/ui/undo-toast';
 import { outboxFetch } from '@/lib/outbox';
 import { toast } from 'sonner';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 export default function NewIssuePage() {
   const router = useRouter();
@@ -105,6 +106,7 @@ export default function NewIssuePage() {
               </Label>
               <Textarea
                 id="description"
+                maxLength={LIMITS.description}
                 required
                 rows={5}
                 value={description}

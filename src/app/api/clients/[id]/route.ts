@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { adminFrom, notFound, parseId, privateJson, unauthorized } from '@/lib/admin-guard';
 import { CLIENT_PUBLIC_SELECT, getClientProfile } from '@/lib/client-directory';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 // Responses leave the QR login token out; the audit log skips it as well.
 const CLIENT_SELECT = CLIENT_PUBLIC_SELECT;
@@ -36,6 +37,16 @@ export async function PATCH(
   const { id } = await params;
   const clientId = parseInt(id);
   const body = await req.json();
+
+  const tooLong = checkLengths([
+    ['L’identifiant', body.login, LIMITS.login],
+    ['Le nom', body.name, LIMITS.name],
+    ['Le numéro d’unité', body.unitNumber, LIMITS.unitNumber],
+    ['Le téléphone', body.phone, LIMITS.phone],
+    ['L’email', body.email, LIMITS.email],
+    ['Le mot de passe', body.password, LIMITS.password],
+  ]);
+  if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
 
   try {
     const before = await prisma.client.findUnique({ where: { id: clientId }, select: CLIENT_SELECT });

@@ -11,11 +11,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { Building2, MapPin, Plus, X, Pencil, Trash2 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 type Area = { id: number; name: string };
 type Building = {
@@ -140,7 +142,16 @@ export default function AdminBuildingsPage() {
     });
   };
 
+  const { confirm, confirmDialog } = useConfirm();
+
   const handleDelete = (building: Building) => {
+    confirm({
+      title: `Supprimer « ${building.name} » ?`,
+      description: 'Les résidents rattachés à cet immeuble restent enregistrés. La suppression est récupérable depuis la corbeille.',
+      onConfirm: () => removeBuilding(building),
+    });
+  };
+  const removeBuilding = (building: Building) => {
     setHiddenIds(prev => new Set(prev).add(building.id));
     showUndoToast({
       message: `Immeuble "${building.name}" supprimé`,
@@ -225,7 +236,7 @@ export default function AdminBuildingsPage() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="form-name" className="text-foreground text-sm">Nom du bâtiment *</Label>
-                <Input id="form-name"
+                <Input id="form-name" maxLength={LIMITS.name}
                   required
                   type="text"
                   value={form.name}
@@ -236,7 +247,7 @@ export default function AdminBuildingsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-address" className="text-foreground text-sm">Adresse complète *</Label>
-                <Input id="form-address"
+                <Input id="form-address" maxLength={LIMITS.address}
                   required
                   type="text"
                   value={form.address}
@@ -388,7 +399,7 @@ export default function AdminBuildingsPage() {
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom du bâtiment *</Label>
-                  <Input id="editForm-name"
+                  <Input id="editForm-name" maxLength={LIMITS.name}
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -397,7 +408,7 @@ export default function AdminBuildingsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-address" className="text-foreground text-sm">Adresse complète *</Label>
-                  <Input id="editForm-address"
+                  <Input id="editForm-address" maxLength={LIMITS.address}
                     required
                     value={editForm.address}
                     onChange={e => setEditForm({ ...editForm, address: e.target.value })}
@@ -451,6 +462,8 @@ export default function AdminBuildingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {confirmDialog}
     </div>
   );
 }

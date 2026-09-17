@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PaginationControls } from '@/components/ui/pagination';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import { invalidateJson, useJson } from '@/hooks/useJson';
 import { CLIENT_PAGE_SIZE, normalizeQuery } from '@/lib/client-search';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ import { clientLabel, formatDay, homeLabel, initials, plural } from '@/component
 import { AccountBadge } from '@/components/admin/clients/AccountBadge';
 import { ClientQrDialog } from '@/components/admin/clients/ClientQrDialog';
 import { ClientEditDialog } from '@/components/admin/clients/ClientEditDialog';
+import { LIMITS } from '@/lib/limits';
 
 type Building = { id: number; name: string };
 
@@ -78,20 +80,21 @@ function CreateClientForm({ onCreated }: { onCreated: (client: { id: number; lab
         <form onSubmit={submit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="new-login">Identifiant (login) *</Label>
-            <Input id="new-login" required value={form.login} onChange={set('login')} placeholder="resident-A101" className={FIELD} />
+            <Input id="new-login" maxLength={LIMITS.login} required value={form.login} onChange={set('login')} placeholder="resident-A101" className={FIELD} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="new-password">Mot de passe temporaire *</Label>
-            <Input id="new-password" required type="password" autoComplete="new-password" value={form.password} onChange={set('password')} placeholder="••••••••" className={FIELD} />
+            <Input id="new-password" maxLength={LIMITS.password} required type="password" autoComplete="new-password" value={form.password} onChange={set('password')} placeholder="••••••••" className={FIELD} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="new-unit">Numéro d&apos;unité *</Label>
-            <Input id="new-unit" required value={form.unitNumber} onChange={set('unitNumber')} placeholder="A101" className={FIELD} />
+            <Input id="new-unit" maxLength={LIMITS.unitNumber} required value={form.unitNumber} onChange={set('unitNumber')} placeholder="A101" className={FIELD} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="new-building">Immeuble</Label>
+            <Label htmlFor="new-building">Immeuble *</Label>
             <select
               id="new-building"
+              required
               value={form.buildingId}
               onChange={set('buildingId')}
               className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -102,15 +105,15 @@ function CreateClientForm({ onCreated }: { onCreated: (client: { id: number; lab
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="new-name">Nom complet</Label>
-            <Input id="new-name" value={form.name} onChange={set('name')} placeholder="Fatima Benali" className={FIELD} />
+            <Input id="new-name" maxLength={LIMITS.name} value={form.name} onChange={set('name')} placeholder="Fatima Benali" className={FIELD} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="new-phone">Téléphone</Label>
-            <Input id="new-phone" type="tel" value={form.phone} onChange={set('phone')} placeholder="+212 6XX XX XX XX" className={FIELD} />
+            <Input id="new-phone" maxLength={LIMITS.phone} type="tel" value={form.phone} onChange={set('phone')} placeholder="+212 6XX XX XX XX" className={FIELD} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="new-email">Email</Label>
-            <Input id="new-email" type="email" value={form.email} onChange={set('email')} placeholder="client@example.com" className={FIELD} />
+            <Input id="new-email" maxLength={LIMITS.email} type="email" value={form.email} onChange={set('email')} placeholder="client@example.com" className={FIELD} />
           </div>
           <div className="pt-2 md:col-span-2">
             <Button type="submit" disabled={submitting} className="w-full">
@@ -233,6 +236,7 @@ function ClientsDirectory() {
   const [editing, setEditing] = useState<ClientRow | null>(null);
   const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
   const deleteTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  const { confirm, confirmDialog } = useConfirm();
 
   const refresh = () => {
     invalidateJson('/api/clients');
@@ -244,6 +248,14 @@ function ClientsDirectory() {
     next.delete(id);
     return next;
   });
+
+  const askRemove = (client: ClientRow) => {
+    confirm({
+      title: `Supprimer « ${clientLabel(client)} » ?`,
+      description: 'Le résident ne pourra plus se connecter. Sa fiche et ses réclamations restent récupérables depuis la corbeille.',
+      onConfirm: () => remove(client),
+    });
+  };
 
   const remove = (client: ClientRow) => {
     setHiddenIds(prev => new Set(prev).add(client.id));
@@ -365,7 +377,7 @@ function ClientsDirectory() {
                 client={client}
                 onQr={() => setQrFor({ id: client.id, label: clientLabel(client) })}
                 onEdit={() => setEditing(client)}
-                onDelete={() => remove(client)}
+                onDelete={() => askRemove(client)}
               />
             ))}
           </ul>
@@ -390,6 +402,8 @@ function ClientsDirectory() {
         onOpenChange={open => { if (!open) setQrFor(null); }}
       />
       <ClientEditDialog client={editing} onClose={() => setEditing(null)} onSaved={refresh} />
+
+      {confirmDialog}
     </div>
   );
 }

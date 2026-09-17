@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
@@ -34,6 +35,12 @@ export async function POST(req: NextRequest) {
     if (!name) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+
+    const tooLong = checkLengths([
+      ['Le nom de la zone', name, LIMITS.name],
+    ]);
+    if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
+
 
     const area = await prisma.area.create({
       data: {

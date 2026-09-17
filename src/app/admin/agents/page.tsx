@@ -10,11 +10,13 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { HardHat, Plus, X, Mail, Phone, Calendar, Users, Pencil, Trash2 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 type Agent = {
   id: number;
@@ -96,7 +98,16 @@ export default function AdminAgentsPage() {
     });
   };
 
+  const { confirm, confirmDialog } = useConfirm();
+
   const handleDelete = (agent: Agent) => {
+    confirm({
+      title: `Supprimer « ${agent.name} » ?`,
+      description: 'L’agent perdra l’accès à l’application. Ses réclamations restent visibles, et la suppression est récupérable depuis la corbeille.',
+      onConfirm: () => removeAgent(agent),
+    });
+  };
+  const removeAgent = (agent: Agent) => {
     setHiddenIds(prev => new Set(prev).add(agent.id));
     showUndoToast({
       message: `Agent "${agent.name}" supprimé`,
@@ -229,7 +240,7 @@ export default function AdminAgentsPage() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="form-name" className="text-foreground text-sm">Nom complet *</Label>
-                <Input id="form-name"
+                <Input id="form-name" maxLength={LIMITS.name}
                   required
                   type="text"
                   value={form.name}
@@ -240,7 +251,7 @@ export default function AdminAgentsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-email" className="text-foreground text-sm">Email *</Label>
-                <Input id="form-email"
+                <Input id="form-email" maxLength={LIMITS.email}
                   required
                   type="email"
                   value={form.email}
@@ -251,7 +262,7 @@ export default function AdminAgentsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-password" className="text-foreground text-sm">Mot de passe temporaire *</Label>
-                <Input id="form-password"
+                <Input id="form-password" maxLength={LIMITS.password}
                   required
                   type="password"
                   value={form.password}
@@ -262,7 +273,7 @@ export default function AdminAgentsPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="form-phone" className="text-foreground text-sm">Téléphone</Label>
-                <Input id="form-phone"
+                <Input id="form-phone" maxLength={LIMITS.phone}
                   type="tel"
                   value={form.phone}
                   onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -384,7 +395,7 @@ export default function AdminAgentsPage() {
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom complet *</Label>
-                  <Input id="editForm-name"
+                  <Input id="editForm-name" maxLength={LIMITS.name}
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -393,7 +404,7 @@ export default function AdminAgentsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-email" className="text-foreground text-sm">Email *</Label>
-                  <Input id="editForm-email"
+                  <Input id="editForm-email" maxLength={LIMITS.email}
                     required
                     type="email"
                     value={editForm.email}
@@ -403,7 +414,7 @@ export default function AdminAgentsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-phone" className="text-foreground text-sm">Téléphone</Label>
-                  <Input id="editForm-phone"
+                  <Input id="editForm-phone" maxLength={LIMITS.phone}
                     type="tel"
                     value={editForm.phone}
                     onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
@@ -412,7 +423,7 @@ export default function AdminAgentsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-password" className="text-foreground text-sm">Nouveau mot de passe</Label>
-                  <Input id="editForm-password"
+                  <Input id="editForm-password" maxLength={LIMITS.password}
                     type="password"
                     value={editForm.password}
                     onChange={e => setEditForm({ ...editForm, password: e.target.value })}
@@ -452,6 +463,8 @@ export default function AdminAgentsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {confirmDialog}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import { writeFile, mkdir } from 'fs/promises';
+import { LIMITS, checkLengths } from '@/lib/limits';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import type { Issue } from '@prisma/client';
@@ -131,6 +132,11 @@ export async function POST(
     if (!content?.trim()) {
       return NextResponse.json({ error: 'Content required' }, { status: 400 });
     }
+
+    const tooLong = checkLengths([
+      ['Le message', content, LIMITS.message],
+    ]);
+    if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
 
     if (typeof clientRequestId === 'string' && clientRequestId) {
       const existing = await prisma.issueMessage.findUnique({ where: { clientRequestId } });

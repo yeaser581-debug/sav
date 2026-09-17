@@ -24,6 +24,8 @@ import {
   CheckCircle2,
   Upload,
 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
+import { RejectionReasonPicker } from '@/components/issues/RejectionReasonPicker';
 
 type Media = { id: number; type: string; url: string };
 type IssueDetails = {
@@ -398,8 +400,10 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="rejectionReason" className="text-xs text-muted-foreground font-semibold">Motif du rejet *</Label>
+                <RejectionReasonPicker value={rejectReason} onPick={setRejectReason} />
                 <Textarea
                   id="rejectionReason"
+                  maxLength={LIMITS.reason}
                   value={rejectReason}
                   onChange={e => setRejectReason(e.target.value)}
                   placeholder="Ex: Le dommage constaté sort du cadre contractuel de la garantie décennale..."
@@ -543,6 +547,7 @@ export default function AgentIssueDetailPage({ params }: { params: Promise<{ id:
                   <Label htmlFor="resolveNote" className="text-xs text-muted-foreground font-semibold">Note (optionnel)</Label>
                   <Textarea
                     id="resolveNote"
+                    maxLength={LIMITS.note}
                     value={resolveNote}
                     onChange={e => setResolveNote(e.target.value)}
                     placeholder="Ex: Remplacement du joint effectué, plus de fuite constatée."

@@ -11,11 +11,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { showUndoToast } from '@/components/ui/undo-toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { MapPinned, HardHat, Plus, X, Building2, Pencil, Trash2 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 type Area = {
   id: number;
@@ -128,7 +130,16 @@ export default function AdminAreasPage() {
     });
   };
 
+  const { confirm, confirmDialog } = useConfirm();
+
   const handleDelete = (area: Area) => {
+    confirm({
+      title: `Supprimer la zone « ${area.name} » ?`,
+      description: 'Les immeubles de cette zone n’auront plus d’agent responsable tant qu’ils ne sont pas réaffectés. La suppression est récupérable depuis la corbeille.',
+      onConfirm: () => removeArea(area),
+    });
+  };
+  const removeArea = (area: Area) => {
     setHiddenIds(prev => new Set(prev).add(area.id));
     showUndoToast({
       message: `Zone "${area.name}" supprimée`,
@@ -213,7 +224,7 @@ export default function AdminAreasPage() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="form-name" className="text-foreground text-sm">Nom de la zone *</Label>
-                <Input id="form-name"
+                <Input id="form-name" maxLength={LIMITS.name}
                   required
                   type="text"
                   value={form.name}
@@ -339,7 +350,7 @@ export default function AdminAreasPage() {
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="editForm-name" className="text-foreground text-sm">Nom de la zone *</Label>
-                  <Input id="editForm-name"
+                  <Input id="editForm-name" maxLength={LIMITS.name}
                     required
                     value={editForm.name}
                     onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -393,6 +404,8 @@ export default function AdminAreasPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {confirmDialog}
     </div>
   );
 }

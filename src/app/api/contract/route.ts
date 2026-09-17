@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
@@ -30,6 +31,12 @@ export async function POST(req: NextRequest) {
     if (!content) {
       return NextResponse.json({ error: 'Content required' }, { status: 400 });
     }
+
+    const tooLong = checkLengths([
+      ['Le contrat', content, LIMITS.contract],
+    ]);
+    if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
+
 
     await prisma.contract.updateMany({
       where: { isActive: true },

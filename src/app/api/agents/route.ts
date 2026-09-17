@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
@@ -32,6 +33,15 @@ export async function POST(req: NextRequest) {
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+
+    const tooLong = checkLengths([
+      ['Le nom', name, LIMITS.name],
+      ['L’email', email, LIMITS.email],
+      ['Le mot de passe', password, LIMITS.password],
+      ['Le téléphone', phone, LIMITS.phone],
+    ]);
+    if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
+
 
     const passwordHash = await bcrypt.hash(password, 10);
 

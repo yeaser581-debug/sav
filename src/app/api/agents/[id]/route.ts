@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import { getActorName, logUpdate, logDelete } from '@/lib/audit';
 import bcrypt from 'bcryptjs';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 const AGENT_SELECT = { id: true, name: true, email: true, phone: true, createdAt: true } as const;
 
@@ -19,6 +20,14 @@ export async function PATCH(
   const { id } = await params;
   const agentId = parseInt(id);
   const body = await req.json();
+
+  const tooLong = checkLengths([
+    ['Le nom', body.name, LIMITS.name],
+    ['L’email', body.email, LIMITS.email],
+    ['Le mot de passe', body.password, LIMITS.password],
+    ['Le téléphone', body.phone, LIMITS.phone],
+  ]);
+  if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
 
   try {
     const before = await prisma.agent.findUnique({ where: { id: agentId }, select: AGENT_SELECT });

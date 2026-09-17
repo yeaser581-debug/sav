@@ -27,6 +27,7 @@ import {
   XCircle,
   X,
 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
 
 type Media = { id: number; type: string; url: string };
 type Proof = { id: number; type: string; url: string; note: string | null };
@@ -507,6 +508,7 @@ export default function IssueDetailPage({ params }: { params: Promise<{ id: stri
                 <Label htmlFor="disputeReason" className="text-xs text-muted-foreground font-semibold">Motif de la contestation *</Label>
                 <Textarea
                   id="disputeReason"
+                  maxLength={LIMITS.reason}
                   value={disputeReason}
                   onChange={e => setDisputeReason(e.target.value)}
                   placeholder="Ex: Le problème persiste après le passage du technicien..."

@@ -12,6 +12,8 @@ import {
   ArrowLeft, User, HardHat, Calendar, Paperclip, IdCard, ChevronRight,
   AlertTriangle, Info, AlertOctagon, ShieldCheck
 } from 'lucide-react';
+import { LIMITS } from '@/lib/limits';
+import { RejectionReasonPicker } from '@/components/issues/RejectionReasonPicker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MediaGallery } from '@/components/ui/media-gallery';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -490,8 +492,10 @@ export function ConversationPane({ issueId }: { issueId: number }) {
             <Label htmlFor="adminRejectionReason" className="text-xs text-muted-foreground font-semibold">
               Motif du rejet *
             </Label>
+            <RejectionReasonPicker value={rejectReason} onPick={setRejectReason} />
             <Textarea
               id="adminRejectionReason"
+              maxLength={LIMITS.reason}
               value={rejectReason}
               onChange={e => setRejectReason(e.target.value)}
               placeholder="Ex: Le dommage constaté sort du cadre contractuel de la garantie décennale..."

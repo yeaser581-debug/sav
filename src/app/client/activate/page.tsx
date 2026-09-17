@@ -5,6 +5,7 @@ import { ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { LIMITS } from '@/lib/limits';
 
 export default function ActivateAccountPage() {
   const [password, setPassword] = useState('');
@@ -61,7 +62,7 @@ export default function ActivateAccountPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
             <Label htmlFor="password" className="text-foreground text-sm">Nouveau mot de passe</Label>
-            <Input id="password"
+            <Input id="password" maxLength={LIMITS.password}
               type="password"
               required
               value={password}

@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <Suspense fallback={<AdminSidebarSkeleton />}>
         <AdminSidebarServer />
       </Suspense>
-      <main className="min-w-0 md:ml-64 p-4 md:p-6 text-foreground">
+      <main className="min-w-0 p-4 text-foreground transition-[margin] duration-200 motion-reduce:transition-none md:ml-(--admin-sidebar-width) md:p-6">
         {children}
       </main>
       <InstallPrompt />

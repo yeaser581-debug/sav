@@ -72,6 +72,11 @@ const CAPTURE_INSTALL_PROMPT = `
 })();
 `;
 
+// Restores a collapsed admin sidebar before the first paint, so the page does
+// not start wide and jump narrow once React runs.
+const RESTORE_ADMIN_SIDEBAR = `try{if(localStorage.getItem('admin-sidebar')==='mini')document.documentElement.dataset.adminSidebar='mini'}catch(e){}`;
+
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -85,6 +90,7 @@ export default async function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: CAPTURE_INSTALL_PROMPT }} />
+        <script dangerouslySetInnerHTML={{ __html: RESTORE_ADMIN_SIDEBAR }} />
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider

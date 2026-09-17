@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import { adminFrom, privateJson, unauthorized } from '@/lib/admin-guard';
 import { listClients } from '@/lib/client-directory';
 import { CLIENT_PAGE_SIZE, normalizeQuery, parsePaging } from '@/lib/client-search';
+import { LIMITS, checkLengths } from '@/lib/limits';
 
 // The list never carries QR login tokens: those are fetched one client at a
 // time from /api/clients/[id]/qr when an admin actually opens a QR code.
@@ -33,6 +34,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields: login, password, unitNumber' }, { status: 400 });
     }
 
+    if (!buildingId) {
+      return NextResponse.json({ error: 'Sélectionnez l’immeuble du résident.' }, { status: 400 });
+    }
+
+    const tooLong = checkLengths([
+      ['L’identifiant', login, LIMITS.login],
+      ['Le mot de passe', password, LIMITS.password],
+      ['Le nom', name, LIMITS.name],
+      ['Le numéro d’unité', unitNumber, LIMITS.unitNumber],
+      ['Le téléphone', phone, LIMITS.phone],
+      ['L’email', email, LIMITS.email],
+    ]);
+    if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
+
+
     const existing = await prisma.client.findUnique({ where: { login } });
     if (existing) {
       return NextResponse.json({ error: `Le login "${login}" est déjà utilisé.` }, { status: 409 });
@@ -50,7 +66,7 @@ export async function POST(req: NextRequest) {
         unitNumber,
         phone: phone || null,
         email: email || null,
-        ...(buildingId && { buildingId: parseInt(buildingId) }),
+        buildingId: parseInt(buildingId),
       },
       select: {
         id: true, name: true, login: true, unitNumber: true, phone: true,

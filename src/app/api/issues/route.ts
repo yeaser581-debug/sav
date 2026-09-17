@@ -3,6 +3,7 @@ import { Prisma, IssueStatus, Severity } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import { adminUnreadIds, countAdminUnread } from '@/lib/unread';
+import { LIMITS, checkLengths } from '@/lib/limits';
 import { readdir, rename, mkdir } from 'fs/promises';
 import path from 'path';
 
@@ -135,6 +136,11 @@ export async function POST(req: NextRequest) {
     if (!description?.trim()) {
       return NextResponse.json({ error: 'Description required' }, { status: 400 });
     }
+
+    const tooLong = checkLengths([
+      ['La description', description, LIMITS.description],
+    ]);
+    if (tooLong) return NextResponse.json({ error: tooLong }, { status: 400 });
 
     if (clientRequestId) {
       const existing = await prisma.issue.findUnique({ where: { clientRequestId } });

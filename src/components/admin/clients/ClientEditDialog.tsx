@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { invalidateJson, useJson } from '@/hooks/useJson';
 import type { ClientBase } from './types';
 import { clientLabel } from './format';
+import { LIMITS } from '@/lib/limits';
 
 type Building = { id: number; name: string };
 
@@ -72,11 +73,11 @@ function EditForm({ client, onDone }: { client: ClientBase; onDone: () => void }
       >
         <div className="space-y-1.5">
           <Label htmlFor="edit-login">Identifiant (login) *</Label>
-          <Input id="edit-login" required value={form.login} onChange={e => set('login', e.target.value)} className={FIELD} />
+          <Input id="edit-login" maxLength={LIMITS.login} required value={form.login} onChange={e => set('login', e.target.value)} className={FIELD} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="edit-name">Nom complet</Label>
-          <Input id="edit-name" value={form.name} onChange={e => set('name', e.target.value)} className={FIELD} />
+          <Input id="edit-name" maxLength={LIMITS.name} value={form.name} onChange={e => set('name', e.target.value)} className={FIELD} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="edit-building">Immeuble</Label>
@@ -92,20 +93,20 @@ function EditForm({ client, onDone }: { client: ClientBase; onDone: () => void }
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="edit-unit">Numéro d&apos;unité *</Label>
-          <Input id="edit-unit" required value={form.unitNumber} onChange={e => set('unitNumber', e.target.value)} className={FIELD} />
+          <Input id="edit-unit" maxLength={LIMITS.unitNumber} required value={form.unitNumber} onChange={e => set('unitNumber', e.target.value)} className={FIELD} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="edit-phone">Téléphone</Label>
-          <Input id="edit-phone" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} className={FIELD} />
+          <Input id="edit-phone" maxLength={LIMITS.phone} type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} className={FIELD} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="edit-email">Email</Label>
-          <Input id="edit-email" type="email" value={form.email} onChange={e => set('email', e.target.value)} className={FIELD} />
+          <Input id="edit-email" maxLength={LIMITS.email} type="email" value={form.email} onChange={e => set('email', e.target.value)} className={FIELD} />
         </div>
         <div className="space-y-1.5 sm:col-span-2">
           <Label htmlFor="edit-password">Nouveau mot de passe temporaire</Label>
           <Input
-            id="edit-password"
+            id="edit-password" maxLength={LIMITS.password}
             type="password"
             autoComplete="new-password"
             value={form.password}
