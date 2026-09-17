@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
-  ArrowLeft, User, HardHat, Calendar, Paperclip,
+  ArrowLeft, User, HardHat, Calendar, Paperclip, IdCard, ChevronRight,
   AlertTriangle, Info, AlertOctagon, ShieldCheck
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +21,7 @@ import { ChatPanel } from '@/components/chat/ChatPanel';
 import { pushNotifications } from '@/lib/notify';
 import { toast } from 'sonner';
 import { timeAgo } from '@/lib/utils';
+import { ClientFicheSheet } from '@/components/admin/clients/ClientFicheSheet';
 
 type Media = { id: number; type: string; url: string };
 type Proof = { id: number; type: string; url: string; note: string | null };
@@ -37,7 +38,7 @@ type IssueDetails = {
   media: Media[];
   proof: Proof[];
   messages: Message[];
-  client: { name: string | null; unitNumber: string; login: string } | null;
+  client: { id: number; name: string | null; unitNumber: string; login: string } | null;
   agent: { id: number; name: string; email: string } | null;
   visits: { id: number; scheduledAt: string; status: string }[];
   disputeReason: string | null;
@@ -51,6 +52,12 @@ export function ConversationPane({ issueId }: { issueId: number }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [infoOpen, setInfoOpen] = useState(false);
+  const [ficheOpen, setFicheOpen] = useState(false);
+
+  const openFiche = () => {
+    setInfoOpen(false);
+    setFicheOpen(true);
+  };
 
   const [agents, setAgents] = useState<{ id: number, name: string }[]>([]);
   const [reopenAgentId, setReopenAgentId] = useState('');
@@ -193,19 +200,25 @@ export function ConversationPane({ issueId }: { issueId: number }) {
 
   const infoContent = (
     <div className="divide-y divide-border [&>*]:py-4 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
-      <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={openFiche}
+        disabled={!issue.client}
+        className="group -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none"
+      >
         <div className="w-10 h-10 rounded-full bg-accent border border-border flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-foreground">
             {(issue.client?.name || issue.client?.login || '?')[0].toUpperCase()}
           </span>
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-foreground truncate">
             {issue.client?.name || issue.client?.login || '—'}
           </p>
-          <p className="text-xs text-muted-foreground">Unité {issue.client?.unitNumber || '—'}</p>
+          <p className="text-xs text-muted-foreground">Unité {issue.client?.unitNumber || '—'} · <span className="text-primary group-hover:underline">Fiche client</span></p>
         </div>
-      </div>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+      </button>
 
       <div className="space-y-3">
         <div>
@@ -406,6 +419,13 @@ export function ConversationPane({ issueId }: { issueId: number }) {
         <StatusBadge status={issue.status} />
         <OverdueTag severity={issue.severity} createdAt={issue.createdAt} status={issue.status} />
         <span className="text-[10px] text-muted-foreground ml-auto hidden sm:inline">{timeAgo(issue.createdAt)}</span>
+        {issue.client && (
+          <Button variant="ghost" size="sm" onClick={openFiche} className="shrink-0 gap-1.5 text-muted-foreground hover:text-foreground">
+            <IdCard className="h-4 w-4" />
+            <span className="hidden xl:inline">Fiche client</span>
+            <span className="sr-only xl:hidden">Fiche client</span>
+          </Button>
+        )}
         <Button variant="ghost" size="icon-sm" onClick={() => setInfoOpen(true)} className="lg:hidden text-muted-foreground hover:text-foreground shrink-0">
           <Info className="h-4 w-4" />
         </Button>
@@ -433,6 +453,13 @@ export function ConversationPane({ issueId }: { issueId: number }) {
           {infoContent}
         </div>
       </div>
+
+      <ClientFicheSheet
+        clientId={issue.client?.id ?? null}
+        currentIssueId={issue.id}
+        open={ficheOpen}
+        onOpenChange={setFicheOpen}
+      />
 
       <Sheet open={infoOpen} onOpenChange={setInfoOpen}>
         <SheetContent side="right" className="overflow-y-auto">

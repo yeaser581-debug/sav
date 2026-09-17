@@ -36,6 +36,11 @@ const ENDPOINTS: EndpointDef[] = [
   { group: 'Agents', label: 'Restaurer un agent', method: 'POST', path: '/api/agents/1/restore' },
 
   { group: 'Clients', label: 'Lister les clients', method: 'GET', path: '/api/clients' },
+  { group: 'Clients', label: 'Rechercher des clients', method: 'GET', path: '/api/clients?q=b12&page=1' },
+  { group: 'Clients', label: 'Fiche d’un client', method: 'GET', path: '/api/clients/1' },
+  { group: 'Clients', label: 'Réclamations d’un client', method: 'GET', path: '/api/clients/1/issues?status=open' },
+  { group: 'Clients', label: 'Code QR d’un client', method: 'GET', path: '/api/clients/1/qr' },
+  { group: 'Clients', label: 'Recherche rapide', method: 'GET', path: '/api/search?q=lahcen' },
   { group: 'Clients', label: 'Créer un client', method: 'POST', path: '/api/clients', body: '{\n  "login": "test.client",\n  "password": "test1234",\n  "unitNumber": "Z99",\n  "buildingId": "1"\n}' },
   { group: 'Clients', label: 'Modifier un client', method: 'PATCH', path: '/api/clients/1', body: '{\n  "phone": "0622222222"\n}' },
   { group: 'Clients', label: 'Supprimer un client (soft delete)', method: 'DELETE', path: '/api/clients/1' },

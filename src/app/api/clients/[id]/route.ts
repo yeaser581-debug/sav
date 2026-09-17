@@ -4,12 +4,24 @@ import { verifyToken } from '@/lib/auth';
 import { getActorName, logUpdate, logDelete } from '@/lib/audit';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { adminFrom, notFound, parseId, privateJson, unauthorized } from '@/lib/admin-guard';
+import { CLIENT_PUBLIC_SELECT, getClientProfile } from '@/lib/client-directory';
 
-const CLIENT_SELECT = {
-  id: true, name: true, login: true, unitNumber: true, phone: true,
-  email: true, qrToken: true, qrUsedAt: true, mustSetPassword: true,
-  buildingId: true, createdAt: true,
-} as const;
+// Responses leave the QR login token out; the audit log skips it as well.
+const CLIENT_SELECT = CLIENT_PUBLIC_SELECT;
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!adminFrom(req)) return unauthorized();
+
+  const clientId = parseId((await params).id);
+  if (!clientId) return notFound();
+
+  const profile = await getClientProfile(clientId);
+  return profile ? privateJson(profile) : notFound();
+}
 
 export async function PATCH(
   req: NextRequest,

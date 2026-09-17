@@ -3,25 +3,20 @@ import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { adminFrom, privateJson, unauthorized } from '@/lib/admin-guard';
+import { listClients } from '@/lib/client-directory';
+import { CLIENT_PAGE_SIZE, normalizeQuery, parsePaging } from '@/lib/client-search';
 
+// The list never carries QR login tokens: those are fetched one client at a
+// time from /api/clients/[id]/qr when an admin actually opens a QR code.
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get('token')?.value;
-  const payload = token ? verifyToken(token) : null;
-  if (!payload || payload.role !== 'admin') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!adminFrom(req)) return unauthorized();
 
-  const clients = await prisma.client.findMany({
-    where: { deletedAt: null },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true, name: true, login: true, unitNumber: true, phone: true,
-      email: true, qrToken: true, qrUsedAt: true, mustSetPassword: true,
-      buildingId: true, createdAt: true,
-    },
-  });
+  const params = req.nextUrl.searchParams;
+  const { page, limit } = parsePaging(params, CLIENT_PAGE_SIZE);
+  const result = await listClients({ query: normalizeQuery(params.get('q')), page, limit });
 
-  return NextResponse.json(clients);
+  return privateJson(result);
 }
 
 export async function POST(req: NextRequest) {
