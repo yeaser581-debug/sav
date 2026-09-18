@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PaginationControls } from '@/components/ui/pagination';
 import { IssueTable, type IssueTableItem } from '@/components/issues/IssueTable';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { onIssueRead } from '@/lib/read-state';
 
 type Counts = { total: number; urgent: number; inProgress: number; resolved: number; unread: number };
@@ -67,6 +67,12 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
   const [severityFilter, setSeverityFilter] = useState(searchParams.get('severity') || 'all');
+  // Set by the dashboard's action tiles; shown as a chip so the shortened list
+  // is never a mystery.
+  const [special, setSpecial] = useState(() => {
+    const value = searchParams.get('filter');
+    return value === 'late' || value === 'unanswered' ? value : null;
+  });
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebouncedValue(search, 300);
@@ -74,7 +80,7 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
-  }, [debouncedSearch, statusFilter, severityFilter]);
+  }, [debouncedSearch, statusFilter, severityFilter, special]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -84,6 +90,7 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
     if (debouncedSearch) params.set('search', debouncedSearch);
     if (statusFilter !== 'all') params.set('status', statusFilter);
     if (severityFilter !== 'all') params.set('severity', severityFilter);
+    if (special) params.set('filter', special);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setRefetching(true);
@@ -104,7 +111,7 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
       });
 
     return () => controller.abort();
-  }, [page, debouncedSearch, statusFilter, severityFilter]);
+  }, [page, debouncedSearch, statusFilter, severityFilter, special]);
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -148,6 +155,18 @@ function InboxListPaneInner({ activeId }: { activeId?: number }) {
             </SelectContent>
           </Select>
         </div>
+
+        {special && (
+          <button
+            type="button"
+            onClick={() => setSpecial(null)}
+            className="flex w-fit items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 py-1 pl-2.5 pr-2 text-[11px] font-semibold text-destructive"
+          >
+            {special === 'late' ? 'En retard sur le délai' : 'Sans réponse depuis 24 h'}
+            <X className="h-3 w-3" />
+            <span className="sr-only">Retirer ce filtre</span>
+          </button>
+        )}
       </div>
 
       <div className={`flex-1 min-h-0 overflow-y-auto ${refetching ? 'opacity-60 transition-opacity' : 'transition-opacity'}`}>

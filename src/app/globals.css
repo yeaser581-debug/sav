@@ -22,6 +22,8 @@
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
+  --color-chart-created: var(--chart-created);
+  --color-chart-resolved: var(--chart-resolved);
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -98,6 +100,14 @@
   --input: #727b8a;
   --ring: #0961bb;
   --radius: 0.5rem;
+  /*
+   * The two dashboard series. Checked with a palette validator against the card:
+   * distinguishable under protanopia, deuteranopia and tritanopia, and both
+   * above 3:1 on this surface. The --chart-1..5 tokens below are status hues and
+   * are not safe as a chart palette - two of them read as grey.
+   */
+  --chart-created: #0961bb;
+  --chart-resolved: #a35a00;
   --chart-1: #0961bb;
   --chart-2: #006d65;
   --chart-3: #786107;
@@ -144,6 +154,8 @@
   --border: #414855;
   --input: #7c8799;
   --ring: #89c3ff;
+  --chart-created: #4a93dd;
+  --chart-resolved: #ba8730;
   --chart-1: #89c3ff;
   --chart-2: #74ddd0;
   --chart-3: #efcd79;

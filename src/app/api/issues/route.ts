@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 import { adminUnreadIds, countAdminUnread } from '@/lib/unread';
 import { LIMITS, checkLengths } from '@/lib/limits';
+import { lateIssueWhere, unansweredOpenIssueIds } from '@/lib/dashboard-data';
 import { readdir, rename, mkdir } from 'fs/promises';
 import path from 'path';
 
@@ -46,6 +47,14 @@ export async function GET(req: NextRequest) {
   if (payload.role === 'admin' && severityParam && severityParam !== 'all' && severityParam in Severity) {
     extraWhere.push({ severity: severityParam as Severity });
   }
+  // The dashboard's action tiles link here: same rules, same numbers.
+  if (payload.role === 'admin' && filterParam === 'late') {
+    extraWhere.push(lateIssueWhere());
+  } else if (payload.role === 'admin' && filterParam === 'unanswered') {
+    const waiting = await unansweredOpenIssueIds();
+    extraWhere.push({ id: { in: waiting.length ? waiting : [-1] } });
+  }
+
   if (payload.role !== 'admin' && filterParam) {
     if (filterParam === 'UNASSIGNED' || filterParam === 'PENDING') {
       extraWhere.push({ status: 'PENDING_AGENT' });
