@@ -11,6 +11,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BulkDeleteBar } from '@/components/admin/BulkDeleteBar';
+import { useRowSelection } from '@/hooks/useRowSelection';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
@@ -184,6 +187,7 @@ export default function AdminAgentsPage() {
     name.split(' ').map(w => w[0]?.toUpperCase()).slice(0, 2).join('');
 
   const visibleAgents = agents.filter(a => !hiddenIds.has(a.id));
+  const selection = useRowSelection(visibleAgents.map(item => item.id));
 
   return (
     <div className="space-y-6 pb-12">
@@ -323,7 +327,19 @@ export default function AdminAgentsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {visibleAgents.map(agent => (
-            <Card key={agent.id} className="bg-card border-border shadow-sm hover:shadow-md transition-shadow group">
+            <Card
+              key={agent.id}
+              className={`bg-card border-border shadow-sm hover:shadow-md transition-shadow group relative ${
+                selection.isSelected(agent.id) ? 'ring-2 ring-primary/40' : ''
+              }`}
+            >
+              <span className="absolute left-3 top-3 z-10">
+                <Checkbox
+                  checked={selection.isSelected(agent.id)}
+                  onChange={() => selection.toggle(agent.id)}
+                  label={`Sélectionner ${agent.name}`}
+                />
+              </span>
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-5">
                   <div className="w-14 h-14 rounded-full bg-accent border-2 border-border flex items-center justify-center">
@@ -463,6 +479,17 @@ export default function AdminAgentsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BulkDeleteBar
+        entity="agents"
+        ids={selection.ids}
+        onClear={selection.clear}
+        onDone={deleted => {
+          setHiddenIds(prev => new Set([...prev, ...deleted]));
+          selection.clear();
+          fetchAgents();
+        }}
+      />
 
       {confirmDialog}
     </div>

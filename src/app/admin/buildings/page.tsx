@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BulkDeleteBar } from '@/components/admin/BulkDeleteBar';
+import { useRowSelection } from '@/hooks/useRowSelection';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
@@ -185,6 +188,7 @@ export default function AdminBuildingsPage() {
   };
 
   const visibleBuildings = buildings.filter(b => !hiddenIds.has(b.id));
+  const selection = useRowSelection(visibleBuildings.map(item => item.id));
 
   return (
     <div className="space-y-6 pb-12">
@@ -317,7 +321,19 @@ export default function AdminBuildingsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {visibleBuildings.map(building => (
-            <Card key={building.id} className="bg-card border-border shadow-sm hover:shadow-md transition-shadow group">
+            <Card
+              key={building.id}
+              className={`bg-card border-border shadow-sm hover:shadow-md transition-shadow group relative ${
+                selection.isSelected(building.id) ? 'ring-2 ring-primary/40' : ''
+              }`}
+            >
+              <span className="absolute left-3 top-3 z-10">
+                <Checkbox
+                  checked={selection.isSelected(building.id)}
+                  onChange={() => selection.toggle(building.id)}
+                  label={`Sélectionner ${building.name}`}
+                />
+              </span>
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-accent border border-border flex items-center justify-center shrink-0 group-hover:bg-accent/70 transition-colors">
@@ -462,6 +478,17 @@ export default function AdminBuildingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BulkDeleteBar
+        entity="buildings"
+        ids={selection.ids}
+        onClear={selection.clear}
+        onDone={deleted => {
+          setHiddenIds(prev => new Set([...prev, ...deleted]));
+          selection.clear();
+          fetchBuildings();
+        }}
+      />
 
       {confirmDialog}
     </div>

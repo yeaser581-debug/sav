@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BulkDeleteBar } from '@/components/admin/BulkDeleteBar';
+import { useRowSelection } from '@/hooks/useRowSelection';
 import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter,
   AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel,
@@ -173,6 +176,7 @@ export default function AdminAreasPage() {
   };
 
   const visibleAreas = areas.filter(a => !hiddenIds.has(a.id));
+  const selection = useRowSelection(visibleAreas.map(item => item.id));
 
   return (
     <div className="space-y-6 pb-12">
@@ -289,7 +293,19 @@ export default function AdminAreasPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {visibleAreas.map(area => (
-            <Card key={area.id} className="bg-card border-border shadow-sm hover:shadow-md transition-shadow group">
+            <Card
+              key={area.id}
+              className={`bg-card border-border shadow-sm hover:shadow-md transition-shadow group relative ${
+                selection.isSelected(area.id) ? 'ring-2 ring-primary/40' : ''
+              }`}
+            >
+              <span className="absolute left-3 top-3 z-10">
+                <Checkbox
+                  checked={selection.isSelected(area.id)}
+                  onChange={() => selection.toggle(area.id)}
+                  label={`Sélectionner ${area.name}`}
+                />
+              </span>
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-accent border border-border flex items-center justify-center shrink-0 group-hover:bg-accent/70 transition-colors">
@@ -404,6 +420,17 @@ export default function AdminAreasPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BulkDeleteBar
+        entity="areas"
+        ids={selection.ids}
+        onClear={selection.clear}
+        onDone={deleted => {
+          setHiddenIds(prev => new Set([...prev, ...deleted]));
+          selection.clear();
+          fetchAreas();
+        }}
+      />
 
       {confirmDialog}
     </div>

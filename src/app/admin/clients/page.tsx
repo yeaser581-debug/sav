@@ -14,6 +14,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PaginationControls } from '@/components/ui/pagination';
 import { showUndoToast } from '@/components/ui/undo-toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BulkDeleteBar } from '@/components/admin/BulkDeleteBar';
+import { useRowSelection } from '@/hooks/useRowSelection';
 import { invalidateJson, useJson } from '@/hooks/useJson';
 import { CLIENT_PAGE_SIZE, SEARCH_MAX_LENGTH, normalizeQuery } from '@/lib/client-search';
 import { cn } from '@/lib/utils';
@@ -28,7 +31,7 @@ type Building = { id: number; name: string };
 
 const EMPTY_FORM = { login: '', password: '', name: '', unitNumber: '', phone: '', email: '', buildingId: '' };
 const FIELD = 'bg-muted border-border text-foreground placeholder:text-muted-foreground';
-const COLUMNS = 'md:grid-cols-[minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_9rem_auto]';
+const COLUMNS = 'md:grid-cols-[1.5rem_minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_9rem_auto]';
 
 function CreateClientForm({ onCreated }: { onCreated: (client: { id: number; label: string }) => void }) {
   const { data: buildings } = useJson<Building[]>('/api/buildings');
@@ -143,16 +146,25 @@ function ClaimsCell({ claims }: { claims: ClientRow['claims'] }) {
   );
 }
 
-function ClientRowItem({ client, onQr, onEdit, onDelete }: {
+function ClientRowItem({ client, onQr, onEdit, onDelete, selected, onSelect }: {
   client: ClientRow;
   onQr: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  selected: boolean;
+  onSelect: () => void;
 }) {
   const label = clientLabel(client);
   return (
-    <li className={cn('relative grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors hover:bg-muted/50', COLUMNS)}>
-      <div className="col-start-1 row-start-1 flex min-w-0 items-center gap-3">
+    <li className={cn(
+      'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors hover:bg-muted/50',
+      COLUMNS,
+      selected && 'bg-accent/40',
+    )}>
+      <span className="relative z-10 col-start-1 row-start-1">
+        <Checkbox checked={selected} onChange={onSelect} label={`Sélectionner ${label}`} />
+      </span>
+      <div className="col-start-2 row-start-1 flex min-w-0 items-center gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
           {initials(label)}
         </span>
@@ -171,20 +183,20 @@ function ClientRowItem({ client, onQr, onEdit, onDelete }: {
         </div>
       </div>
 
-      <div className="relative z-10 col-start-2 row-start-1 flex items-center gap-0.5 justify-self-end md:col-start-5">
+      <div className="relative z-10 col-start-3 row-start-1 flex items-center gap-0.5 justify-self-end md:col-start-6">
         <IconButton icon={QrCode} onClick={onQr} label={`Code QR de ${label}`} />
         <IconButton icon={Pencil} onClick={onEdit} label={`Modifier ${label}`} />
         <IconButton icon={Trash2} onClick={onDelete} variant="destructive" label={`Supprimer ${label}`} />
       </div>
 
-      <div className="col-span-2 row-start-2 flex min-w-0 flex-wrap gap-x-6 gap-y-2 pl-12 md:contents">
-        <span className="min-w-0 text-sm text-foreground md:col-start-2 md:row-start-1 md:truncate">{homeLabel(client)}</span>
-        <span className="flex min-w-0 flex-col text-xs text-muted-foreground md:col-start-3 md:row-start-1">
+      <div className="col-span-3 row-start-2 flex min-w-0 flex-wrap gap-x-6 gap-y-2 pl-12 md:contents">
+        <span className="min-w-0 text-sm text-foreground md:col-start-3 md:row-start-1 md:truncate">{homeLabel(client)}</span>
+        <span className="flex min-w-0 flex-col text-xs text-muted-foreground md:col-start-4 md:row-start-1">
           {client.phone && <span className="truncate font-mono tabular-nums text-foreground">{client.phone}</span>}
           {client.email && <span className="truncate">{client.email}</span>}
           {!client.phone && !client.email && <span>—</span>}
         </span>
-        <span className="md:col-start-4 md:row-start-1"><ClaimsCell claims={client.claims} /></span>
+        <span className="md:col-start-5 md:row-start-1"><ClaimsCell claims={client.claims} /></span>
       </div>
     </li>
   );
@@ -288,6 +300,7 @@ function ClientsDirectory() {
 
   const clients = (data?.clients ?? []).filter(c => !hiddenIds.has(c.id));
   const total = data?.total ?? 0;
+  const selection = useRowSelection(clients.map(c => c.id));
 
   return (
     <div className="space-y-6 pb-12">
@@ -351,6 +364,14 @@ function ClientsDirectory() {
 
       <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
         <div className={cn('hidden gap-x-4 border-b border-border px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground md:grid', COLUMNS)}>
+          <span>
+            <Checkbox
+              checked={selection.allVisible}
+              indeterminate={selection.someVisible}
+              onChange={selection.toggleAllVisible}
+              label="Tout sélectionner sur cette page"
+            />
+          </span>
           <span>Client</span><span>Logement</span><span>Contact</span><span>Réclamations</span><span className="sr-only">Actions</span>
         </div>
 
@@ -384,6 +405,8 @@ function ClientsDirectory() {
                 onQr={() => setQrFor({ id: client.id, label: clientLabel(client) })}
                 onEdit={() => setEditing(client)}
                 onDelete={() => askRemove(client)}
+                selected={selection.isSelected(client.id)}
+                onSelect={() => selection.toggle(client.id)}
               />
             ))}
           </ul>
@@ -400,6 +423,17 @@ function ClientsDirectory() {
           </div>
         )}
       </section>
+
+      <BulkDeleteBar
+        entity="clients"
+        ids={selection.ids}
+        onClear={selection.clear}
+        onDone={deleted => {
+          setHiddenIds(prev => new Set([...prev, ...deleted]));
+          selection.clear();
+          refresh();
+        }}
+      />
 
       <ClientQrDialog
         clientId={qrFor?.id ?? null}
