@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 const PUBLIC_ROUTES = [
   '/login',
   '/api/auth/login',
+  '/api/auth/sign-in',
   '/api/auth/client-login',
   '/api/auth/logout',
   '/api/auth/qr',
