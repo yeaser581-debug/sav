@@ -3,10 +3,10 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Home, Loader2, Pencil, Plus, QrCode, Search, Trash2, Users, X } from 'lucide-react';
+import { FileSpreadsheet, Home, Loader2, Pencil, Plus, QrCode, Search, Trash2, Users, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { IconButton } from '@/components/ui/icon-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -306,6 +306,10 @@ function ClientsDirectory() {
                 : `${plural(total, 'résident enregistré', 'résidents enregistrés')}`}
           </p>
         </div>
+        <div className="flex flex-wrap gap-2">
+        <Link href="/admin/clients/import" className={buttonVariants({ variant: 'outline', className: 'gap-2' })}>
+          <FileSpreadsheet className="h-4 w-4" /> Importer un fichier
+        </Link>
         <Button
           onClick={() => setShowForm(s => !s)}
           variant={showForm ? 'outline' : 'default'}
@@ -313,6 +317,7 @@ function ClientsDirectory() {
         >
           {showForm ? <><X className="h-4 w-4" /> Annuler</> : <><Plus className="h-4 w-4" /> Nouveau client</>}
         </Button>
+        </div>
       </div>
 
       {showForm && (

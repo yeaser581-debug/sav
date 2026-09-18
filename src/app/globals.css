@@ -174,3 +174,11 @@
     @apply font-sans;
   }
 }
+
+@media print {
+  /* The admin chrome is not part of the handout. */
+  aside, nav, header, footer { display: none !important; }
+  main { margin: 0 !important; padding: 0 !important; }
+  body { background: #fff; }
+  @page { margin: 12mm; }
+}

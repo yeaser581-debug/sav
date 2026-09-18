@@ -7,7 +7,9 @@ import { authedRequest } from '../helpers/request';
 
 beforeEach(resetDb);
 
-const NOW = new Date('2026-09-17T12:00:00Z');
+// Anchored to the real clock: the API routes under test use theirs, and a
+// fixed date drifts out of step with them overnight.
+const NOW = new Date();
 const hoursAgo = (h: number) => new Date(NOW.getTime() - h * 3_600_000);
 const daysAgo = (d: number) => hoursAgo(d * 24);
 

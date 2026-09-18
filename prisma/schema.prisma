@@ -40,6 +40,7 @@ model Area {
 model Building {
   id        Int       @id @default(autoincrement())
   name      String
+  tranche   String?
   address   String?
   areaId    Int?
   area      Area?     @relation(fields: [areaId], references: [id])
@@ -53,6 +54,16 @@ model Client {
   email           String?
   phone           String?
   unitNumber      String?
+  // Full code from the developer's sheet, e.g. GZ-T1-3-A-A-21. Identifies the
+  // unit across imports and is the resident's login.
+  unitCode        String?   @unique
+  floor           String?
+  unitType        String?
+  standing        String?
+  addressLine     String?
+  city            String?
+  country         String?
+  phone2          String?
   login           String    @unique
   passwordHash    String
   qrToken         String    @unique
